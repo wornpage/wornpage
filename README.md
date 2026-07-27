@@ -1,6 +1,6 @@
 # Wornpage
 
-> Svelte 5 component library + development toolkit.
+> Component library + dev toolkit. **The tools are framework-agnostic.**
 > **This monorepo is a mirror.** Individual packages have their own repos.
 > Import them directly: `bun add @wornpage/sidebar`
 
