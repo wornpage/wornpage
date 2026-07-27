@@ -10,7 +10,7 @@
 git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
-bun test          # 60 tests across all packages
+bun test          # 82 tests across all packages and tools
 ```
 
 ## Quick start — using in your app
@@ -35,7 +35,8 @@ bun add @wornpage/toast
 | `@wornpage/undo` | [wornpage/undo](https://github.com/wornpage/undo) | Undo/redo stack |
 | `@wornpage/workflow` | [wornpage/workflow](https://github.com/wornpage/workflow) | Pack state machine — blockers, next-action, energy |
 | `@wornpage/receipt` | [wornpage/receipt](https://github.com/wornpage/receipt) | Action receipt card with undo support |
-| `@wornpage/sync` | [wornpage/sync](https://github.com/wornpage/sync) | Sync code generation and hashing |
+| `@wornpage/sync` | [wornpage/sync](https://github.com/wornpage/sync) | Sync code generation, hashing, and QR encoding |
+| `@wornpage/scenarios` | [wornpage/scenarios](https://github.com/wornpage/scenarios) | Shared scenario definitions and validators |
 | `@wornpage/cli` | [wornpage/cli](https://github.com/wornpage/cli) | Scaffold + ship new components |
 
 ### Tools (`tools/` — monorepo-native)
@@ -50,6 +51,11 @@ bun add @wornpage/toast
 
 - **Standalone repos are canonical.** Each `@wornpage/*` package lives in its own repo.
 - **This monorepo mirrors them.** `bun run sync` pulls the latest from each standalone repo.
+- **`packages/` is generated — never hand-edit it.** A change made here reaches
+  nobody, because nothing installs from this repo. `bun run sync` overwrites it.
+- **`bun run sync --check` reports drift** without changing anything, and exits
+  non-zero when the mirror no longer matches canonical. Wire it into CI: a
+  mirror nobody verifies goes stale silently.
 - **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
 - **Tests run across everything.** `bun test` validates all packages and tools together.
 

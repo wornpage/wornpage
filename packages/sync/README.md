@@ -32,6 +32,21 @@ normalizeSyncCode('too-short');           // null
 | `generateSyncCode` | `() => string` | 16 crypto-random chars as `XXXX-XXXX-XXXX-XXXX` |
 | `syncClientId` | `(code: string) => Promise<string>` | SHA-256 of `projects-web-demo-sync:<code>`, as `sync-<base64url>` |
 | `normalizeSyncCode` | `(raw: string) => string \| null` | Uppercase, strip whitespace, re-insert dashes; `null` if not 16 chars |
+| `syncQrSvg` | `(value: string) => string` | QR code for any string, as an inline SVG |
+| `syncQR` | `(code: string, baseUrl: string) => string` | QR for `<baseUrl>?sync=<code>`, as an inline SVG |
+
+## QR codes
+
+The QR encoder is dependency-free and returns SVG markup, so it can be
+inlined directly rather than loaded as an image:
+
+```svelte
+{@html syncQR(code, location.origin)}
+```
+
+The returned `<svg>` carries a `viewBox` and no intrinsic width, so it fills
+its container — **give that container a size**, or the QR collapses to zero
+width and silently renders as nothing.
 
 ## Alphabet
 

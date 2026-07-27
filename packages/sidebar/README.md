@@ -115,3 +115,8 @@ The component uses CSS custom properties. Wrap in a container with `.worn-sideba
 ## License
 
 MIT
+
+---
+
+**Part of [Wornpage](https://github.com/wornpage/wornpage)** — a Svelte 5 component library.
+Browse all packages in the [monorepo](https://github.com/wornpage/wornpage).

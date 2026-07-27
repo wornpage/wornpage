@@ -49,8 +49,12 @@
       "name": "@wornpage/receipt",
       "version": "0.1.0",
       "peerDependencies": {
-        "svelte": "^5.0.0",
+        "svelte": "^5.56.8",
       },
+    },
+    "packages/scenarios": {
+      "name": "@wornpage/scenarios",
+      "version": "0.1.0",
     },
     "packages/sidebar": {
       "name": "@wornpage/sidebar",
@@ -328,6 +332,8 @@
     "@wornpage/cmdk": ["@wornpage/cmdk@workspace:packages/cmdk"],
 
     "@wornpage/receipt": ["@wornpage/receipt@workspace:packages/receipt"],
+
+    "@wornpage/scenarios": ["@wornpage/scenarios@workspace:packages/scenarios"],
 
     "@wornpage/sidebar": ["@wornpage/sidebar@workspace:packages/sidebar"],
 
