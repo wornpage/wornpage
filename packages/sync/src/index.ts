@@ -1,3 +1,5 @@
+import { syncQrSvg } from './qr.js';
+
 /**
  * Generate a random sync code in the format XXXX-XXXX-XXXX-XXXX.
  * Uses crypto.randomUUID() and maps to an alphanumeric code.
@@ -39,33 +41,7 @@ export async function syncClientId(syncCode: string): Promise<string> {
  * Returns the normalized code or null if invalid.
  */
 
-/**
- * Generate a QR code URL for a sync link using the QR Server API.
- * Returns a URL string suitable for an <img src> attribute.
- * Free, no API key needed. Falls back to a text-based SVG on error.
- *
- * @param syncCode - The sync code to encode
- * @param baseUrl - The base URL of the app (e.g., "https://projectsdemo.org")
- * @param size - QR code size in pixels (default 200)
- */
-export function syncQRUrl(syncCode: string, baseUrl: string, size: number = 200): string {
-  const url = baseUrl + "?sync=" + encodeURIComponent(syncCode);
-  return "https://api.qrserver.com/v1/create-qr-code/?size=" + size + "x" + size + "&data=" + encodeURIComponent(url);
-}
 
-/**
- * Offline SVG fallback — a text-based QR placeholder that works without network.
- * Shows the code and URL as readable text in a sized SVG frame.
- */
-export function syncTextQR(syncCode: string, baseUrl: string, size: number = 200): string {
-  const url = baseUrl + "?sync=" + encodeURIComponent(syncCode);
-  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '">' +
-    '<rect width="' + size + '" height="' + size + '" fill="white"/>' +
-    '<text x="' + (size/2) + '" y="' + (size/2) + '" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="12" fill="black">' + syncCode + '</text>' +
-    '<text x="' + (size/2) + '" y="' + (size/2 + 18) + '" text-anchor="middle" font-size="8" fill="gray">Scan to open</text>' +
-    '</svg>';
-  return "data:image/svg+xml," + encodeURIComponent(svg);
-}
 export function normalizeSyncCode(raw: string): string | null {
   const cleaned = raw.toUpperCase().replace(/\s/g, '');
   // Accept with or without dashes — insert dashes if missing
@@ -76,4 +52,10 @@ export function normalizeSyncCode(raw: string): string | null {
     return null;
   }
   return normalized;
+}
+
+export { syncQrSvg } from './qr.js';
+
+export function syncQR(syncCode: string, baseUrl: string): string {
+  return syncQrSvg(baseUrl + '?sync=' + encodeURIComponent(syncCode));
 }
