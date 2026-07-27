@@ -4,9 +4,21 @@
   "description": "APCA perceptual contrast calculator — tiny, MIT-licensed, zero dependencies",
   "type": "module",
   "main": "./src/index.ts",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "test": "bun test" },
-  "files": ["src/"],
-  "keywords": ["apca", "contrast", "accessibility", "wcag3"],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "files": [
+    "src/",
+    "README.md"
+  ],
+  "keywords": [
+    "apca",
+    "contrast",
+    "accessibility",
+    "wcag3"
+  ],
   "license": "MIT"
 }
