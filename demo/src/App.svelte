@@ -31,7 +31,7 @@
     kind: 'section' as const
   }));
 
-  let cmdkOpen = $state(false);
+  let cmdkRef = $state<unknown>(null);
   const cmdkItems: CmdkItem[] = sidebarItems.map(i => ({ id: i.id, label: i.label, onSelect: () => onnavigate(i.href || "") }));
 
   let receiptVisible = $state(false);
@@ -90,7 +90,7 @@
       <p>Fuzzy-search palette using native dialog. 11 tests. Try it:</p>
       <code>bun add @wornpage/cmdk</code>
       <div class="demo-preview">
-        <button class="demo-btn" onclick={() => cmdkOpen = true}>Open palette</button>
+        <button class="demo-btn" onclick={() => cmdkRef?.open()}>Open palette</button>
         {#if cmdkOpen}
           <div class="cmdk-overlay" role="dialog" aria-label="Command palette" onclick={() => cmdkOpen = false} onkeydown={(e) => { if (e.key === "Escape") cmdkOpen = false }}>
             <div class="cmdk-wrapper" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
