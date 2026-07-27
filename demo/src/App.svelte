@@ -32,6 +32,7 @@
   }));
 
   let cmdkRef = $state<unknown>(null);
+  function closeCmdk() { /* dialog manages itself */ }
   const cmdkItems: CmdkItem[] = sidebarItems.map(i => ({ id: i.id, label: i.label, onSelect: () => onnavigate(i.href || "") }));
 
   let receiptVisible = $state(false);
@@ -59,7 +60,7 @@
 
   function onnavigate(href: string) {
     activeSection = href.replace('#', '') || 'sidebar';
-    cmdkOpen = false;
+
   }
 </script>
 
@@ -73,7 +74,7 @@
       <h1>Wornpage</h1>
       <p>Svelte 5 component library — 9 packages, 66 tests, 1 CLI</p>
       <div class="header-actions">
-        <button class="demo-btn" onclick={() => cmdkOpen = !cmdkOpen}>Search</button>
+        <button class="demo-btn" onclick={() => cmdkRef?.open()}>Search</button>
         <Theme bind:theme={currentTheme} />
         <a href="https://github.com/wornpage/wornpage" class="demo-btn">GitHub</a>
       </div>
@@ -91,13 +92,7 @@
       <code>bun add @wornpage/cmdk</code>
       <div class="demo-preview">
         <button class="demo-btn" onclick={() => cmdkRef?.open()}>Open palette</button>
-        {#if cmdkOpen}
-          <div class="cmdk-overlay" role="dialog" aria-label="Command palette" onclick={() => cmdkOpen = false} onkeydown={(e) => { if (e.key === "Escape") cmdkOpen = false }}>
-            <div class="cmdk-wrapper" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
-              <Cmdk items={cmdkItems} onclose={() => cmdkOpen = false} />
-            </div>
-          </div>
-        {/if}
+        <Cmdk items={cmdkItems} bind:this={cmdkRef} />
       </div>
     </section>
 
