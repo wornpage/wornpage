@@ -5,6 +5,17 @@
   import { Theme } from '@wornpage/theme';
   import { WornReceipt } from '@wornpage/receipt';
   import { Toast } from '@wornpage/toast';
+
+  function generateSyncCodeLocal(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    let code = '';
+    for (let i = 0; i < 16; i++) {
+      code += chars[bytes[i] % chars.length];
+      if (i % 4 === 3 && i < 15) code += '-';
+    }
+    return code;
+  }
   
   import { filterPacks, orderPacks, buildStandupText, primaryCommand, hasBlocker } from '@wornpage/workflow';
   import type { DemoPack } from '@wornpage/workflow';
@@ -32,7 +43,7 @@
   }));
 
   let cmdkOpen = $state(false);
-  const cmdkItems: CmdkItem[] = sidebarItems.map(i => ({ id: i.id, label: i.label, href: i.href }));
+  const cmdkItems: CmdkItem[] = sidebarItems.map(i => ({ id: i.id, label: i.label, onSelect: () => onnavigate(i.href || "") }));
 
   let receiptVisible = $state(false);
   let toasts = $state<Array<{ id: number; message: string; kind: string }>>([]);
@@ -74,7 +85,7 @@
       <p>Svelte 5 component library — 9 packages, 66 tests, 1 CLI</p>
       <div class="header-actions">
         <button class="demo-btn" onclick={() => cmdkOpen = !cmdkOpen}>Search</button>
-        <Theme {currentTheme} onchange={(t: string) => currentTheme = t} />
+        <Theme bind:theme={currentTheme} />
         <a href="https://github.com/wornpage/wornpage" class="demo-btn">GitHub</a>
       </div>
     </header>
@@ -94,7 +105,7 @@
         {#if cmdkOpen}
           <div class="cmdk-overlay" role="dialog" aria-label="Command palette" onclick={() => cmdkOpen = false} onkeydown={(e) => { if (e.key === "Escape") cmdkOpen = false }}>
             <div class="cmdk-wrapper" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
-              <Cmdk items={cmdkItems} onselect={(id: string) => { const item = cmdkItems.find(i => i.id === id); if (item?.href) onnavigate(item.href); }} onclose={() => cmdkOpen = false} />
+              <Cmdk items={cmdkItems} onclose={() => cmdkOpen = false} />
             </div>
           </div>
         {/if}
@@ -233,4 +244,4 @@
   .sync-code-display { font-family: monospace; font-size: 18px; letter-spacing: 2px; margin: 8px 0; }
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--cockpit-border); text-align: center; font-size: 13px; color: var(--cockpit-text-muted); }
   footer a { color: var(--cockpit-accent); text-decoration: none; }
-</style>
+</style> 
