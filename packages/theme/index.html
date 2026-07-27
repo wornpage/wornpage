@@ -1,12 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><title>@wornpage/theme Demo</title>
-<style>body{font-family:system-ui;margin:20px}.demo-theme-bg{background:var(--wrn-theme-btn-bg,transparent);}</style>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>@wornpage/theme Demo</title>
+<style>
+  /* The package ships no CSS — it only sets data-theme on <html>. These are
+     the rules a consuming app supplies. Without them the buttons still work,
+     data-theme still changes, and nothing on screen moves — which is exactly
+     how this demo looked before. Palette matches the wornpage projects demo. */
+  :root,
+  [data-theme="light"] {
+    --bg: #f5f0e8; --surface: #fdfbf7; --text: #21322b;
+    --muted: #506058; --border: #e2ddd5; --link: #0f766e; --accent: #0f766e;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1714; --surface: #18241f; --text: #f7fffc;
+    --muted: #b0bcb4; --border: #3a4d45; --link: #7ddac3; --accent: #469784;
+  }
+  [data-theme="forest"] {
+    --bg: #1c251a; --surface: #263226; --text: #e8f2e0;
+    --muted: #b6c2b8; --border: #3f523b; --link: #96cb86; --accent: #5a984a;
+  }
+  [data-theme="ocean"] {
+    --bg: #0f1d2c; --surface: #182c42; --text: #e6eff7;
+    --muted: #acc0d1; --border: #2f4a65; --link: #93c2e3; --accent: #3f85c5;
+  }
+  [data-theme="sepia"] {
+    --bg: #2d241a; --surface: #3c3226; --text: #efe0cc;
+    --muted: #d0bca9; --border: #504234; --link: #e3b886; --accent: #b57e3e;
+  }
+  /* Seasonal themes layer an accent over the dark base. */
+  [data-theme="halloween"] {
+    --bg: #0f1714; --surface: #18241f; --text: #f7fffc;
+    --muted: #b0bcb4; --border: #3a4d45; --link: #fb923c; --accent: #ea580c;
+  }
+  [data-theme="winter"] {
+    --bg: #0f1714; --surface: #18241f; --text: #f7fffc;
+    --muted: #b0bcb4; --border: #3a4d45; --link: #93c5fd; --accent: #3b82f6;
+  }
+  [data-theme="holiday"] {
+    --bg: #0f1714; --surface: #18241f; --text: #f7fffc;
+    --muted: #b0bcb4; --border: #3a4d45; --link: #f9a8d4; --accent: #ec3b77;
+  }
+
+  body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 160ms ease, color 160ms ease;
+  }
+  main { max-width: 640px; margin: 0 auto; }
+  h2 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
+  .lede { color: var(--muted); margin: 0 0 20px; font-size: 15px; }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 20px;
+  }
+  .panel h3 { margin: 0 0 8px; font-size: 18px; line-height: 1.3; }
+  .panel p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+  .panel a { color: var(--link); }
+  .pill {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+  }
+  .swatches { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+  .sw {
+    width: 46px; height: 46px; border-radius: 10px;
+    border: 1px solid var(--border);
+    display: grid; place-items: end center;
+    font-size: 9px; color: var(--muted); padding-bottom: 2px;
+  }
+  .sw-bg { background: var(--bg); }
+  .sw-surface { background: var(--surface); }
+  .sw-accent { background: var(--accent); }
+  .sw-link { background: var(--link); }
+  .sw-border { background: var(--border); }
+  code { color: var(--link); }
+  @media (prefers-reduced-motion: reduce) { body { transition: none; } }
+</style>
 </head>
 <body>
-<h2>@wornpage/theme</h2>
-<p>Click a theme button — persists to localStorage. Each theme defines CSS custom properties via <code>[data-theme="..."]</code> selectors.</p>
-<worn-theme id="theme-el"></worn-theme>
+<main>
+  <h2>@wornpage/theme</h2>
+  <p class="lede">Pick a theme — it persists to localStorage and follows your OS while set to System.</p>
+
+  <worn-theme id="theme-el"></worn-theme>
+
+  <div class="panel">
+    <h3>Live preview</h3>
+    <p>
+      This panel reads only CSS custom properties, so it restyles itself when
+      <code>data-theme</code> changes. The package sets that attribute; the
+      rules that give each theme its colours live in this page's
+      <code>index.html</code>.
+    </p>
+    <span class="pill">Accent</span>
+    <a href="#preview">A link</a>
+    <div class="swatches">
+      <div class="sw sw-bg">bg</div>
+      <div class="sw sw-surface">surf</div>
+      <div class="sw sw-accent">acc</div>
+      <div class="sw sw-link">link</div>
+      <div class="sw sw-border">bord</div>
+    </div>
+  </div>
+</main>
 
 <script type="module" src="./dist/worn-theme.js"></script>
 </body>

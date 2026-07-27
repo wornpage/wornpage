@@ -1,77 +1,64 @@
 # Wornpage
 
 > Svelte 5 component library + development toolkit.
-> One repo. One `bun install`. All the pieces.
+> **This monorepo is a mirror.** Individual packages have their own repos.
+> Import them directly: `bun add @wornpage/sidebar`
 
-## What's inside
-
-### Components (`packages/`)
-
-| Package | Description |
-|---|---|
-| `@wornpage/sidebar` | Collapsible sidebar with groups, search, favorites, drag-reorder, keyboard nav |
-| `@wornpage/cmdk` | Command palette — fuzzy search, keyboard-first |
-| `@wornpage/toast` | Toast notification web component |
-| `@wornpage/theme` | Theme switcher with 8 palettes |
-| `@wornpage/undo` | Undo/redo stack |
-| `@wornpage/workflow` | Pack state machine — blockers, next-action, energy |
-| `@wornpage/receipt` | Action receipt card with undo support |
-| `@wornpage/sync` | Sync code generation and hashing |
-| `@wornpage/cli` | Scaffold + ship new components |
-
-### Tools (`tools/`)
-
-| Tool | Description |
-|---|---|
-| `apca-lc` | APCA perceptual contrast calculator (MIT license) |
-| `public-audit` | Static asset deploy-safety linter |
-| `find-unused-css` | Scanner that maps CSS selectors to source files |
-
-## Quick start
+## Quick start — browsing
 
 ```bash
 git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
-bun test
+bun test          # 60 tests across all packages
 ```
 
-## Create a new component
+## Quick start — using in your app
 
 ```bash
-bun run new my-component
-cd packages/my-component
-# Edit src/WornMyComponent.svelte
-bun run --filter @wornpage/my-component test
+# Import from standalone repos (canonical source):
+bun add @wornpage/sidebar    # or: github:wornpage/sidebar
+bun add @wornpage/cmdk
+bun add @wornpage/toast
 ```
 
-## Ship a component
+## What's inside
 
-```bash
-cd packages/my-component
-bunx wornpage ship
-```
+### Components (`packages/` — mirrored from standalone repos)
 
-## Using in your app
+| Package | Standalone repo | Description |
+|---|---|---|
+| `@wornpage/sidebar` | [wornpage/sidebar](https://github.com/wornpage/sidebar) | Collapsible sidebar with groups, search, favorites, keyboard nav |
+| `@wornpage/cmdk` | [wornpage/cmdk](https://github.com/wornpage/cmdk) | Command palette — fuzzy search, keyboard-first |
+| `@wornpage/toast` | [wornpage/toast](https://github.com/wornpage/toast) | Toast notification web component |
+| `@wornpage/theme` | [wornpage/theme](https://github.com/wornpage/theme) | Theme switcher with 8 palettes |
+| `@wornpage/undo` | [wornpage/undo](https://github.com/wornpage/undo) | Undo/redo stack |
+| `@wornpage/workflow` | [wornpage/workflow](https://github.com/wornpage/workflow) | Pack state machine — blockers, next-action, energy |
+| `@wornpage/receipt` | [wornpage/receipt](https://github.com/wornpage/receipt) | Action receipt card with undo support |
+| `@wornpage/sync` | [wornpage/sync](https://github.com/wornpage/sync) | Sync code generation and hashing |
+| `@wornpage/cli` | [wornpage/cli](https://github.com/wornpage/cli) | Scaffold + ship new components |
 
-Each package is also published to npm individually:
+### Tools (`tools/` — monorepo-native)
 
-```bash
-bun add @wornpage/sidebar
-```
-
-Or use the monorepo directly with workspaces.
+| Tool | Description |
+|---|---|
+| `apca-lc` | APCA perceptual contrast calculator (MIT license, zero deps) |
+| `public-audit` | Static asset deploy-safety linter |
+| `find-unused-css` | Scanner that maps CSS selectors to source files |
 
 ## Architecture
 
-Every component follows the same pattern:
-- **`src/Component.svelte`** — the Svelte 5 component
-- **`src/index.ts`** — barrel export
-- **`tests/test.ts`** — bun tests
-- **`dist/`** — built output (committed, for CDN/git-based installs)
+- **Standalone repos are canonical.** Each `@wornpage/*` package lives in its own repo.
+- **This monorepo mirrors them.** `bun run sync` pulls the latest from each standalone repo.
+- **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
+- **Tests run across everything.** `bun test` validates all packages and tools together.
 
-Component packages use `--cockpit-*` CSS custom properties for theming.
-Web components register as custom elements (e.g. `<worn-sidebar>`).
+## Contributing
+
+1. Find the package you want to change in the table above
+2. Clone its standalone repo
+3. Make your changes, run `bun test`, submit a PR there
+4. The monorepo will pick up your changes on the next sync
 
 ## License
 

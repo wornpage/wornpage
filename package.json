@@ -11,7 +11,8 @@
     "test": "bun test --coverage",
     "lint": "bun run --filter '*' lint",
     "clean": "rm -rf packages/*/dist tools/*/dist packages/*/node_modules tools/*/node_modules",
-    "new": "bun run packages/cli/src/index.ts new"
+    "new": "bun run packages/cli/src/index.ts new",
+    "sync": "bun run scripts/sync.ts"
   },
   "devDependencies": {
     "bun-types": "latest",
