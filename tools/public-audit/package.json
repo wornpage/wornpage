@@ -1,0 +1,13 @@
+{
+  "name": "public-audit",
+  "version": "0.1.0",
+  "description": "Static asset deploy-safety linter — file budgets, forbidden patterns, allowlists",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": { "public-audit": "./src/cli.ts" },
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "bun test" },
+  "files": ["src/"],
+  "keywords": ["audit", "deploy", "security", "assets", "linter"],
+  "license": "MIT"
+}

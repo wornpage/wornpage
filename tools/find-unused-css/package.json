@@ -1,0 +1,13 @@
+{
+  "name": "find-unused-css",
+  "version": "0.1.0",
+  "description": "Scanner that maps CSS selectors to source files — find dead classes fast",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": { "find-unused-css": "./src/index.ts" },
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "bun test" },
+  "files": ["src/"],
+  "keywords": ["css", "unused", "dead-code", "purge"],
+  "license": "MIT"
+}
