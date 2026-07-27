@@ -4,18 +4,7 @@
   import type { CmdkItem } from '@wornpage/cmdk';
   import { Theme } from '@wornpage/theme';
   import { WornReceipt } from '@wornpage/receipt';
-  import { Toast } from '@wornpage/toast';
-
-  function generateSyncCodeLocal(): string {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    const bytes = crypto.getRandomValues(new Uint8Array(16));
-    let code = '';
-    for (let i = 0; i < 16; i++) {
-      code += chars[bytes[i] % chars.length];
-      if (i % 4 === 3 && i < 15) code += '-';
-    }
-    return code;
-  }
+  
   
   import { filterPacks, orderPacks, buildStandupText, primaryCommand, hasBlocker } from '@wornpage/workflow';
   import type { DemoPack } from '@wornpage/workflow';
@@ -185,7 +174,7 @@
       <code>bun add @wornpage/sync</code>
       <div class="demo-preview">
         <button class="demo-btn" onclick={() => syncDemoCode = generateSyncCodeLocal()}>Generate code</button>
-        {#if syncDemoCode}
+        {#if syncDemoCode}`n          <div class="demo-qr">{@html syncQR(syncDemoCode, window.location.origin)}</div>
           <p class="sync-code-display">{syncDemoCode}</p>
         {/if}
       </div>
