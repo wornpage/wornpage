@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test';
-import { generateSyncCode, normalizeSyncCode, syncClientId } from '../src/index.ts';
+import { generateSyncCode, normalizeSyncCode, syncClientId, syncQRUrl, syncTextQR } from '../src/index.ts';
 
 describe('generateSyncCode', () => {
   it('produces a code in XXXX-XXXX-XXXX-XXXX format', () => {
@@ -54,4 +54,31 @@ describe('syncClientId', () => {
     const b = await syncClientId('CODE-BBBB-BBBB-BBBB');
     expect(a).not.toBe(b);
   });
+
+describe("syncQRUrl", () => {
+  it("returns a qrserver URL with the sync code", () => {
+    const url = syncQRUrl("ABCD-EFGH-JKLM-NPQR", "https://example.com");
+    expect(url).toContain("api.qrserver.com");
+    expect(url).toContain("ABCD-EFGH-JKLM-NPQR");
+    expect(decodeURIComponent(url)).toContain('https://example.com');
+  });
+
+  it("accepts a custom size", () => {
+    const url = syncQRUrl("TEST-CODE-0000-0000", "https://x.com", 400);
+    expect(url).toContain("400x400");
+  });
+});
+
+describe("syncTextQR", () => {
+  it("returns a data URI SVG", () => {
+    const svg = syncTextQR("ABCD-EFGH-JKLM-NPQR", "https://example.com");
+    expect(svg).toContain("data:image/svg+xml");
+    expect(decodeURIComponent(svg)).toContain('ABCD-EFGH-JKLM-NPQR');
+  });
+
+  it("includes a scannable message", () => {
+    const svg = syncTextQR("TEST-CODE", "https://x.com");
+    expect(decodeURIComponent(svg)).toContain('Scan to open');
+  });
+});
 });
