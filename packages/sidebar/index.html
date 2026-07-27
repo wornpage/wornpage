@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>worn-sidebar demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f5f0e8; color: #21322b; }
+  .app-shell { display: grid; grid-template-columns: auto 1fr; min-height: 100vh; }
+  .demo-sidebar { height: 100dvh; overflow-y: auto; background: var(--worn-sidebar-surface, #fdfbf7); border-right: 1px solid var(--worn-sidebar-border, #e2ddd5); }
+  .main { padding: 32px; max-width: 720px; }
+  .main h1 { font-size: 24px; margin-bottom: 8px; }
+  .main p { color: #506058; line-height: 1.5; margin-bottom: 16px; }
+  .main pre { background: #eaf4f0; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
+  code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 13px; }
+  .status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: #d7efe7; color: #0f766e; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block; }
+  .demo-box { background: #fdfbf7; border: 1px solid #e2ddd5; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .demo-box h3 { font-size: 14px; margin-bottom: 8px; color: #21322b; }
+  .demo-box .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .demo-box button { padding: 8px 16px; border: 1px solid #e2ddd5; border-radius: 999px; background: #fdfbf7; color: #21322b; cursor: pointer; font-size: 13px; transition: all 0.15s; }
+  .demo-box button:hover { background: #eaf4f0; border-color: #0d9488; }
+  .demo-box .event-log { font-size: 12px; color: #506058; margin-top: 8px; padding: 8px; background: #f5f0e8; border-radius: 6px; max-height: 100px; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="demo-sidebar">
+    <worn-sidebar id="sidebar-demo"></worn-sidebar>
+  </aside>
+
+  <main class="main">
+    <div class="status"><span class="status-dot"></span> @wornpage/sidebar — web component demo</div>
+    <h1>Standalone web component</h1>
+    <p>This page loads <code>&lt;worn-sidebar&gt;</code> from a single JavaScript file. No bundler, no framework, no npm install.</p>
+
+    <div class="demo-box">
+      <h3>🔧 Control panel</h3>
+      <div class="row">
+        <button id="toggle-collapse">Toggle collapse</button>
+        <button id="load-packs">Add pack items</button>
+        <button id="clear-items">Reset to default</button>
+      </div>
+      <div class="event-log" id="event-log">Events appear here…</div>
+    </div>
+
+    <div class="demo-box">
+      <h3>💻 How to use</h3>
+      <pre><code>&lt;script type="module"&gt;
+  import '@wornpage/sidebar';  // or load dist/worn-sidebar.js
+
+  const sb = document.querySelector('worn-sidebar');
+  sb.items = [{ id: 'home', href: '/', label: 'Home', icon: '&lt;path d="…"/&gt;' }];
+  sb.addEventListener('worn-nav', e =&gt; {
+    console.log('Navigate to', e.detail.href);
+  });
+&lt;/script&gt;</code></pre>
+    </div>
+
+    <div class="demo-box">
+      <h3>📦 Bundle size</h3>
+      <p>110 KB (31 KB gzipped) — self-contained, zero dependencies. Includes the Svelte runtime compiled into the output.</p>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import './dist/worn-sidebar.js';
+
+  const sb = document.getElementById('sidebar-demo');
+  const log = document.getElementById('event-log');
+
+  function logEvent(msg) {
+    const entry = document.createElement('div');
+    entry.textContent = `▸ ${msg}`;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // Default items
+  const DEFAULT_ITEMS = [
+    { id: 'home', href: '#home', label: 'Home', icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>', kind: 'page' },
+    { id: 'dashboard', href: '#dashboard', label: 'Dashboard', icon: '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>', kind: 'page' },
+    { id: 'review', href: '#review', label: 'Review', icon: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>', badge: 3, badgeVariant: 'danger', kind: 'section', attention: true },
+    { id: 'next', href: '#next', label: 'Next', icon: '<polyline points="9 18 15 12 9 6"/>', kind: 'action', relatedTo: ['review'] },
+    { id: 'work', href: '#work', label: 'Work', icon: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>', kind: 'section' },
+    { id: 'more', label: 'Tools', kind: 'section', children: [
+      { id: 'search', href: '#search', label: 'Search', icon: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>' },
+      { id: 'settings', href: '#settings', label: 'Settings', icon: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>' },
+    ]},
+  ];
+
+  const PACK_ITEMS = [
+    { id: 'pack-1', href: '#pack-1', label: 'Lighting checklist', icon: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>', badge: 1 },
+    { id: 'pack-2', href: '#pack-2', label: 'Onboarding flow', icon: '<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.28-3.16 3 3 0 0 1-.34-5.36 3 3 0 0 1 1.72-7.22A2.5 2.5 0 0 1 9.5 2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.28-3.16 3 3 0 0 0 .34-5.36 3 3 0 0 0-1.72-7.22A2.5 2.5 0 0 0 14.5 2z"/>' },
+    { id: 'pack-3', href: '#pack-3', label: 'Model evaluations', icon: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>' },
+  ];
+
+  sb.items = DEFAULT_ITEMS;
+
+  document.getElementById('toggle-collapse').addEventListener('click', () => {
+    sb.collapsed = !sb.collapsed;
+    logEvent(`Collapsed: ${sb.collapsed}`);
+  });
+
+  document.getElementById('load-packs').addEventListener('click', () => {
+    sb.items = [...PACK_ITEMS, ...DEFAULT_ITEMS];
+    logEvent('Loaded pack items');
+  });
+
+  document.getElementById('clear-items').addEventListener('click', () => {
+    sb.items = DEFAULT_ITEMS;
+    logEvent('Reset to default');
+  });
+
+  sb.addEventListener('worn-nav', (e) => {
+    logEvent(`Navigate to: ${e.detail.href}`);
+  });
+
+  sb.addEventListener('worn-collapse', (e) => {
+    logEvent(`Collapse: ${e.detail.collapsed}`);
+  });
+
+  logEvent('Sidebar mounted');
+</script>
+</body>
+</html>

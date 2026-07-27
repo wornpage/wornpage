@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@wornpage/sync — Demo</title>
+  <style>
+    body { font-family: system-ui; max-width: 480px; margin: 40px auto; padding: 0 20px; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+    .result { background: #e8f5e9; padding: 12px; border-radius: 8px; margin: 12px 0; word-break: break-all; }
+    button { padding: 8px 16px; font-size: 14px; cursor: pointer; }
+    input { padding: 8px; font-size: 14px; width: 200px; }
+    label { display: block; margin: 12px 0 4px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>@wornpage/sync</h1>
+  <p>Demo state sync code generation and hashing. No accounts needed — share a code to share state.</p>
+
+  <label>Generate a sync code</label>
+  <button id="gen-btn">Generate</button>
+  <div class="result" id="code-output"></div>
+
+  <label>Normalize a code</label>
+  <input id="raw-input" placeholder="abcd efgh jklm npqr" />
+  <button id="norm-btn">Normalize</button>
+  <div class="result" id="norm-output"></div>
+
+  <label>Hash a code to client ID</label>
+  <button id="hash-btn">Hash</button>
+  <div class="result" id="hash-output"></div>
+
+  <script type="module">
+    // Inlined from src/index.ts — avoids MIME type issues with .ts on Pages
+    function generateSyncCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const segments = 4, segmentLen = 4;
+      const bytes = new Uint8Array(segments * segmentLen);
+      crypto.getRandomValues(bytes);
+      const parts = [];
+      for (let s = 0; s < segments; s++) {
+        let part = '';
+        for (let i = 0; i < segmentLen; i++) part += chars[bytes[s * segmentLen + i] % chars.length];
+        parts.push(part);
+      }
+      return parts.join('-');
+    }
+
+    function normalizeSyncCode(raw) {
+      const cleaned = raw.toUpperCase().replace(/\s/g, '');
+      let normalized = cleaned.replace(/[^A-Z0-9]/g, '');
+      if (normalized.length !== 16) return null;
+      normalized = normalized.replace(/(.{4})(.{4})(.{4})(.{4})/, '---');
+      if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(normalized)) return null;
+      return normalized;
+    }
+
+    async function syncClientId(syncCode) {
+      const data = new TextEncoder().encode("projects-web-demo-sync:" + syncCode);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      const bytes = new Uint8Array(hash);
+      const base64url = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      return "sync-" + base64url.slice(0, 64);
+    }
+
+    document.getElementById('code-output').textContent = generateSyncCode();
+    document.getElementById('gen-btn').onclick = () => {
+      document.getElementById('code-output').textContent = generateSyncCode();
+    };
+    document.getElementById('norm-btn').onclick = () => {
+      const raw = document.getElementById('raw-input').value;
+      const result = normalizeSyncCode(raw);
+      document.getElementById('norm-output').textContent = result ?? 'Invalid code format';
+    };
+    document.getElementById('hash-btn').onclick = async () => {
+      const raw = document.getElementById('raw-input').value;
+      const normalized = normalizeSyncCode(raw);
+      if (!normalized) { document.getElementById('hash-output').textContent = 'Normalize the code first'; return; }
+      document.getElementById('hash-output').textContent = await syncClientId(normalized);
+    };
+  </script>
+</body>
+</html>

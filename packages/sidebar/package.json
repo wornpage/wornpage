@@ -1,0 +1,20 @@
+{
+  "name": "@wornpage/sidebar",
+  "version": "0.1.0",
+  "description": "Svelte 5 sidebar navigation component — collapsible groups, keyboard nav, search, favorites, recent items, drag-to-reorder",
+  "type": "module",
+  "scripts": { "test": "bun test" },
+  "main": "./dist/worn-sidebar.js",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/types.ts",
+      "svelte": "./src/index.ts",
+      "default": "./dist/worn-sidebar.js"
+    }
+  },
+  "files": ["dist", "src"],
+  "peerDependencies": { "svelte": "^5.0.0" },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/wornpage/sidebar.git" }
+}

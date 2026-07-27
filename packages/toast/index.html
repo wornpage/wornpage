@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>@wornpage/toast Demo</title>
+<style>body{font-family:system-ui;margin:20px}button{margin:4px;padding:8px 16px;cursor:pointer;border:1px solid #ddd;border-radius:6px;background:#fff;font-size:14px}button:hover{background:#eaf4f0}#container{position:fixed;bottom:20px;right:20px;width:300px;display:flex;flex-direction:column;gap:8px;z-index:100}</style>
+</head>
+<body>
+<h2>@wornpage/toast</h2>
+<p>Click to show toasts — they auto-dismiss after 3s.</p>
+<button onclick="show('info')">Info</button>
+<button onclick="show('success')">Success</button>
+<button onclick="show('error')">Error</button>
+<div id="container"></div>
+
+<script type="module" src="./dist/worn-toast.js"></script>
+<script type="module">
+  const container = document.getElementById('container');
+  window.show = (kind) => {
+    const el = document.createElement('worn-toast');
+    el.message = `${kind.charAt(0).toUpperCase() + kind.slice(1)} at ${new Date().toLocaleTimeString()}`;
+    el.kind = kind;
+    el.addEventListener('worn-dismiss', () => el.remove());
+    container.appendChild(el);
+  };
+  // Also show one on load
+  setTimeout(() => show('info'), 300);
+</script>
+</body>
+</html>

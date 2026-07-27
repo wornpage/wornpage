@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>@wornpage/cmdk Demo</title>
+<style>body{font-family:system-ui;margin:40px}.hint{color:#666;margin:12px 0 20px}button{padding:8px 16px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:14px}button:hover{background:#eaf4f0}</style>
+</head>
+<body>
+<h2>@wornpage/cmdk</h2>
+<p class="hint">Press <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd> or click the button</p>
+<button id="open-btn">Open command palette</button>
+<worn-cmdk id="cmdk"></worn-cmdk>
+<script type="module" src="./dist/worn-cmdk.js"></script>
+<script type="module">
+  const cmdk = document.getElementById('cmdk');
+  cmdk.items = [
+    { id: 'home', label: 'Go to Home', hint: 'Screen', onSelect: () => alert('Home') },
+    { id: 'work', label: 'View Work Items', hint: '3 packs', keywords: ['tasks'], onSelect: () => alert('Work') },
+    { id: 'review', label: 'Needs Review', hint: 'Blocked', keywords: ['blocked'], onSelect: () => alert('Review') },
+    { id: 'theme', label: 'Toggle Dark Mode', hint: 'Action', keywords: ['dark'], group: 'Actions', onSelect: () => alert('Dark mode toggled') },
+    { id: 'reset', label: 'Reset All Data', hint: 'Danger', keywords: ['clear'], group: 'Actions', onSelect: () => alert('Reset!') },
+  ];
+  cmdk.placeholder = 'Search pages, packs…';
+
+  document.getElementById('open-btn').addEventListener('click', () => { cmdk.open(); });
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); cmdk.open(); }
+  });
+</script>
+</body>
+</html>
