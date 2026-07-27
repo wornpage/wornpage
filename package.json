@@ -4,7 +4,8 @@
   "description": "Wornpage — Svelte 5 component library and development toolkit. A collection of reusable UI components, CSS audit tools, and the CLI that ties them together.",
   "workspaces": [
     "packages/*",
-    "tools/*"
+    "tools/*",
+    "demo"
   ],
   "scripts": {
     "build": "bun run --filter '*' build",
