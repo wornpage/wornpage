@@ -8,12 +8,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@wornpage/button": "file:../../button",
     "@wornpage/cmdk": "*",
     "@wornpage/receipt": "*",
-    "@wornpage/theme": "*",
     "@wornpage/sidebar": "*",
+    "@wornpage/theme": "*",
+    "@wornpage/toast": "*",
     "@wornpage/workflow": "*",
-    "@wornpage/toast": "*"
+    "@wornpage/sync": "file:../packages/sync"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",

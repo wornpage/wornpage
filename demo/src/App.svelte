@@ -4,17 +4,19 @@
   import type { CmdkItem } from '@wornpage/cmdk';
   import { Theme } from '@wornpage/theme';
   import { WornReceipt } from '@wornpage/receipt';
+  import { Button } from '@wornpage/button';
   
   
   import { filterPacks, orderPacks, buildStandupText, primaryCommand, hasBlocker } from '@wornpage/workflow';
   import type { DemoPack } from '@wornpage/workflow';
+  import { generateSyncCode, syncQR } from '@wornpage/sync';
   import { fly, fade } from 'svelte/transition';
 
   let currentTheme = $state('light');
   $effect(() => document.documentElement.setAttribute('data-theme', currentTheme));
 
   let sidebarCollapsed = $state(false);
-  const sections = ['sidebar','cmdk','theme','receipt','workflow','toast','undo','sync','cli'];
+  const sections = ['sidebar','button','cmdk','theme','receipt','workflow','toast','undo','sync','cli'];
   let activeSection = $state('sidebar');
 
   const sidebarItems = sections.map(id => ({
@@ -173,7 +175,7 @@
       <p>No-account sharing via sync codes. 10 tests.</p>
       <code>bun add @wornpage/sync</code>
       <div class="demo-preview">
-        <button class="demo-btn" onclick={() => syncDemoCode = generateSyncCodeLocal()}>Generate code</button>
+        <button class="demo-btn" onclick={() => syncDemoCode = generateSyncCode()}>Generate code</button>
         {#if syncDemoCode}`n          <div class="demo-qr">{@html syncQR(syncDemoCode, window.location.origin)}</div>
           <p class="sync-code-display">{syncDemoCode}</p>
         {/if}

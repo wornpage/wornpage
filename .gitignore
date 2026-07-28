@@ -2,3 +2,5 @@ node_modules/
 dist/*.map
 *.tsbuildinfo
 .sync-tmp/
+
+demo/dist/
