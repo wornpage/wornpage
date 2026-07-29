@@ -75,7 +75,7 @@
       <h1>Wornpage</h1>
       <p>Svelte 5 component library — 9 packages, 66 tests, 1 CLI</p>
       <div class="header-actions">
-        <button class="demo-btn" onclick={() => cmdkOpen = !cmdkOpen}>Search</button>
+        <Button onclick={() => cmdkOpen = !cmdkOpen}>Search</Button>
         <Theme bind:theme={currentTheme} />
         <a href="https://github.com/wornpage/wornpage" class="demo-btn">GitHub</a>
       </div>
@@ -92,7 +92,7 @@
       <p>Fuzzy-search palette using native dialog. 11 tests. Try it:</p>
       <code>bun add @wornpage/cmdk</code>
       <div class="demo-preview">
-        <button class="demo-btn" onclick={() => cmdkRef?.open()}>Open palette</button>
+        <Button onclick={() => cmdkRef?.open()}>Open palette</Button>
         {#if cmdkOpen}
           <div class="cmdk-overlay" role="dialog" aria-label="Command palette" onclick={() => cmdkOpen = false} onkeydown={(e) => { if (e.key === "Escape") cmdkOpen = false }}>
             <div class="cmdk-wrapper" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
@@ -121,7 +121,7 @@
       <p>Action confirmation cards with undo. Fly transition.</p>
       <code>bun add @wornpage/receipt</code>
       <div class="demo-preview">
-        <button class="demo-btn" onclick={showReceiptDemo}>{receiptVisible ? 'Dismiss' : 'Show'} receipt</button>
+        <Button variant="primary" onclick={showReceiptDemo}>{receiptVisible ? 'Dismiss' : 'Show'} receipt</Button>
         {#key receiptVisible}
           {#if receiptVisible}
             <WornReceipt summary="Pack started." cells={[{ label: 'Status', value: 'Active' }, { label: 'By', value: 'Demo' }]} undoAvailable={true} onundo={() => receiptVisible = false} ondone={() => receiptVisible = false} />
@@ -158,9 +158,9 @@
       <p>Notification component with fly transition. Try it:</p>
       <code>bun add @wornpage/toast</code>
       <div class="demo-preview">
-        <button class="demo-btn" onclick={() => addToast('Changes saved!', 'success')}>Success</button>
-        <button class="demo-btn" onclick={() => addToast('Something went wrong.', 'error')}>Error</button>
-        <button class="demo-btn" onclick={() => addToast('Just a heads up.', 'info')}>Info</button>
+        <Button onclick={() => addToast('Changes saved!', 'success')}>Success</Button>
+        <Button variant="danger" onclick={() => addToast('Something went wrong.', 'error')}>Error</Button>
+        <Button variant="accent" onclick={() => addToast('Just a heads up.', 'info')}>Info</Button>
       </div>
     </section>
 
@@ -175,8 +175,9 @@
       <p>No-account sharing via sync codes. 10 tests.</p>
       <code>bun add @wornpage/sync</code>
       <div class="demo-preview">
-        <button class="demo-btn" onclick={() => syncDemoCode = generateSyncCode()}>Generate code</button>
-        {#if syncDemoCode}`n          <div class="demo-qr">{@html syncQR(syncDemoCode, window.location.origin)}</div>
+        <Button variant="primary" onclick={() => syncDemoCode = generateSyncCode()}>Generate code</Button>
+        {#if syncDemoCode}
+          <div class="demo-qr">{@html syncQR(syncDemoCode, window.location.origin)}</div>
           <p class="sync-code-display">{syncDemoCode}</p>
         {/if}
       </div>
@@ -236,3 +237,7 @@
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--cockpit-border); text-align: center; font-size: 13px; color: var(--cockpit-text-muted); }
   footer a { color: var(--cockpit-accent); text-decoration: none; }
 </style> 
+
+
+
+
