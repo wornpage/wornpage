@@ -116,21 +116,22 @@
 <style>
 	@keyframes cmdk-in { from { opacity: 0; transform: scale(0.96) translateY(-6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 	.cmdk { animation: cmdk-in 0.15s ease-out; width: min(520px, 92vw); max-width: 92vw; padding: 0;
-		border: 1px solid var(--cmdk-border, #d0cac1); border-radius: var(--cmdk-radius, 8px);
-		background: var(--cmdk-surface, #fff); color: var(--cmdk-text, #21322b);
+		border: 1px solid var(--cmdk-border, var(--cockpit-border-strong, #d0cac1)); border-radius: var(--cmdk-radius, 8px);
+		background: var(--cmdk-surface, var(--cockpit-surface, #fff)); color: var(--cmdk-text, var(--cockpit-text, #21322b));
 		box-shadow: 0 12px 40px rgba(0,0,0,0.3); margin: 12vh auto auto; }
-	.cmdk::backdrop { background: rgba(0,0,0,0.45); }
+	.cmdk::backdrop { background: var(--cmdk-backdrop, rgba(0,0,0,0.45)); }
 	.cmdk-input { width: 100%; box-sizing: border-box; border: 0;
-		border-bottom: 1px solid var(--cmdk-border, #e2ddd5); background: transparent;
+		border-bottom: 1px solid var(--cmdk-border, var(--cockpit-border, #e2ddd5)); background: transparent;
 		color: inherit; font: inherit; font-size: 15px; padding: 14px 16px; outline: none; }
+	.cmdk-input::placeholder { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); opacity: 1; }
 	.cmdk-list { list-style: none; margin: 0; padding: 6px; max-height: 46vh; overflow-y: auto; }
 	.cmdk-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
 		padding: 8px 10px; border-radius: var(--cmdk-radius-sm, 6px); cursor: pointer;
 		width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-size: 14px;
 		text-align: left; }
-	.cmdk-item.is-active { background: var(--cmdk-selected-bg, #d7efe7); }
-	.cmdk-item small { color: var(--cmdk-text-muted, #63746a); font-size: 11px; white-space: nowrap; }
+	.cmdk-item.is-active { background: var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7)); }
+	.cmdk-item small { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); font-size: 11px; white-space: nowrap; }
 	.cmdk-group-label { padding: 8px 10px 4px; font-size: 10px; font-weight: 600;
-		text-transform: uppercase; letter-spacing: 0.04em; color: var(--cmdk-text-muted, #63746a); }
-	.cmdk-empty { padding: 12px 10px; color: var(--cmdk-text-muted, #63746a); font-size: 13px; }
+		text-transform: uppercase; letter-spacing: 0.04em; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); }
+	.cmdk-empty { padding: 12px 10px; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); font-size: 13px; }
 </style>

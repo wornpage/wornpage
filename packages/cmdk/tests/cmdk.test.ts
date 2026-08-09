@@ -91,4 +91,13 @@ describe('command palette chrome', () => {
 		expect(cmdkSource).not.toContain('cmdk-hint');
 		expect(cmdkSource).not.toContain('Up/Down to move');
 	});
+
+	test('inherits shared theme tokens with standalone fallbacks', () => {
+		expect(cmdkSource).toContain('var(--cmdk-surface, var(--cockpit-surface, #fff))');
+		expect(cmdkSource).toContain('var(--cmdk-text, var(--cockpit-text, #21322b))');
+		expect(cmdkSource).toContain('var(--cmdk-border, var(--cockpit-border-strong, #d0cac1))');
+		expect(cmdkSource).toContain('var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7))');
+		expect(cmdkSource).toContain('var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a))');
+		expect(cmdkSource).toContain('.cmdk-input::placeholder');
+	});
 });
