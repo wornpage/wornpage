@@ -10,7 +10,7 @@
 git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
-bun test          # 82 tests across all packages and tools
+bun test          # 100+ tests across all packages and tools
 ```
 
 ## Quick start — using in your app
@@ -18,6 +18,7 @@ bun test          # 82 tests across all packages and tools
 ```bash
 # Import from standalone repos (canonical source):
 bun add @wornpage/sidebar    # or: github:wornpage/sidebar
+bun add @wornpage/button
 bun add @wornpage/cmdk
 bun add @wornpage/toast
 ```
@@ -28,6 +29,7 @@ bun add @wornpage/toast
 
 | Package | Standalone repo | Description |
 |---|---|---|
+| `@wornpage/button` | [wornpage/button](https://github.com/wornpage/button) | Buttons and button-links with shared variants and disabled states |
 | `@wornpage/sidebar` | [wornpage/sidebar](https://github.com/wornpage/sidebar) | Collapsible sidebar with groups, search, favorites, keyboard nav |
 | `@wornpage/cmdk` | [wornpage/cmdk](https://github.com/wornpage/cmdk) | Command palette — fuzzy search, keyboard-first |
 | `@wornpage/toast` | [wornpage/toast](https://github.com/wornpage/toast) | Toast notification web component |

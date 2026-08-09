@@ -26,6 +26,7 @@ import { join, relative } from "node:path";
 // and is deliberately NOT listed here, because sync deletes and replaces
 // whatever it mirrors.
 const PACKAGES = [
+	"button",
 	"cmdk",
 	"receipt",
 	"scenarios",

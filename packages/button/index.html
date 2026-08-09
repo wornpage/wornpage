@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>@wornpage/button demo</title>
+<style>
+  body { font-family: system-ui; padding: 24px; background: #f5f3ef; color: #1a1a2e; }
+  .demo { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+  h2 { margin: 20px 0 8px; font-size: 16px; }
+  .worn-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: monospace; font-size: 13px; font-weight: 610; line-height: 1.2; padding: 8px 16px; border: 1px solid #d0ccc4; border-radius: 6px; background: #fff; color: #1a1a2e; cursor: pointer; user-select: none; text-decoration: none; }
+  .worn-btn.is-primary { background: #0d9488; border-color: #0d9488; color: #fff; transform: rotate(-0.3deg); }
+  .worn-btn.is-danger { background: #e74c3c; border-color: #e74c3c; color: #fff; }
+  .worn-btn.is-warning { border-color: #d2991d; color: #d2991d; }
+  .worn-btn.is-sm { font-size: 12px; padding: 4px 10px; }
+  .worn-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<h1>@wornpage/button</h1>
+<p>Svelte 5 button component — primary, danger, warning, link mode</p>
+
+<h2>Default</h2>
+<div class="demo"><button class="worn-btn">Default</button><button class="worn-btn is-sm">Small</button><button class="worn-btn" disabled>Disabled</button></div>
+
+<h2>Primary</h2>
+<div class="demo"><button class="worn-btn is-primary">Primary</button><button class="worn-btn is-primary is-sm">Small primary</button><button class="worn-btn is-primary" disabled>Disabled primary</button></div>
+
+<h2>Danger</h2>
+<div class="demo"><button class="worn-btn is-danger">Danger</button><button class="worn-btn is-danger is-sm">Small danger</button></div>
+
+<h2>Warning</h2>
+<div class="demo"><button class="worn-btn is-warning">Warning</button></div>
+
+<h2>Link mode</h2>
+<div class="demo"><a class="worn-btn is-primary" href="#">Link button</a></div>
+</body>
+</html>
