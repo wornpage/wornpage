@@ -1,10 +1,11 @@
 {
   "name": "@wornpage/toast",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 toast notification — fly-in, auto-dismiss, zero deps",
   "type": "module",
   "scripts": {
-    "test": "bun test"
+    "test": "bun test",
+    "build": "vite build"
   },
   "main": "./dist/worn-toast.js",
   "svelte": "./src/index.ts",
