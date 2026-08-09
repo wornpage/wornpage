@@ -2,6 +2,7 @@
 
 <script lang="ts">
 	import type { CmdkItem } from './types.js';
+	import { groupCmdkItems } from './group.js';
 
 	interface Props {
 		items?: string | CmdkItem[];
@@ -54,10 +55,10 @@
 	}
 
 	function onKeydown(e: KeyboardEvent) {
-		const count = filtered.length;
+		const count = displayedItems.length;
 		if (e.key === 'ArrowDown' && count) { e.preventDefault(); selected = (selected + 1) % count; scrollActive(); }
 		else if (e.key === 'ArrowUp' && count) { e.preventDefault(); selected = (selected - 1 + count) % count; scrollActive(); }
-		else if (e.key === 'Enter') { e.preventDefault(); filtered[selected]?.onSelect?.(); dialogEl?.close(); dispatchEvent(new CustomEvent('close')); }
+		else if (e.key === 'Enter') { e.preventDefault(); displayedItems[selected]?.onSelect?.(); dialogEl?.close(); dispatchEvent(new CustomEvent('close')); }
 	}
 
 	function scrollActive() {
@@ -65,23 +66,13 @@
 	}
 
 	function handleSelect(index: number) {
-		filtered[index]?.onSelect?.();
+		displayedItems[index]?.onSelect?.();
 		dialogEl?.close();
 		dispatchEvent(new CustomEvent('close'));
 	}
 
-	// Group items for display
-	const grouped = $derived.by(() => {
-		const noGroup = filtered.filter(i => !i.group);
-		const groups = new Map<string, CmdkItem[]>();
-		for (const item of filtered) {
-			if (item.group) {
-				if (!groups.has(item.group)) groups.set(item.group, []);
-				groups.get(item.group)!.push(item);
-			}
-		}
-		return { noGroup, groups: [...groups.entries()] };
-	});
+	const grouped = $derived(groupCmdkItems(filtered));
+	const displayedItems = $derived(grouped.orderedItems);
 </script>
 
 <dialog bind:this={dialogEl} class="cmdk" aria-label="Command palette"
@@ -89,11 +80,12 @@
 	<input bind:this={inputEl} bind:value={query} class="cmdk-input" type="text"
 		autocomplete="off" spellcheck="false" {placeholder}
 		aria-label="Command palette search" role="combobox" aria-expanded="true"
-		aria-controls="cmdk-list" onkeydown={onKeydown} />
+		aria-controls="cmdk-list" aria-activedescendant={displayedItems.length ? `cmdk-option-${selected}` : undefined}
+		onkeydown={onKeydown} />
 	<ul id="cmdk-list" class="cmdk-list" role="listbox" aria-label="Results">
 		{#each grouped.noGroup as item, i (item.id)}
 			<li role="presentation">
-				<button type="button" class="cmdk-item" class:is-active={selected === i}
+				<button id={`cmdk-option-${i}`} type="button" class="cmdk-item" class:is-active={selected === i}
 					role="option" aria-selected={selected === i}
 					onclick={() => handleSelect(i)}>
 					<span>{item.label}</span>
@@ -101,12 +93,12 @@
 				</button>
 			</li>
 		{/each}
-		{#each grouped.groups as [groupName, groupItems]}
-			<li class="cmdk-group-label" role="separator">{groupName}</li>
-			{#each groupItems as item, gi (item.id)}
-				{@const idx = grouped.noGroup.length + [...grouped.groups].slice(0, grouped.groups.indexOf([groupName, groupItems])).reduce((a, [, g]) => a + g.length, 0) + gi}
+		{#each grouped.groups as group (group.name)}
+			<li class="cmdk-group-label" role="separator">{group.name}</li>
+			{#each group.items as item, gi (item.id)}
+				{@const idx = group.startIndex + gi}
 				<li role="presentation">
-					<button type="button" class="cmdk-item" class:is-active={selected === idx}
+					<button id={`cmdk-option-${idx}`} type="button" class="cmdk-item" class:is-active={selected === idx}
 						role="option" aria-selected={selected === idx}
 						onclick={() => handleSelect(idx)}>
 						<span>{item.label}</span>

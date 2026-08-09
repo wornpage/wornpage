@@ -1,4 +1,6 @@
 import { describe, test, expect } from 'bun:test';
+import { groupCmdkItems } from '../src/group.js';
+import type { CmdkItem } from '../src/types.js';
 
 function fuzzyMatch(query: string, target: string): boolean {
   if (!query) return true;
@@ -43,4 +45,38 @@ describe('fuzzySearch', () => {
   test('keyword match', () => expect(fuzzySearch(items, 'blocked')[0].label).toBe('Review'));
   test('no match', () => expect(fuzzySearch(items, 'zzz').length).toBe(0));
   test('case insensitive', () => expect(fuzzySearch(items, 'HOME')[0].label).toBe('Home'));
+});
+
+describe('groupCmdkItems', () => {
+	const action = () => {};
+	const items: CmdkItem[] = [
+		{ id: 'screen-home', label: 'Home', group: 'Screens', onSelect: action },
+		{ id: 'plain', label: 'Plain', onSelect: action },
+		{ id: 'screen-work', label: 'Work', group: 'Screens', onSelect: action },
+		{ id: 'scenario-default', label: 'Default', group: 'Scenarios', onSelect: action }
+	];
+
+	test('assigns stable offsets in displayed order', () => {
+		const grouped = groupCmdkItems(items);
+		expect(grouped.noGroup.map((item) => item.id)).toEqual(['plain']);
+		expect(grouped.groups.map((group) => [group.name, group.startIndex])).toEqual([
+			['Screens', 1],
+			['Scenarios', 3]
+		]);
+	});
+
+	test('maps every rendered index back to the matching displayed item', () => {
+		const grouped = groupCmdkItems(items);
+		expect(grouped.orderedItems.map((item) => item.id)).toEqual([
+			'plain',
+			'screen-home',
+			'screen-work',
+			'scenario-default'
+		]);
+		for (const group of grouped.groups) {
+			group.items.forEach((item, index) => {
+				expect(grouped.orderedItems[group.startIndex + index].id).toBe(item.id);
+			});
+		}
+	});
 });

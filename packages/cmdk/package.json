@@ -1,9 +1,9 @@
 {
   "name": "@wornpage/cmdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 command palette — fuzzy search, keyboard nav, zero deps",
   "type": "module",
-  "scripts": { "test": "bun test" },
+  "scripts": { "test": "bun test", "build": "vite build" },
   "main": "./dist/worn-cmdk.js",
   "svelte": "./src/index.ts",
   "exports": {
@@ -15,6 +15,10 @@
   },
   "files": ["dist", "src"],
   "peerDependencies": { "svelte": "^5.0.0" },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "vite": "^8.1.5"
+  },
   "keywords": ["svelte", "command-palette", "cmdk", "svelte5", "fuzzy-search"],
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/wornpage/cmdk.git" }
