@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { NavItem } from './types.js';
+	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
+	import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 
 	interface Props {
 		items: NavItem[];
@@ -12,14 +14,48 @@
 
 	let { items, activeHref = '', collapsed = $bindable(false), rounded = 'md', onnavigate, oncollapsed }: Props = $props();
 
-	let moreOpen = $state(true);
+	// Per-group open state — a Set of section ids, NOT one shared boolean.
+	// Previously every <details> bound to the same `moreOpen`, so toggling
+	// any section title flipped ALL sections open/closed together.
 	let filterText = $state('');
 	let focusedIndex = $state(-1);
 	let favorites = $state<Set<string>>(new Set());
 	let recentRoutes = $state<string[]>([]);
-	let contextMenu = $state<{ x: number; y: number; id: string } | null>(null);
-	let indicatorEl: HTMLDivElement | undefined = $state();
-	let contextMenuEl: HTMLDivElement | undefined = $state();
+	let contextMenu = $state<string | null>(null);
+
+	// Sections default open; persisted per-section state (wornpage-sidebar-
+	// open-sections) is honored, with any NEW section defaulting open; the
+	// group holding the active item is forced open so the current page is
+	// never hidden inside a collapsed section.
+	let openSections = $state<Set<string>>(new Set());
+	$effect(() => {
+		try {
+			const raw = localStorage.getItem('wornpage-sidebar-open-sections');
+			const stored = raw ? (JSON.parse(raw) as string[]) : null;
+			openSections = initialOpenSections(items, stored);
+		} catch {
+			openSections = new Set(items.filter((i) => i.children).map((i) => i.id));
+		}
+	});
+	$effect(() => {
+		// Force the active item's section open — but only when it is NOT
+		// already open. Writing a fresh Set unconditionally here made this
+		// effect depend on its own write (new Set !== old Set → re-run → write
+		// again), which looped until Svelte threw effect_update_depth_exceeded
+		// and the whole sidebar (and every WornReveal on the page) crashed.
+		const parent = activeSectionToForceOpen(items, activeHref, openSections);
+		if (parent) {
+			openSections = new Set(openSections).add(parent.id);
+		}
+	});
+	function toggleSection(id: string, open: boolean) {
+		const next = new Set(openSections);
+		if (open) next.add(id); else next.delete(id);
+		openSections = next;
+	}
+	$effect(() => {
+		try { localStorage.setItem('wornpage-sidebar-open-sections', JSON.stringify([...openSections])); } catch {}
+	});
 
 	$effect(() => {
 		const path = activeHref;
@@ -41,8 +77,15 @@
 			if (r) recentRoutes = JSON.parse(r);
 		} catch {}
 		try {
+			// Migrate the legacy single "more-open" flag: '0' meant every
+			// section was collapsed. New per-section state lives under
+			// wornpage-sidebar-open-sections (read above); only apply the old
+			// flag when the new key was never written.
 			const v = localStorage.getItem('wornpage-sidebar-more-open');
-			if (v === '0') moreOpen = false;
+			const hasNew = localStorage.getItem('wornpage-sidebar-open-sections') !== null;
+			if (v === '0' && !hasNew) {
+				openSections = new Set();
+			}
 		} catch {}
 	});
 
@@ -70,16 +113,9 @@
 
 	function showContextMenu(e: MouseEvent, id: string) {
 		e.preventDefault();
-		contextMenu = { x: e.clientX, y: e.clientY, id };
+		contextMenu = id;
 	}
 	function closeContextMenu() { contextMenu = null; }
-	// Set CSS custom properties for context menu positioning (CSP-safe)
-	$effect(() => {
-		if (contextMenu && contextMenuEl) {
-			contextMenuEl.style.setProperty('--worn-cm-x', `${contextMenu.x}px`);
-			contextMenuEl.style.setProperty('--worn-cm-y', `${contextMenu.y}px`);
-		}
-	});
 	function hideItem(id: string) {
 		const next = new Set(favorites);
 		next.delete(id);
@@ -106,13 +142,7 @@
 	const flatItems = $derived(flatten(items));
 	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && (!filterText || i.label.toLowerCase().includes(filterText.toLowerCase()))));
 
-	function filterList(list: NavItem[]): NavItem[] {
-		if (!filterText) return list;
-		const q = filterText.toLowerCase();
-		return list.filter(i => i.label.toLowerCase().includes(q));
-	}
-
-	const topLevel = $derived(filterList(items));
+	const topLevel = $derived(filterNavItems(items, filterText));
 	const recentItems = $derived(
 		recentRoutes
 			.map(href => flatItems.find(i => i.href === href))
@@ -130,13 +160,24 @@
 			: []
 	);
 
+	const filteredNavLinks = $derived(filterNavLinks(items, filterText, favorites));
 	const allVisible = $derived([
-		...favItems,
-		...topLevel.filter(i => !favorites.has(i.id) && !i.children),
-		...(moreOpen ? topLevel.filter(i => !favorites.has(i.id) && i.children) : []),
+		...(filterText.trim()
+			? [...favItems, ...filteredNavLinks]
+			: [
+					...favItems,
+					...topLevel.filter(i => !favorites.has(i.id) && !i.children),
+					...topLevel.filter(i => !favorites.has(i.id) && i.children && openSections.has(i.id)),
+			  ]),
 	]);
 
 	function handleKeydown(e: KeyboardEvent) {
+		if (shouldClearNavFilter(e.key, filterText)) {
+			e.preventDefault();
+			filterText = '';
+			focusedIndex = -1;
+			return;
+		}
 		const len = allVisible.length;
 		if (len === 0) return;
 		if (e.key === 'ArrowDown') { e.preventDefault(); focusedIndex = Math.min(focusedIndex + 1, len - 1); focusItem(focusedIndex); }
@@ -163,27 +204,10 @@
 
 	let navEl: HTMLElement | undefined = $state();
 
-	$effect(() => {
-		const radii: Record<string, string> = { sm: '4px', md: '8px', lg: '12px', pill: '999px' };
-		try { document.documentElement.style.setProperty('--worn-nav-radius', radii[rounded] || '8px'); } catch {}
-	});
-
-	function updateIndicator() {
-		if (!navEl || !indicatorEl || collapsed) { return; }
-		const active = navEl.querySelector<HTMLElement>('.worn-nav-item.active');
-		if (active) {
-			const navRect = navEl.getBoundingClientRect();
-			const rect = active.getBoundingClientRect();
-			indicatorEl.style.setProperty('--worn-indicator-top', `${rect.top - navRect.top}px`);
-			indicatorEl.style.setProperty('--worn-indicator-height', `${rect.height}px`);
-		}
-	}
-
-	$effect(() => { activeHref; collapsed; requestAnimationFrame(() => updateIndicator()); });
 </script>
 
 {#snippet navLink(item: NavItem)}
-	<a href={item.href || '#'} class="worn-nav-item" class:active={isActive(item)} data-nav-id={item.id}
+	<a href={item.href || '#'} class="worn-nav-item" class:active={isActive(item)} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
 		aria-current={isActive(item) ? 'page' : undefined}
 		onclick={(e) => handleNav(e, item.href)}
 		oncontextmenu={(e) => showContextMenu(e, item.id)}
@@ -193,7 +217,7 @@
 		{/if}
 		<span class="worn-nav-label">{item.label}</span>
 		{#if item.badge !== undefined && item.badge > 0}
-			<span class="worn-nav-badge" class:is-danger={item.badgeVariant === 'danger'}>{item.badge}</span>
+			<span class="worn-nav-badge" class:is-danger={item.badgeVariant === 'danger'} class:is-warning={item.badgeVariant === 'warning'}>{item.badge}</span>
 		{/if}
 		{#if favorites.has(item.id)}
 			<span class="worn-nav-reorder">
@@ -208,15 +232,17 @@
 	</a>
 {/snippet}
 
-<div class="worn-sidebar" class:is-collapsed={collapsed}>
+<div class="worn-sidebar" class:is-collapsed={collapsed} data-radius={rounded}>
 <div class="worn-sidebar-filter">
-	<input type="search" class="worn-filter-input" placeholder="Filter…" bind:value={filterText} onkeydown={handleKeydown} />
+	<input type="text" role="searchbox" inputmode="search" autocomplete="off" class="worn-filter-input" placeholder="Filter…" aria-label="Filter navigation" bind:value={filterText} onkeydown={handleKeydown} />
 	{#if filterText}<button type="button" class="worn-filter-clear" onclick={() => filterText = ''} aria-label="Clear filter">×</button>{/if}
 </div>
 
 <nav class="worn-nav" bind:this={navEl}>
-	<div class="worn-active-indicator" bind:this={indicatorEl}
-	style="top: var(--worn-indicator-top); height: var(--worn-indicator-height);"></div>
+	<div class="worn-active-indicator"></div>
+	{#if filterText.trim() && !hasNavFilterResults(items, filterText)}
+		<div class="worn-filter-empty" role="status">No matches</div>
+	{/if}
 
 	{#if recentItems.length > 0 && !filterText}
 		<div class="worn-section-label">Recent</div>
@@ -244,9 +270,9 @@
 
 	{#each topLevel.filter(i => !favorites.has(i.id)) as item (item.id)}
 		{#if item.children}
-			<details class="worn-nav-group" bind:open={moreOpen}>
-				<summary class="worn-nav-item worn-nav-summary"><span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span><span class="worn-nav-label">{item.label}</span></summary>
-				{#each filterList(item.children).filter(c => !favorites.has(c.id)) as child (child.id)}
+			<details class="worn-nav-group" open={shouldOpenNavSection(item, filterText, openSections)} ontoggle={(e) => toggleSection(item.id, (e.currentTarget as HTMLDetailsElement).open)}>
+				<summary class="worn-nav-item worn-nav-summary" class:active={sectionForActiveHref(items, activeHref)?.id === item.id}><span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span><span class="worn-nav-label">{item.label}</span></summary>
+				{#each filterNavChildren(item, filterText).filter(c => !favorites.has(c.id)) as child (child.id)}
 					{@render navLink(child)}
 				{/each}
 			</details>
@@ -258,10 +284,9 @@
 
 {#if contextMenu}
 	<div class="worn-menu-backdrop" onclick={closeContextMenu}></div>
-	<div class="worn-context-menu" bind:this={contextMenuEl}
-	style="left: var(--worn-cm-x, 0px); top: var(--worn-cm-y, 0px)">
-		<button type="button" onclick={() => { toggleFavorite(contextMenu.id); closeContextMenu(); }}>{favorites.has(contextMenu.id) ? '📌 Unpin' : '📌 Pin'}</button>
-		<button type="button" onclick={() => hideItem(contextMenu.id)}>👁 Hide</button>
+	<div class="worn-context-menu">
+		<button type="button" onclick={() => { toggleFavorite(contextMenu); closeContextMenu(); }}>{favorites.has(contextMenu) ? '📌 Unpin' : '📌 Pin'}</button>
+		<button type="button" onclick={() => hideItem(contextMenu)}>👁 Hide</button>
 		<button type="button" onclick={resetAll}>🔄 Reset all</button>
 	</div>
 {/if}
@@ -286,6 +311,12 @@
 		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
 		cursor: pointer; font-size: 16px; padding: 2px 6px; line-height: 1;
 	}
+	.worn-filter-empty {
+		padding: 12px;
+		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		font-size: 12px;
+		text-align: center;
+	}
 
 	.worn-nav { position: relative; }
 	.worn-nav-item {
@@ -303,7 +334,13 @@
 	.worn-nav-item.active {
 		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
 		color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff));
+		anchor-name: --worn-active-item;
 	}
+	.worn-nav-item.is-context-anchor { anchor-name: --worn-ctx; }
+	.worn-sidebar[data-radius="sm"] { --worn-nav-radius: 4px; }
+	.worn-sidebar[data-radius="md"] { --worn-nav-radius: 8px; }
+	.worn-sidebar[data-radius="lg"] { --worn-nav-radius: 12px; }
+	.worn-sidebar[data-radius="pill"] { --worn-nav-radius: 999px; }
 	.worn-nav-icon { flex-shrink: 0; display: flex; }
 	.worn-nav-icon svg { display: block; }
 	.worn-nav-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -318,6 +355,7 @@
 		text-align: center;
 	}
 	.worn-nav-badge.is-danger { background: var(--worn-sidebar-danger, var(--cockpit-danger-text, #e74c3c)); color: #fff; }
+	.worn-nav-badge.is-warning { background: var(--worn-sidebar-warning, var(--cockpit-warning-text, #d97706)); color: #fff; }
 
 	.worn-section-label {
 		font-size: 9px; font-weight: 600; text-transform: uppercase;
@@ -327,18 +365,39 @@
 	}
 	.worn-section-divider { height: 1px; background: var(--worn-sidebar-border, var(--cockpit-border, #ddd)); margin: 4px 8px; }
 
-	.worn-nav-summary { font-weight: 600; }
+	.worn-nav-summary {
+		font-weight: 600;
+		/* The summary is the SECTION TITLE, not a child row: it stays flush
+		   with the base 12px padding instead of inheriting the child indent.
+		   (Previously .worn-nav-group > .worn-nav-item set 24px on BOTH the
+		   summary and its children, so section titles sat at the same indent
+		   as the rows inside them.) */
+		padding-left: 12px;
+	}
 	.worn-nav-group { border-top: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd)); margin-top: 4px; padding-top: 4px; }
-	.worn-nav-group > .worn-nav-item { padding-left: 24px; }
+	.worn-nav-group > .worn-nav-item:not(.worn-nav-summary) { padding-left: 24px; }
+
+	/* Section title selected state: the summary highlights when the group is
+	   open (the arrow row the user clicked) or holds the active page. The
+	   chevron rotates to point at the expanded children. */
+	.worn-nav-group > .worn-nav-summary.active {
+		background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05)));
+		color: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
+	}
+	.worn-nav-group > .worn-nav-summary .worn-nav-icon { transition: transform 0.18s var(--worn-ease, ease); }
+	.worn-nav-group[open] > .worn-nav-summary .worn-nav-icon { transform: rotate(90deg); }
 
 	.worn-active-indicator {
 		position: absolute; left: 2px; width: calc(100% - 4px);
+		position-anchor: --worn-active-item;
+		top: anchor(--worn-active-item top);
+		height: anchor(--worn-active-item height);
 		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
 		border-radius: 999px;
-		transition: top 0.25s cubic-bezier(0.4, 0, 0.2, 1), height 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+		transition: opacity 0.15s ease;
 		pointer-events: none; z-index: 0; opacity: 0;
 	}
-	.worn-active-indicator[style*="--worn-indicator-top"] {
+	.worn-sidebar:not(.is-collapsed) .worn-nav:has(.worn-nav-item.active) .worn-active-indicator {
 		opacity: 0.15;
 	}
 
@@ -355,6 +414,9 @@
 	.worn-menu-backdrop { position: fixed; inset: 0; z-index: 100; }
 	.worn-context-menu {
 		position: fixed; z-index: 101;
+		position-anchor: --worn-ctx;
+		left: anchor(right);
+		top: anchor(bottom);
 		background: var(--worn-sidebar-surface, var(--cockpit-surface, #fff));
 		border: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd));
 		border-radius: 6px;

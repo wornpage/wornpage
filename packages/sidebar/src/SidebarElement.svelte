@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div bind:this={el} style="height:100%">
+<div bind:this={el} class="worn-sidebar-element">
 <Sidebar
 	{items}
 	activeHref={activehref}
@@ -28,3 +28,7 @@
 	oncollapsed={(c) => emit('worn-collapse', { collapsed: c })}
 />
 </div>
+
+<style>
+	.worn-sidebar-element { height: 100%; }
+</style>

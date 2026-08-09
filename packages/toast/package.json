@@ -10,7 +10,7 @@
   "svelte": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./src/types.ts",
+      "types": "./src/index.ts",
       "svelte": "./src/index.ts",
       "default": "./dist/worn-toast.js"
     }

@@ -4,7 +4,7 @@ export interface NavItem {
   label: string;
   icon?: string;
   badge?: number;
-  badgeVariant?: 'default' | 'danger';
+  badgeVariant?: 'default' | 'danger' | 'warning';
   disabled?: boolean;
   children?: NavItem[];
   kind?: 'page' | 'action' | 'section' | 'tool';
