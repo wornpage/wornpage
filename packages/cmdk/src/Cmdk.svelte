@@ -111,7 +111,6 @@
 			<li class="cmdk-empty" role="option" aria-selected="false">No matches.</li>
 		{/if}
 	</ul>
-	<p class="cmdk-hint">Up/Down to move · Enter to run · Esc to close</p>
 </dialog>
 
 <style>
@@ -134,6 +133,4 @@
 	.cmdk-group-label { padding: 8px 10px 4px; font-size: 10px; font-weight: 600;
 		text-transform: uppercase; letter-spacing: 0.04em; color: var(--cmdk-text-muted, #63746a); }
 	.cmdk-empty { padding: 12px 10px; color: var(--cmdk-text-muted, #63746a); font-size: 13px; }
-	.cmdk-hint { margin: 0; padding: 8px 16px; border-top: 1px solid var(--cmdk-border, #e2ddd5);
-		color: var(--cmdk-text-muted, #63746a); font-size: 11px; }
 </style>

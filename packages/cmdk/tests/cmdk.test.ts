@@ -1,6 +1,9 @@
 import { describe, test, expect } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { groupCmdkItems } from '../src/group.js';
 import type { CmdkItem } from '../src/types.js';
+
+const cmdkSource = readFileSync(new URL('../src/Cmdk.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 
 function fuzzyMatch(query: string, target: string): boolean {
   if (!query) return true;
@@ -78,5 +81,14 @@ describe('groupCmdkItems', () => {
 				expect(grouped.orderedItems[group.startIndex + index].id).toBe(item.id);
 			});
 		}
+	});
+});
+
+describe('command palette chrome', () => {
+	test('keeps keyboard behavior without a visible shortcut footer', () => {
+		expect(cmdkSource).toContain('function onKeydown(e: KeyboardEvent)');
+		expect(cmdkSource).toContain('onkeydown={onKeydown}');
+		expect(cmdkSource).not.toContain('cmdk-hint');
+		expect(cmdkSource).not.toContain('Up/Down to move');
 	});
 });
