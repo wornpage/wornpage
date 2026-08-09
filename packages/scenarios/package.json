@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/scenarios",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared scenario definitions and validators for wornpage demo apps",
   "type": "module",
   "scripts": { "test": "bun test" },

@@ -1,15 +1,33 @@
-/** Valid demo scenario identifiers. Mirrors server/src/constants.js */
-export const VALID_SCENARIOS = new Set([
-  'default', 'due-view', 'empty', 'healthy', 'onboarding', 'review',
-  'ai-prompts', 'ai-evals', 'ops-day', 'sales', 'ai-companion'
-]);
-
-export interface ScenarioDef {
+export interface ScenarioCatalogEntry {
   id: string;
   label: string;
   desc: string;
-  icon: string;
   route: string;
+}
+
+/** Canonical scenario metadata for selectors, launchers, and validation. */
+export const SCENARIOS = [
+  { id: 'default', label: 'Default', desc: 'Standard sample work across several states.', route: '/' },
+  { id: 'due-view', label: 'Due view', desc: 'Due dates for Calendar and Timeline.', route: '/work' },
+  { id: 'empty', label: 'Empty', desc: 'Start from scratch.', route: '/review' },
+  { id: 'healthy', label: 'Healthy', desc: 'Clear next actions and no blockers.', route: '/work' },
+  { id: 'onboarding', label: 'Onboarding', desc: 'Work path, next actions, and profiles.', route: '/' },
+  { id: 'review', label: 'Review', desc: 'Blockers and missing next actions.', route: '/review' },
+  { id: 'ai-prompts', label: 'AI Prompts', desc: 'AI prompt copy profile.', route: '/review' },
+  { id: 'ai-evals', label: 'AI Evals', desc: 'Evaluation sources and proof targets.', route: '/review' },
+  { id: 'ops-day', label: 'Ops Day', desc: 'Milestones and locations.', route: '/review' },
+  { id: 'sales', label: 'Sales', desc: 'Sales copy profile.', route: '/review' },
+  { id: 'ai-companion', label: 'AI Companion', desc: 'AI-assisted workflows.', route: '/work' },
+  { id: 'demo', label: 'Demo', desc: 'Examples across app features.', route: '/work' }
+] as const satisfies readonly ScenarioCatalogEntry[];
+
+export type ScenarioId = (typeof SCENARIOS)[number]['id'];
+
+/** Valid demo scenario identifiers. Derived from the canonical catalog. */
+export const VALID_SCENARIOS: ReadonlySet<string> = new Set(SCENARIOS.map(({ id }) => id));
+
+export interface ScenarioDef extends ScenarioCatalogEntry {
+  icon: string;
 }
 
 /** Method cards shown on the home page welcome screen */
