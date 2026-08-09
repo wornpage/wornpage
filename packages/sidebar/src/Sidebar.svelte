@@ -283,7 +283,7 @@
 </nav>
 
 {#if contextMenu}
-	<div class="worn-menu-backdrop" onclick={closeContextMenu}></div>
+	<button type="button" class="worn-menu-backdrop" aria-label="Close menu" onclick={closeContextMenu}></button>
 	<div class="worn-context-menu">
 		<button type="button" onclick={() => { toggleFavorite(contextMenu); closeContextMenu(); }}>{favorites.has(contextMenu) ? '📌 Unpin' : '📌 Pin'}</button>
 		<button type="button" onclick={() => hideItem(contextMenu)}>👁 Hide</button>
@@ -411,7 +411,14 @@
 	.worn-nav-item:hover .worn-reorder-btn { opacity: 0.7; }
 	.worn-nav-item:hover .worn-reorder-btn:hover { opacity: 1; }
 
-	.worn-menu-backdrop { position: fixed; inset: 0; z-index: 100; }
+	.worn-menu-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		background: transparent;
+		border: 0;
+		padding: 0;
+	}
 	.worn-context-menu {
 		position: fixed; z-index: 101;
 		position-anchor: --worn-ctx;

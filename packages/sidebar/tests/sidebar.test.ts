@@ -13,6 +13,13 @@ describe('filter control', () => {
 	});
 });
 
+describe('context menu', () => {
+	test('uses a real control for backdrop dismissal', () => {
+		expect(sidebarSource).toContain('<button type="button" class="worn-menu-backdrop" aria-label="Close menu" onclick={closeContextMenu}></button>');
+		expect(sidebarSource).not.toContain('<div class="worn-menu-backdrop"');
+	});
+});
+
 function flatten(items: { id: string; children?: any[] }[]): { id: string }[] {
   const result: { id: string }[] = [];
   for (const item of items) {
