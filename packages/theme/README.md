@@ -13,6 +13,14 @@ Nine theme names: `system`, `light`, `dark`, `forest`, `ocean`, `sepia`,
 > [Supplying the CSS](#supplying-the-css) below — it is three lines to get
 > going.
 
+<!-- wornpage-delivery:v1 browser-bundle -->
+## Delivery
+
+`src/` is the canonical implementation and the Svelte consumer entry. `dist/` is a generated browser bundle; run `bun run build` after source changes and never edit `dist/` directly.
+
+The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+<!-- /wornpage-delivery -->
+
 ## Install
 
 ```bash
@@ -43,6 +51,9 @@ The component restores the saved theme on mount, writes every change to
   document.getElementById('t').theme = 'forest';
 </script>
 ```
+
+The browser entry is generated from `src/ThemeElement.svelte` with
+`bun run build`; do not edit `dist/worn-theme.js` directly.
 
 ## Usage (no component)
 

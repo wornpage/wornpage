@@ -1,8 +1,11 @@
 import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from '../src/filter.js';
+import { nextNavFocusIndex } from '../src/keyboard.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
+const elementSource = readFileSync(new URL('../src/SidebarElement.svelte', import.meta.url), 'utf8');
+const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 describe('filter control', () => {
 	test('owns one accessible clear affordance', () => {
@@ -10,6 +13,91 @@ describe('filter control', () => {
 		expect(sidebarSource).not.toContain('type="search"');
 		expect(sidebarSource.match(/class="worn-filter-clear"/gu)?.length).toBe(1);
 		expect(sidebarSource).toContain('aria-label="Clear filter"');
+	});
+});
+
+describe('collapsed web component', () => {
+	test('owns a visual collapsed state without removing link names', () => {
+		expect(sidebarSource).toContain('title={collapsed ? item.label : undefined}');
+		expect(sidebarSource).toContain('.worn-sidebar.is-collapsed {');
+		expect(sidebarSource).toContain('inline-size: var(--worn-sidebar-collapsed-width, 60px);');
+		expect(sidebarSource).toContain('.worn-sidebar.is-collapsed .worn-nav-label {');
+		expect(sidebarSource).toContain('clip-path: inset(50%);');
+		expect(sidebarSource).toContain('@media (prefers-reduced-motion: reduce)');
+	});
+
+	test('sizes the custom-element host and exposes demo control state', () => {
+		expect(elementSource).toContain('class="worn-sidebar-element" class:is-collapsed={collapsed}');
+		expect(elementSource).toContain('inline-size: var(--worn-sidebar-width, 240px);');
+		expect(elementSource).toContain('.worn-sidebar-element.is-collapsed');
+		expect(demoSource).toContain('aria-controls="sidebar-demo" aria-pressed="false">Collapse sidebar</button>');
+		expect(demoSource).toContain("collapseButton.setAttribute('aria-pressed', String(collapsed));");
+		expect(demoSource).toContain("collapseButton.textContent = collapsed ? 'Expand sidebar' : 'Collapse sidebar';");
+	});
+
+});
+
+describe('standalone demo', () => {
+	test('keeps the component and controls while removing documentation panels', () => {
+		expect(demoSource).toContain('<h1>@wornpage/sidebar</h1>');
+		expect(demoSource).toContain('<h2>Controls</h2>');
+		expect(demoSource).not.toContain('Standalone web component');
+		expect(demoSource).not.toContain('How to use');
+		expect(demoSource).not.toContain('Bundle size');
+	});
+});
+
+describe('keyboard navigation', () => {
+	test('moves through bounded rendered-link indexes', () => {
+		expect(nextNavFocusIndex('ArrowDown', -1, 4)).toBe(0);
+		expect(nextNavFocusIndex('ArrowDown', 1, 4)).toBe(2);
+		expect(nextNavFocusIndex('ArrowDown', 3, 4)).toBe(3);
+		expect(nextNavFocusIndex('ArrowUp', 2, 4)).toBe(1);
+		expect(nextNavFocusIndex('ArrowUp', 0, 4)).toBe(0);
+		expect(nextNavFocusIndex('Home', 3, 4)).toBe(0);
+		expect(nextNavFocusIndex('End', 0, 4)).toBe(3);
+	});
+
+	test('ignores non-navigation keys and empty link sets', () => {
+		expect(nextNavFocusIndex('Enter', 0, 4)).toBeNull();
+		expect(nextNavFocusIndex('ArrowDown', -1, 0)).toBeNull();
+	});
+
+	test('continues handling keys after focus enters rendered navigation', () => {
+		expect(sidebarSource).toMatch(/onclick=\{\(e\) => handleNav\(e, item\.href\)\}\s+onkeydown=\{handleKeydown\}/u);
+		expect(sidebarSource).toContain('<nav class="worn-nav" bind:this={navEl}>');
+		expect(sidebarSource).toContain("querySelectorAll<HTMLAnchorElement>('[data-nav-id]')");
+		expect(sidebarSource).toContain('links.findIndex((link) => link === document.activeElement)');
+		expect(sidebarSource).toContain("else if (e.key === ' ' && currentIndex >= 0)");
+		expect(sidebarSource).not.toContain('allVisible');
+		expect(sidebarSource).not.toContain('focusedIndex');
+	});
+});
+
+describe('pinned reorder controls', () => {
+	test('keeps buttons outside the navigation link', () => {
+		const start = sidebarSource.indexOf('{#snippet navLink');
+		const end = sidebarSource.indexOf('{/snippet}', start);
+		const snippet = sidebarSource.slice(start, end);
+		const anchorClose = snippet.indexOf('</a>');
+		const firstButton = snippet.indexOf('class="worn-reorder-btn"');
+
+		expect(snippet).toContain('<div class="worn-nav-row" class:has-reorder={favorites.has(item.id) && favItems.length > 1}>');
+		expect(anchorClose).toBeGreaterThan(0);
+		expect(firstButton).toBeGreaterThan(anchorClose);
+		expect(snippet).not.toContain('>▲<');
+		expect(snippet).not.toContain('>▼<');
+	});
+
+	test('names visible icon controls and reserves their row space', () => {
+		expect(sidebarSource).toContain('title="Move up" aria-label={`Move ${item.label} up`}');
+		expect(sidebarSource).toContain('title="Move down" aria-label={`Move ${item.label} down`}');
+		expect(sidebarSource).toContain('<svg viewBox="0 0 24 24" aria-hidden="true">');
+		expect(sidebarSource).toContain('.worn-nav-row.has-reorder > .worn-nav-item { padding-inline-end: 72px; }');
+		expect(sidebarSource).toContain('height: 28px;');
+		expect(sidebarSource).toContain('width: 28px;');
+		expect(sidebarSource).toContain('.worn-reorder-btn:focus-visible');
+		expect(sidebarSource).not.toContain('opacity: 0; transition: opacity');
 	});
 });
 

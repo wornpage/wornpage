@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "description": "Svelte 5 theme system — multi-theme CSS custom properties, persist, auto-detect",
   "type": "module",
+  "wornpage": {
+    "contractVersion": 1,
+    "delivery": "browser-bundle"
+  },
   "scripts": {
-    "test": "bun test"
+    "test": "bun test",
+    "build": "vite build"
   },
   "main": "./dist/worn-theme.js",
   "svelte": "./src/index.ts",

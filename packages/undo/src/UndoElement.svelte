@@ -9,7 +9,7 @@
 	let el: HTMLElement;
 	function emit(name: string, detail: any) { el?.dispatchEvent(new CustomEvent(name, { detail, bubbles: true })); }
 
-	const action: UndoAction = { type: 'action', packId: packid, label, createdAt: Date.now() };
+	let action: UndoAction = $derived({ type: 'action', packId: packid, label, createdAt: Date.now() });
 </script>
 
 <div bind:this={el} style="display:contents">

@@ -56,8 +56,8 @@ bun add @wornpage/toast
 - **`packages/` is generated — never hand-edit it.** A change made here reaches
   nobody, because nothing installs from this repo. `bun run sync` overwrites it.
 - **`bun run sync --check` reports drift** without changing anything, and exits
-  non-zero when the mirror no longer matches canonical. Wire it into CI: a
-  mirror nobody verifies goes stale silently.
+  non-zero when the mirror no longer matches canonical. CI runs it on repository
+  changes and daily, so drift is visible even when this mirror is untouched.
 - **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
 - **Tests run across everything.** `bun test` validates all packages and tools together.
 

@@ -3,6 +3,10 @@
   "version": "0.1.1",
   "description": "Svelte 5 button — primary, danger, warning variants, link mode, keyboard-friendly",
   "type": "module",
+  "wornpage": {
+    "contractVersion": 1,
+    "delivery": "browser-bundle"
+  },
   "main": "./dist/worn-button.js",
   "svelte": "./src/index.ts",
   "exports": {

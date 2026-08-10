@@ -3,6 +3,14 @@
 Svelte 5 undo system — a generic snapshot stack plus a receipt component that
 offers Undo/Redo on the last action. Zero dependencies.
 
+<!-- wornpage-delivery:v1 browser-bundle -->
+## Delivery
+
+`src/` is the canonical implementation and the Svelte consumer entry. `dist/` is a generated browser bundle; run `bun run build` after source changes and never edit `dist/` directly.
+
+The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+<!-- /wornpage-delivery -->
+
 ## Install
 
 ```bash
@@ -61,6 +69,19 @@ const previous = undo.pop();         // last committed snapshot, or null
 
 The label comes from `UNDO_LABELS[action.type]`, falling back to `action.label`,
 then `'Action'`.
+
+## Web component
+
+The generated browser entry registers `<worn-undo>`. Listen for `wrn-undo`
+and `wrn-redo` events to connect it to application state.
+
+```html
+<script type="module" src="./dist/worn-undo.js"></script>
+<worn-undo label="Updated venue" packid="venue"></worn-undo>
+```
+
+Generate the browser entry from `src/UndoElement.svelte` with
+`bun run build`; do not edit `dist/worn-undo.js` directly.
 
 ## Scope
 

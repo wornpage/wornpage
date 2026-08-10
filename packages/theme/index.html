@@ -2,10 +2,6 @@
 <html lang="en">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>@wornpage/theme Demo</title>
 <style>
-  /* The package ships no CSS — it only sets data-theme on <html>. These are
-     the rules a consuming app supplies. Without them the buttons still work,
-     data-theme still changes, and nothing on screen moves — which is exactly
-     how this demo looked before. Palette matches the wornpage projects demo. */
   :root,
   [data-theme="light"] {
     --bg: #f5f0e8; --surface: #fdfbf7; --text: #21322b;
@@ -50,8 +46,7 @@
     transition: background 160ms ease, color 160ms ease;
   }
   main { max-width: 640px; margin: 0 auto; }
-  h2 { margin: 0 0 6px; font-size: 26px; line-height: 1.2; }
-  .lede { color: var(--muted); margin: 0 0 20px; font-size: 15px; }
+  h1 { margin: 0 0 18px; font-size: 24px; line-height: 1.2; }
   .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -59,9 +54,9 @@
     padding: 16px;
     margin-top: 20px;
   }
-  .panel h3 { margin: 0 0 8px; font-size: 18px; line-height: 1.3; }
-  .panel p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+  .panel h2 { margin: 0 0 12px; font-size: 16px; line-height: 1.3; }
   .panel a { color: var(--link); }
+  .samples { align-items: center; display: flex; gap: 12px; }
   .pill {
     display: inline-block;
     padding: 5px 12px;
@@ -72,43 +67,34 @@
   }
   .swatches { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
   .sw {
-    width: 46px; height: 46px; border-radius: 10px;
+    width: 62px; height: 54px; border-radius: 8px;
     border: 1px solid var(--border);
     display: grid; place-items: end center;
-    font-size: 9px; color: var(--muted); padding-bottom: 2px;
+    font-size: 10px; color: var(--muted); padding-bottom: 3px;
   }
   .sw-bg { background: var(--bg); }
   .sw-surface { background: var(--surface); }
   .sw-accent { background: var(--accent); }
   .sw-link { background: var(--link); }
   .sw-border { background: var(--border); }
-  code { color: var(--link); }
   @media (prefers-reduced-motion: reduce) { body { transition: none; } }
 </style>
 </head>
 <body>
 <main>
-  <h2>@wornpage/theme</h2>
-  <p class="lede">Pick a theme — it persists to localStorage and follows your OS while set to System.</p>
+  <h1>@wornpage/theme</h1>
 
   <worn-theme id="theme-el"></worn-theme>
 
   <div class="panel">
-    <h3>Live preview</h3>
-    <p>
-      This panel reads only CSS custom properties, so it restyles itself when
-      <code>data-theme</code> changes. The package sets that attribute; the
-      rules that give each theme its colours live in this page's
-      <code>index.html</code>.
-    </p>
-    <span class="pill">Accent</span>
-    <a href="#preview">A link</a>
+    <h2>Palette</h2>
+    <div class="samples"><span class="pill">Accent</span><a href="#preview">Link</a></div>
     <div class="swatches">
-      <div class="sw sw-bg">bg</div>
-      <div class="sw sw-surface">surf</div>
-      <div class="sw sw-accent">acc</div>
-      <div class="sw sw-link">link</div>
-      <div class="sw sw-border">bord</div>
+      <div class="sw sw-bg">Background</div>
+      <div class="sw sw-surface">Surface</div>
+      <div class="sw sw-accent">Accent</div>
+      <div class="sw sw-link">Link</div>
+      <div class="sw sw-border">Border</div>
     </div>
   </div>
 </main>

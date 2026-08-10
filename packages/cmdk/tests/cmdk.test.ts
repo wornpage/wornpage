@@ -4,6 +4,7 @@ import { groupCmdkItems } from '../src/group.js';
 import type { CmdkItem } from '../src/types.js';
 
 const cmdkSource = readFileSync(new URL('../src/Cmdk.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 function fuzzyMatch(query: string, target: string): boolean {
   if (!query) return true;
@@ -99,5 +100,16 @@ describe('command palette chrome', () => {
 		expect(cmdkSource).toContain('var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7))');
 		expect(cmdkSource).toContain('var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a))');
 		expect(cmdkSource).toContain('.cmdk-input::placeholder');
+	});
+});
+
+describe('browser demo', () => {
+	test('leads with the open action and reports selections without instructions or alerts', () => {
+		expect(demoSource).toContain('<h1>@wornpage/cmdk</h1>');
+		expect(demoSource).toContain('aria-keyshortcuts="Control+K Meta+K"');
+		expect(demoSource).toContain('<output id="selection" aria-live="polite"></output>');
+		expect(demoSource).toContain('src="./dist/worn-cmdk.js"');
+		expect(demoSource).not.toContain('Press <kbd>');
+		expect(demoSource).not.toContain('alert(');
 	});
 });

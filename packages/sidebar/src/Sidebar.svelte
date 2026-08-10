@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { NavItem } from './types.js';
 	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
-	import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
+	import { filterNavChildren, filterNavItems, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
+	import { nextNavFocusIndex } from './keyboard.js';
 
 	interface Props {
 		items: NavItem[];
@@ -18,10 +19,11 @@
 	// Previously every <details> bound to the same `moreOpen`, so toggling
 	// any section title flipped ALL sections open/closed together.
 	let filterText = $state('');
-	let focusedIndex = $state(-1);
 	let favorites = $state<Set<string>>(new Set());
 	let recentRoutes = $state<string[]>([]);
 	let contextMenu = $state<string | null>(null);
+	let filterInput: HTMLInputElement | undefined = $state();
+	let navEl: HTMLElement | undefined = $state();
 
 	// Sections default open; persisted per-section state (wornpage-sidebar-
 	// open-sections) is honored, with any NEW section defaulting open; the
@@ -160,36 +162,24 @@
 			: []
 	);
 
-	const filteredNavLinks = $derived(filterNavLinks(items, filterText, favorites));
-	const allVisible = $derived([
-		...(filterText.trim()
-			? [...favItems, ...filteredNavLinks]
-			: [
-					...favItems,
-					...topLevel.filter(i => !favorites.has(i.id) && !i.children),
-					...topLevel.filter(i => !favorites.has(i.id) && i.children && openSections.has(i.id)),
-			  ]),
-	]);
-
 	function handleKeydown(e: KeyboardEvent) {
 		if (shouldClearNavFilter(e.key, filterText)) {
 			e.preventDefault();
 			filterText = '';
-			focusedIndex = -1;
+			filterInput?.focus();
 			return;
 		}
-		const len = allVisible.length;
-		if (len === 0) return;
-		if (e.key === 'ArrowDown') { e.preventDefault(); focusedIndex = Math.min(focusedIndex + 1, len - 1); focusItem(focusedIndex); }
-		else if (e.key === 'ArrowUp') { e.preventDefault(); focusedIndex = Math.max(focusedIndex - 1, 0); focusItem(focusedIndex); }
-		else if (e.key === 'Home') { e.preventDefault(); focusedIndex = 0; focusItem(0); }
-		else if (e.key === 'End') { e.preventDefault(); focusedIndex = len - 1; focusItem(len - 1); }
-		else if ((e.key === 'Enter' || e.key === ' ') && focusedIndex >= 0) { e.preventDefault(); const item = allVisible[focusedIndex]; if (item?.href) onnavigate?.(item.href); }
-	}
 
-	function focusItem(index: number) {
-		const el = navEl?.querySelectorAll<HTMLAnchorElement>('[data-nav-id]')[index];
-		el?.focus();
+		const links = Array.from(navEl?.querySelectorAll<HTMLAnchorElement>('[data-nav-id]') ?? []);
+		const currentIndex = links.findIndex((link) => link === document.activeElement);
+		const nextIndex = nextNavFocusIndex(e.key, currentIndex, links.length);
+		if (nextIndex !== null) {
+			e.preventDefault();
+			links[nextIndex]?.focus();
+		} else if (e.key === ' ' && currentIndex >= 0) {
+			e.preventDefault();
+			links[currentIndex]?.click();
+		}
 	}
 
 	function handleNav(e: MouseEvent, href?: string) {
@@ -202,39 +192,45 @@
 
 	function handleCollapse() { collapsed = !collapsed; oncollapsed?.(collapsed); }
 
-	let navEl: HTMLElement | undefined = $state();
-
 </script>
 
 {#snippet navLink(item: NavItem)}
-	<a href={item.href || '#'} class="worn-nav-item" class:active={isActive(item)} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
-		aria-current={isActive(item) ? 'page' : undefined}
-		onclick={(e) => handleNav(e, item.href)}
-		oncontextmenu={(e) => showContextMenu(e, item.id)}
-	>
-		{#if item.icon}
-			<span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html item.icon}</svg></span>
-		{/if}
-		<span class="worn-nav-label">{item.label}</span>
-		{#if item.badge !== undefined && item.badge > 0}
-			<span class="worn-nav-badge" class:is-danger={item.badgeVariant === 'danger'} class:is-warning={item.badgeVariant === 'warning'}>{item.badge}</span>
-		{/if}
-		{#if favorites.has(item.id)}
+	<div class="worn-nav-row" class:has-reorder={favorites.has(item.id) && favItems.length > 1}>
+		<a href={item.href || '#'} class="worn-nav-item" class:active={isActive(item)} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
+			aria-current={isActive(item) ? 'page' : undefined}
+			title={collapsed ? item.label : undefined}
+			onclick={(e) => handleNav(e, item.href)}
+			onkeydown={handleKeydown}
+			oncontextmenu={(e) => showContextMenu(e, item.id)}
+		>
+			{#if item.icon}
+				<span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html item.icon}</svg></span>
+			{/if}
+			<span class="worn-nav-label">{item.label}</span>
+			{#if item.badge !== undefined && item.badge > 0}
+				<span class="worn-nav-badge" class:is-danger={item.badgeVariant === 'danger'} class:is-warning={item.badgeVariant === 'warning'}>{item.badge}</span>
+			{/if}
+		</a>
+		{#if favorites.has(item.id) && favItems.length > 1}
 			<span class="worn-nav-reorder">
 				{#if favItems.indexOf(item) > 0}
-					<button type="button" class="worn-reorder-btn" onclick={(e) => { e.stopPropagation(); e.preventDefault(); moveFavorite(item.id, -1); }} title="Move up">▲</button>
+					<button type="button" class="worn-reorder-btn" onclick={() => moveFavorite(item.id, -1)} title="Move up" aria-label={`Move ${item.label} up`}>
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg>
+					</button>
 				{/if}
 				{#if favItems.indexOf(item) < favItems.length - 1}
-					<button type="button" class="worn-reorder-btn" onclick={(e) => { e.stopPropagation(); e.preventDefault(); moveFavorite(item.id, 1); }} title="Move down">▼</button>
+					<button type="button" class="worn-reorder-btn" onclick={() => moveFavorite(item.id, 1)} title="Move down" aria-label={`Move ${item.label} down`}>
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19 12-7 7-7-7"></path><path d="M12 5v14"></path></svg>
+					</button>
 				{/if}
 			</span>
 		{/if}
-	</a>
+	</div>
 {/snippet}
 
 <div class="worn-sidebar" class:is-collapsed={collapsed} data-radius={rounded}>
 <div class="worn-sidebar-filter">
-	<input type="text" role="searchbox" inputmode="search" autocomplete="off" class="worn-filter-input" placeholder="Filter…" aria-label="Filter navigation" bind:value={filterText} onkeydown={handleKeydown} />
+	<input type="text" role="searchbox" inputmode="search" autocomplete="off" class="worn-filter-input" placeholder="Filter…" aria-label="Filter navigation" bind:this={filterInput} bind:value={filterText} onkeydown={handleKeydown} />
 	{#if filterText}<button type="button" class="worn-filter-clear" onclick={() => filterText = ''} aria-label="Clear filter">×</button>{/if}
 </div>
 
@@ -294,6 +290,44 @@
 </div>
 
 <style>
+	.worn-sidebar {
+		inline-size: 100%;
+		min-inline-size: 0;
+		overflow-x: hidden;
+		transition: inline-size 0.2s ease;
+	}
+	.worn-sidebar.is-collapsed {
+		inline-size: var(--worn-sidebar-collapsed-width, 60px);
+	}
+	.worn-sidebar.is-collapsed .worn-sidebar-filter,
+	.worn-sidebar.is-collapsed .worn-nav-badge,
+	.worn-sidebar.is-collapsed .worn-nav-reorder,
+	.worn-sidebar.is-collapsed .worn-section-label,
+	.worn-sidebar.is-collapsed .worn-section-divider {
+		display: none;
+	}
+	.worn-sidebar.is-collapsed .worn-nav-label {
+		border: 0;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		white-space: nowrap;
+		width: 1px;
+	}
+	.worn-sidebar.is-collapsed .worn-nav-item {
+		gap: 0;
+		justify-content: center;
+		padding-inline: 6px;
+	}
+	.worn-sidebar.is-collapsed .worn-nav-group > .worn-nav-row > .worn-nav-item {
+		padding-inline: 6px;
+	}
+	.worn-sidebar.is-collapsed .worn-nav-icon { margin: 0; }
+
 	.worn-sidebar-filter { position: relative; margin: 4px 8px 8px; }
 	.worn-filter-input {
 		width: 100%; padding: 6px 28px 6px 10px;
@@ -330,6 +364,9 @@
 		cursor: pointer;
 		min-height: 36px;
 	}
+	.worn-nav-row { position: relative; }
+	.worn-nav-row > .worn-nav-item { box-sizing: border-box; width: 100%; }
+	.worn-nav-row.has-reorder > .worn-nav-item { padding-inline-end: 72px; }
 	.worn-nav-item:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
 	.worn-nav-item.active {
 		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
@@ -375,7 +412,7 @@
 		padding-left: 12px;
 	}
 	.worn-nav-group { border-top: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd)); margin-top: 4px; padding-top: 4px; }
-	.worn-nav-group > .worn-nav-item:not(.worn-nav-summary) { padding-left: 24px; }
+	.worn-nav-group > .worn-nav-row > .worn-nav-item { padding-left: 24px; }
 
 	/* Section title selected state: the summary highlights when the group is
 	   open (the arrow row the user clicked) or holds the active page. The
@@ -401,15 +438,32 @@
 		opacity: 0.15;
 	}
 
-	.worn-reorder-btn {
-		background: none; border: 0;
-		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
-		cursor: pointer; font-size: 8px; padding: 2px;
-		opacity: 0; transition: opacity 0.15s;
-		min-height: unset; line-height: 1;
+	.worn-nav-reorder {
+		align-items: center;
+		display: flex;
+		gap: 2px;
+		inset-inline-end: 8px;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
 	}
-	.worn-nav-item:hover .worn-reorder-btn { opacity: 0.7; }
-	.worn-nav-item:hover .worn-reorder-btn:hover { opacity: 1; }
+	.worn-reorder-btn {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-radius: 4px;
+		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		cursor: pointer;
+		display: inline-flex;
+		height: 28px;
+		justify-content: center;
+		padding: 0;
+		width: 28px;
+	}
+	.worn-reorder-btn:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--cockpit-text, #000)); }
+	.worn-reorder-btn:focus-visible { outline: 2px dashed var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488)); outline-offset: 1px; }
+	.worn-reorder-btn svg { fill: none; height: 14px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 14px; }
+	.worn-nav-row:has(.worn-nav-item.active) .worn-reorder-btn { color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff)); }
 
 	.worn-menu-backdrop {
 		position: fixed;
@@ -440,4 +494,8 @@
 		cursor: pointer; text-align: left; min-height: 36px;
 	}
 	.worn-context-menu button:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
+
+	@media (prefers-reduced-motion: reduce) {
+		.worn-sidebar { transition: none; }
+	}
 </style>

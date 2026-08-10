@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 
 const buttonSource = readFileSync(new URL('../src/WornButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const elementSource = readFileSync(new URL('../src/ButtonElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 
 describe('disabled state', () => {
 	test('is owned by the package for buttons and links', () => {
@@ -18,5 +19,13 @@ describe('disabled state', () => {
 		expect(buttonSource).toContain(":active:not(:disabled):not([aria-disabled='true'])");
 		expect(buttonSource).not.toContain('.worn-btn:hover:not(:disabled) {');
 		expect(buttonSource).not.toContain('.worn-btn:active:not(:disabled) {');
+	});
+});
+
+describe('browser wrapper', () => {
+	test('delegates its public attributes to the canonical Svelte button', () => {
+		expect(elementSource).toContain("tag: 'worn-button'");
+		expect(elementSource).toContain("disabled: { type: 'Boolean' }");
+		expect(elementSource).toContain('<Button {variant} {disabled} {size} {type} {href}>{label}</Button>');
 	});
 });

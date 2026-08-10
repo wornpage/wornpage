@@ -2,6 +2,14 @@
 
 Svelte 5 button component — primary, danger, warning variants, link mode (`href`), size `sm`/`md`, keyboard-friendly `focus-visible` outline.
 
+<!-- wornpage-delivery:v1 browser-bundle -->
+## Delivery
+
+`src/` is the canonical implementation and the Svelte consumer entry. `dist/` is a generated browser bundle; run `bun run build` after source changes and never edit `dist/` directly.
+
+The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+<!-- /wornpage-delivery -->
+
 ## Install
 
 ```bash
@@ -18,6 +26,15 @@ npm install @wornpage/button
 <Button variant="primary" onclick={() => alert('hi')}>Click me</Button>
 <Button variant="danger" href="/danger">Go danger</Button>
 <Button size="sm" disabled>Small disabled</Button>
+```
+
+## Browser bundle
+
+The generated browser bundle registers `<worn-button>`. Its `label`, `variant`, `size`, `type`, `href`, and `disabled` attributes map to the Svelte component props.
+
+```html
+<script type="module" src="./dist/worn-button.js"></script>
+<worn-button label="Continue" variant="primary"></worn-button>
 ```
 
 ## Props

@@ -9,15 +9,10 @@
   body { font-family: system-ui, -apple-system, sans-serif; background: #f5f0e8; color: #21322b; }
   .app-shell { display: grid; grid-template-columns: auto 1fr; min-height: 100vh; }
   .demo-sidebar { height: 100dvh; overflow-y: auto; background: var(--worn-sidebar-surface, #fdfbf7); border-right: 1px solid var(--worn-sidebar-border, #e2ddd5); }
-  .main { padding: 32px; max-width: 720px; }
-  .main h1 { font-size: 24px; margin-bottom: 8px; }
-  .main p { color: #506058; line-height: 1.5; margin-bottom: 16px; }
-  .main pre { background: #eaf4f0; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; }
-  code { font-family: 'SF Mono', 'Consolas', monospace; font-size: 13px; }
-  .status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: #d7efe7; color: #0f766e; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block; }
+  .main { padding: 32px; max-width: 520px; }
+  .main h1 { font-size: 24px; margin-bottom: 18px; }
   .demo-box { background: #fdfbf7; border: 1px solid #e2ddd5; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-  .demo-box h3 { font-size: 14px; margin-bottom: 8px; color: #21322b; }
+  .demo-box h2 { font-size: 14px; margin-bottom: 10px; color: #21322b; }
   .demo-box .row { display: flex; gap: 8px; flex-wrap: wrap; }
   .demo-box button { padding: 8px 16px; border: 1px solid #e2ddd5; border-radius: 999px; background: #fdfbf7; color: #21322b; cursor: pointer; font-size: 13px; transition: all 0.15s; }
   .demo-box button:hover { background: #eaf4f0; border-color: #0d9488; }
@@ -32,36 +27,16 @@
   </aside>
 
   <main class="main">
-    <div class="status"><span class="status-dot"></span> @wornpage/sidebar — web component demo</div>
-    <h1>Standalone web component</h1>
-    <p>This page loads <code>&lt;worn-sidebar&gt;</code> from a single JavaScript file. No bundler, no framework, no npm install.</p>
+    <h1>@wornpage/sidebar</h1>
 
     <div class="demo-box">
-      <h3>🔧 Control panel</h3>
+      <h2>Controls</h2>
       <div class="row">
-        <button id="toggle-collapse">Toggle collapse</button>
+        <button id="toggle-collapse" type="button" aria-controls="sidebar-demo" aria-pressed="false">Collapse sidebar</button>
         <button id="load-packs">Add pack items</button>
         <button id="clear-items">Reset to default</button>
       </div>
-      <div class="event-log" id="event-log">Events appear here…</div>
-    </div>
-
-    <div class="demo-box">
-      <h3>💻 How to use</h3>
-      <pre><code>&lt;script type="module"&gt;
-  import '@wornpage/sidebar';  // or load dist/worn-sidebar.js
-
-  const sb = document.querySelector('worn-sidebar');
-  sb.items = [{ id: 'home', href: '/', label: 'Home', icon: '&lt;path d="…"/&gt;' }];
-  sb.addEventListener('worn-nav', e =&gt; {
-    console.log('Navigate to', e.detail.href);
-  });
-&lt;/script&gt;</code></pre>
-    </div>
-
-    <div class="demo-box">
-      <h3>📦 Bundle size</h3>
-      <p>110 KB (31 KB gzipped) — self-contained, zero dependencies. Includes the Svelte runtime compiled into the output.</p>
+      <div class="event-log" id="event-log">Ready</div>
     </div>
   </main>
 </div>
@@ -71,6 +46,7 @@
 
   const sb = document.getElementById('sidebar-demo');
   const log = document.getElementById('event-log');
+  const collapseButton = document.getElementById('toggle-collapse');
 
   function logEvent(msg) {
     const entry = document.createElement('div');
@@ -100,9 +76,12 @@
 
   sb.items = DEFAULT_ITEMS;
 
-  document.getElementById('toggle-collapse').addEventListener('click', () => {
-    sb.collapsed = !sb.collapsed;
-    logEvent(`Collapsed: ${sb.collapsed}`);
+  collapseButton.addEventListener('click', () => {
+    const collapsed = !sb.collapsed;
+    sb.collapsed = collapsed;
+    collapseButton.setAttribute('aria-pressed', String(collapsed));
+    collapseButton.textContent = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    logEvent(`Collapsed: ${collapsed}`);
   });
 
   document.getElementById('load-packs').addEventListener('click', () => {

@@ -1,75 +1,68 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>@wornpage/undo — Demo</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@wornpage/undo demo</title>
   <style>
     :root {
-      --cockpit-bg: #f5f3ef; --cockpit-surface: #fff; --cockpit-border: #e0dcd5;
-      --cockpit-radius: 8px; --cockpit-text: #1a1a1a; --cockpit-text-muted: #888;
-      --cockpit-accent: #0d9488; --cockpit-accent-text: #fff;
+      --cockpit-bg: #f5f3ef;
+      --cockpit-surface: #fff;
+      --cockpit-border: #d5d0c8;
+      --cockpit-text: #21322b;
+      --cockpit-accent: #0d9488;
+      --cockpit-accent-text: #fff;
     }
-    body { font-family: system-ui; max-width: 480px; margin: 40px auto; padding: 0 20px; background: var(--cockpit-bg); }
-    button { padding: 8px 16px; font-size: 14px; cursor: pointer; border-radius: 6px; border: 1px solid var(--cockpit-border); background: var(--cockpit-surface); }
-    button.primary { background: var(--cockpit-accent); color: var(--cockpit-accent-text); border-color: var(--cockpit-accent); }
-    .receipt { margin: 12px 0; padding: 12px; border: 1px solid var(--cockpit-border); border-radius: 8px; background: var(--cockpit-surface); }
-    .log { font-family: monospace; font-size: 12px; color: var(--cockpit-text-muted); margin-top: 8px; }
+    body { margin: 0; padding: 32px; background: var(--cockpit-bg); color: var(--cockpit-text); font-family: system-ui, sans-serif; }
+    main { max-width: 480px; margin: 0 auto; }
+    h1 { margin: 0 0 22px; font-size: 22px; }
+    .state { margin-bottom: 12px; padding: 14px; border: 1px solid var(--cockpit-border); border-radius: 6px; background: var(--cockpit-surface); }
+    .controls { display: flex; gap: 8px; margin-bottom: 18px; }
+    .controls button { min-width: 44px; min-height: 40px; border: 1px solid var(--cockpit-border); border-radius: 6px; background: var(--cockpit-surface); color: inherit; cursor: pointer; font-size: 15px; }
+    .controls button:first-child { border-color: var(--cockpit-accent); background: var(--cockpit-accent); color: var(--cockpit-accent-text); }
+    worn-undo { display: block; }
+    worn-undo[hidden] { display: none; }
   </style>
 </head>
 <body>
-  <h1>@wornpage/undo</h1>
-  <p>Simple undo stack for state mutations. Build a snapshot before mutating, commit only on success.</p>
+  <main>
+    <h1>@wornpage/undo</h1>
+    <div class="state">Value: <strong id="value">0</strong></div>
+    <div class="controls">
+      <button type="button" data-delta="1" aria-label="Increase value">+1</button>
+      <button type="button" data-delta="-1" aria-label="Decrease value">-1</button>
+    </div>
+    <worn-undo id="undo" packid="demo-state" hidden></worn-undo>
+  </main>
 
-  <div class="receipt" id="state">State: <strong>0</strong></div>
-  <button class="primary" onclick="increment()">+1</button>
-  <button onclick="decrement()">-1</button>
-  <button id="undo-btn" disabled onclick="undo()">Undo</button>
-  <div class="log" id="log"></div>
-
+  <script type="module" src="./dist/worn-undo.js"></script>
   <script type="module">
-    // Simple undo stack implementation (mirrors @wornpage/undo pattern)
-    const MAX_UNDO = 20;
-    let undoStack = [];
+    const output = document.getElementById('value');
+    const receipt = document.getElementById('undo');
     let value = 0;
+    let previous = null;
 
-    function buildSnapshot() { return { value }; }
-
-    function commitSnapshot(snapshot) {
-      undoStack.push(snapshot);
-      if (undoStack.length > MAX_UNDO) undoStack.shift();
-      updateUI();
+    function render() {
+      output.textContent = String(value);
     }
 
-    function undo() {
-      if (!undoStack.length) return;
-      const snap = undoStack.pop();
-      value = snap.value;
-      updateUI();
-    }
+    document.querySelectorAll('[data-delta]').forEach((button) => {
+      button.addEventListener('click', () => {
+        previous = value;
+        value += Number(button.dataset.delta);
+        receipt.label = `Changed ${previous} to ${value}`;
+        receipt.hidden = false;
+        render();
+      });
+    });
 
-    function increment() {
-      const snap = buildSnapshot();
-      value++;
-      commitSnapshot(snap);
-    }
-
-    function decrement() {
-      const snap = buildSnapshot();
-      value--;
-      commitSnapshot(snap);
-    }
-
-    function updateUI() {
-      document.querySelector('#state strong').textContent = value;
-      document.getElementById('undo-btn').disabled = !undoStack.length;
-      document.getElementById('log').textContent = 'Undo stack: ' + undoStack.length + ' entries';
-    }
-
-    window.increment = increment;
-    window.decrement = decrement;
-    window.undo = undo;
-    updateUI();
+    receipt.addEventListener('wrn-undo', () => {
+      if (previous === null) return;
+      value = previous;
+      previous = null;
+      receipt.hidden = true;
+      render();
+    });
   </script>
 </body>
 </html>

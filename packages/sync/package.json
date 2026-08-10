@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Demo state sync code generation and hashing — no-account sharing for wornpage apps",
   "type": "module",
+  "wornpage": {
+    "contractVersion": 1,
+    "delivery": "source"
+  },
   "scripts": { "test": "bun test" },
   "main": "./src/index.ts",
   "exports": { ".": { "types": "./src/index.ts", "default": "./src/index.ts" } },

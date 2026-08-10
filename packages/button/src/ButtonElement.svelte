@@ -1,17 +1,34 @@
+<svelte:options customElement={{
+	tag: 'worn-button',
+	shadow: 'none',
+	props: {
+		label: {},
+		variant: {},
+		disabled: { type: 'Boolean' },
+		size: {},
+		type: {},
+		href: {}
+	}
+}} />
+
 <script lang="ts">
 	import Button from './WornButton.svelte';
-	import { mount } from 'svelte';
+
+	let {
+		label = 'Button',
+		variant = 'default',
+		disabled = false,
+		size = 'md',
+		type = 'button',
+		href
+	}: {
+		label?: string;
+		variant?: 'primary' | 'default' | 'danger' | 'warning';
+		disabled?: boolean;
+		size?: 'sm' | 'md';
+		type?: 'button' | 'submit';
+		href?: string;
+	} = $props();
 </script>
 
-<!-- Web component wrapper for @wornpage/button -->
-<script lang="ts" module>
-	let instance: ReturnType<typeof mount>;
-	export function mountButton(target: HTMLElement, props: Record<string, unknown>) {
-		if (instance) unmountButton();
-		instance = mount(Button, { target, props });
-		return () => { unmountButton(); };
-	}
-	function unmountButton() {
-		if (instance) { import('svelte').then(({unmount}) => unmount(instance)); instance = undefined; }
-	}
-</script>
+<Button {variant} {disabled} {size} {type} {href}>{label}</Button>

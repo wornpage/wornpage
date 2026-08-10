@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div bind:this={el} class="worn-sidebar-element">
+<div bind:this={el} class="worn-sidebar-element" class:is-collapsed={collapsed}>
 <Sidebar
 	{items}
 	activeHref={activehref}
@@ -30,5 +30,16 @@
 </div>
 
 <style>
-	.worn-sidebar-element { height: 100%; }
+	:host { display: block; height: 100%; }
+	.worn-sidebar-element {
+		height: 100%;
+		inline-size: var(--worn-sidebar-width, 240px);
+		transition: inline-size 0.2s ease;
+	}
+	.worn-sidebar-element.is-collapsed {
+		inline-size: var(--worn-sidebar-collapsed-width, 60px);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.worn-sidebar-element { transition: none; }
+	}
 </style>

@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "description": "Svelte 5 undo system — receipt stack, snapshot capture, redo",
   "type": "module",
+  "wornpage": {
+    "contractVersion": 1,
+    "delivery": "browser-bundle"
+  },
   "scripts": {
-    "test": "bun test"
+    "test": "bun test",
+    "build": "vite build"
   },
   "main": "./dist/worn-undo.js",
   "svelte": "./src/index.ts",

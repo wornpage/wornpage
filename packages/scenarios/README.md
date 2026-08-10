@@ -6,6 +6,14 @@ TypeScript, zero dependencies, no Svelte required.
 This is the one package in the set that imports cleanly in a bun or node server
 process as well as in a browser — it is data and validators, nothing else.
 
+<!-- wornpage-delivery:v1 source -->
+## Delivery
+
+`src/` is the canonical implementation and published runtime. This package is source-only; it does not ship a generated `dist/` directory.
+
+The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+<!-- /wornpage-delivery -->
+
 ## Install
 
 ```bash

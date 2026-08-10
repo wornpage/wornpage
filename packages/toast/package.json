@@ -3,6 +3,10 @@
   "version": "0.1.1",
   "description": "Svelte 5 toast notification — fly-in, auto-dismiss, zero deps",
   "type": "module",
+  "wornpage": {
+    "contractVersion": 1,
+    "delivery": "browser-bundle"
+  },
   "scripts": {
     "test": "bun test",
     "build": "vite build"

@@ -1,0 +1,32 @@
+name: Mirror contract
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out mirror
+        uses: actions/checkout@v6
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install workspace dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check canonical repository drift
+        run: bun run sync --check
+
+      - name: Run cross-package tests
+        run: bun test
