@@ -8,10 +8,11 @@
     "demo"
   ],
   "scripts": {
-    "build": "bun run --filter '*' build",
+    "build": "bun run --cwd demo build",
     "test": "bun test --coverage",
     "lint": "bun run --filter '*' lint",
     "clean": "rm -rf packages/*/dist tools/*/dist packages/*/node_modules tools/*/node_modules",
+    "check:workspace": "bun run scripts/check-workspace-contract.ts",
     "new": "bun run packages/cli/src/index.ts new",
     "sync": "bun run scripts/sync.ts"
   },

@@ -19,9 +19,9 @@ This monorepo mirrors them so you can browse, test, and refactor across packages
 | You want to... | Go to |
 |---|---|
 | Fix a component bug | The component's standalone repo |
-| Add a new component | `bun run new <name>` in the monorepo, then publish standalone |
+| Add a new component | Scaffold and publish its standalone repo, then sync the monorepo |
 | Improve a dev tool | The monorepo `tools/` directory |
-| Cross-package refactor | The monorepo (test everything together) |
+| Cross-package verification or tooling | The monorepo; component edits still ship from standalone repos |
 
 ## Workflow
 
@@ -39,10 +39,14 @@ This monorepo mirrors them so you can browse, test, and refactor across packages
 ## Conventions
 
 ### Every component package must have:
-- `src/index.ts` — barrel export
-- `src/Component.svelte` — the Svelte 5 component
-- `tests/test.ts` — at minimum a "renders without error" test
-- `package.json` — with `@wornpage/` scope, `main`, `svelte`, `exports`
+- One canonical implementation under `src/`
+- A v2 `package.json#wornpage` delivery declaration
+- The generated Delivery section and deterministic `.gitattributes`
+- The shared release-contract workflow from `@wornpage/cli`
+
+The [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md)
+defines source-only and generated browser-bundle packages. Run
+`wornpage verify --frozen-dist` in the standalone repository before shipping.
 
 ### Every tool must have:
 - `src/index.ts` — library export
@@ -58,7 +62,9 @@ for standalone use. See `@wornpage/sidebar` for the reference pattern.
 ```bash
 cd wornpage
 bun install
-bun test          # 60+ tests across all packages and tools
+bun run check:workspace
+bun run sync --check
+bun test
 ```
 
 ## Questions?

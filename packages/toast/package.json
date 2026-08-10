@@ -4,7 +4,7 @@
   "description": "Svelte 5 toast notification — fly-in, auto-dismiss, zero deps",
   "type": "module",
   "wornpage": {
-    "contractVersion": 1,
+    "contractVersion": 2,
     "delivery": "browser-bundle"
   },
   "scripts": {

@@ -4,7 +4,7 @@
   "description": "Svelte 5 theme system — multi-theme CSS custom properties, persist, auto-detect",
   "type": "module",
   "wornpage": {
-    "contractVersion": 1,
+    "contractVersion": 2,
     "delivery": "browser-bundle"
   },
   "scripts": {

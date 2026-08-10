@@ -4,7 +4,7 @@
   "description": "Svelte 5 sidebar navigation component — collapsible groups, keyboard nav, search, favorites, recent items, drag-to-reorder",
   "type": "module",
   "wornpage": {
-    "contractVersion": 1,
+    "contractVersion": 2,
     "delivery": "browser-bundle"
   },
   "scripts": {

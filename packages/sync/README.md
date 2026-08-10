@@ -7,10 +7,12 @@ A sync code lets one browser hand its demo state to another device without
 sign-in: generate a code, derive a stable client id from it, and any browser
 using the same code reads the same server row.
 
-<!-- wornpage-delivery:v1 source -->
+<!-- wornpage-delivery:v2 source -->
 ## Delivery
 
 `src/` is the canonical implementation and published runtime. This package is source-only; it does not ship a generated `dist/` directory.
+
+Repository text is checked out as LF through `.gitattributes`, so generated output is byte-stable across Windows and Linux.
 
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->

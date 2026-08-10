@@ -8,14 +8,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wornpage/button": "file:../../button",
-    "@wornpage/cmdk": "*",
-    "@wornpage/receipt": "*",
-    "@wornpage/sidebar": "*",
-    "@wornpage/theme": "*",
-    "@wornpage/toast": "*",
-    "@wornpage/workflow": "*",
-    "@wornpage/sync": "file:../packages/sync"
+    "@wornpage/button": "workspace:*",
+    "@wornpage/cmdk": "workspace:*",
+    "@wornpage/receipt": "workspace:*",
+    "@wornpage/sidebar": "workspace:*",
+    "@wornpage/theme": "workspace:*",
+    "@wornpage/toast": "workspace:*",
+    "@wornpage/workflow": "workspace:*",
+    "@wornpage/sync": "workspace:*"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",

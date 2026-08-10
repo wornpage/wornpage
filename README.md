@@ -10,6 +10,7 @@
 git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
+bun run check:workspace
 bun test          # 100+ tests across all packages and tools
 ```
 
@@ -55,11 +56,17 @@ bun add @wornpage/toast
 - **This monorepo mirrors them.** `bun run sync` pulls the latest from each standalone repo.
 - **`packages/` is generated — never hand-edit it.** A change made here reaches
   nobody, because nothing installs from this repo. `bun run sync` overwrites it.
+- **The demo consumes only mirrored workspaces.** Every internal dependency uses
+  `workspace:*`; sibling `file:` paths and floating internal versions are
+  rejected by `bun run check:workspace` before CI installs the frozen lockfile.
 - **`bun run sync --check` reports drift** without changing anything, and exits
   non-zero when the mirror no longer matches canonical. CI runs it on repository
   changes and daily, so drift is visible even when this mirror is untouched.
 - **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
 - **Tests run across everything.** `bun test` validates all packages and tools together.
+- **The root build is an integration build.** `bun run build` compiles the demo
+  against mirrored `workspace:*` sources without generating package `dist/`
+  trees inside the mirror.
 
 ## Contributing
 
