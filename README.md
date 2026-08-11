@@ -11,6 +11,7 @@ git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
 bun run check:workspace
+bun run check:components
 bun test          # 100+ tests across all packages and tools
 ```
 
@@ -28,19 +29,21 @@ bun add @wornpage/toast
 
 ### Components (`packages/` — mirrored from standalone repos)
 
-| Package | Standalone repo | Description |
-|---|---|---|
-| `@wornpage/button` | [wornpage/button](https://github.com/wornpage/button) | Buttons and button-links with shared variants and disabled states |
-| `@wornpage/sidebar` | [wornpage/sidebar](https://github.com/wornpage/sidebar) | Collapsible sidebar with groups, search, favorites, keyboard nav |
-| `@wornpage/cmdk` | [wornpage/cmdk](https://github.com/wornpage/cmdk) | Command palette — fuzzy search, keyboard-first |
-| `@wornpage/toast` | [wornpage/toast](https://github.com/wornpage/toast) | Toast notification web component |
-| `@wornpage/theme` | [wornpage/theme](https://github.com/wornpage/theme) | Theme switcher with 8 palettes |
-| `@wornpage/undo` | [wornpage/undo](https://github.com/wornpage/undo) | Undo/redo stack |
-| `@wornpage/workflow` | [wornpage/workflow](https://github.com/wornpage/workflow) | Pack state machine — blockers, next-action, energy |
-| `@wornpage/receipt` | [wornpage/receipt](https://github.com/wornpage/receipt) | Action receipt card with undo support |
-| `@wornpage/sync` | [wornpage/sync](https://github.com/wornpage/sync) | Sync code generation, hashing, and QR encoding |
-| `@wornpage/scenarios` | [wornpage/scenarios](https://github.com/wornpage/scenarios) | Shared scenario definitions and validators |
-| `@wornpage/cli` | [wornpage/cli](https://github.com/wornpage/cli) | Scaffold + ship new components |
+| Package | Standalone repo | Delivery | Description |
+|---|---|---|---|
+| `@wornpage/button` | [wornpage/button](https://github.com/wornpage/button) | `browser-bundle` | Buttons and button-links with shared variants and disabled states |
+| `@wornpage/sidebar` | [wornpage/sidebar](https://github.com/wornpage/sidebar) | `browser-bundle` | Collapsible sidebar with groups, search, favorites, keyboard nav |
+| `@wornpage/cmdk` | [wornpage/cmdk](https://github.com/wornpage/cmdk) | `browser-bundle` | Command palette - fuzzy search, keyboard-first |
+| `@wornpage/toast` | [wornpage/toast](https://github.com/wornpage/toast) | `browser-bundle` | Toast notification web component |
+| `@wornpage/theme` | [wornpage/theme](https://github.com/wornpage/theme) | `browser-bundle` | Theme switcher with 8 palettes |
+| `@wornpage/undo` | [wornpage/undo](https://github.com/wornpage/undo) | `browser-bundle` | Undo/redo stack |
+| `@wornpage/date-input` | *(not yet a standalone GitHub repo)* | `source` | Date input wrapper |
+| `@wornpage/multi-select` | *(not yet a standalone GitHub repo)* | `source` | Multi-select control |
+| `@wornpage/workflow` | [wornpage/workflow](https://github.com/wornpage/workflow) | `source` | Pack state machine - blockers, next-action, energy |
+| `@wornpage/receipt` | [wornpage/receipt](https://github.com/wornpage/receipt) | `source` | Action receipt card with undo support |
+| `@wornpage/sync` | [wornpage/sync](https://github.com/wornpage/sync) | `source` | Sync code generation, hashing, and QR encoding |
+| `@wornpage/scenarios` | [wornpage/scenarios](https://github.com/wornpage/scenarios) | `source` | Shared scenario definitions and validators |
+| `@wornpage/cli` | [wornpage/cli](https://github.com/wornpage/cli) | `tooling` | Scaffold + ship new components |
 
 ### Tools (`tools/` — monorepo-native)
 
@@ -64,6 +67,9 @@ bun add @wornpage/toast
   changes and daily, so drift is visible even when this mirror is untouched.
 - **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
 - **Tests run across everything.** `bun test` validates all packages and tools together.
+- **Delivery is checked as a fleet.** `bun run check:components` inspects every
+  mirrored component's versioned declaration, exports, local Delivery section,
+  release workflow, and source/runtime boundary without rebuilding generated output.
 - **The root build is an integration build.** `bun run build` compiles the demo
   against mirrored `workspace:*` sources without generating package `dist/`
   trees inside the mirror.

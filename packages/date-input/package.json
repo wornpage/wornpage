@@ -1,0 +1,26 @@
+{
+  "name": "@wornpage/date-input",
+  "version": "0.1.1",
+  "description": "Svelte 5 date input control with touch-safe styling and native date-picker semantics.",
+  "type": "module",
+  "wornpage": {
+    "contractVersion": 2,
+    "delivery": "source"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": ["src", "README.md"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/date-input.git"
+  }
+}
