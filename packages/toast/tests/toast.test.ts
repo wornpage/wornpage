@@ -3,6 +3,9 @@ import { readFileSync } from 'node:fs';
 import type { ToastItem } from '../src/types';
 
 const toastSource = readFileSync(new URL('../src/Toast.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const browserBundleSource = readFileSync(new URL('../dist/worn-toast.js', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 function createToast(items: ToastItem[], item: Omit<ToastItem, 'id'>): ToastItem[] {
@@ -40,6 +43,14 @@ describe('toast store logic', () => {
 });
 
 describe('toast component', () => {
+	test('keeps the Svelte root canonical while preserving browser delivery', () => {
+		expect(indexSource).toContain("export { default as Toast } from './Toast.svelte';");
+		expect(indexSource).toContain("export type { ToastItem, ToastProps } from './types.js';");
+		expect(indexSource).not.toContain('ToastElement');
+		expect(viteSource).toContain("entry: 'src/ToastElement.svelte'");
+		expect(browserBundleSource).toContain('customElements.define("worn-toast"');
+	});
+
 	test('uses shared theme tokens with standalone fallbacks', () => {
 		expect(toastSource).toContain('var(--wrn-toast-bg, var(--cockpit-surface, #fdfbf7))');
 		expect(toastSource).toContain('var(--wrn-toast-text, var(--cockpit-text, #21322b))');

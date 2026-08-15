@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { COMPONENT_REPOSITORIES } from './component-repositories.ts';
 import { DEMO_CATALOG } from '../demo/src/sections.ts';
 
@@ -12,7 +12,6 @@ const sidebarIndexSource = readFileSync(new URL('../packages/sidebar/src/index.t
 const sidebarItemSource = readFileSync(new URL('../packages/sidebar/src/SidebarItem.svelte', import.meta.url), 'utf8');
 const themeIndexSource = readFileSync(new URL('../packages/theme/src/index.ts', import.meta.url), 'utf8');
 const tabsSource = readFileSync(new URL('../packages/tabs/src/Tabs.svelte', import.meta.url), 'utf8');
-const adapterFiles = readdirSync(new URL('../demo/src/adapters/', import.meta.url)).sort();
 const demoPackage = JSON.parse(readFileSync(new URL('../demo/package.json', import.meta.url), 'utf8')) as {
   dependencies: Record<string, string>;
 };
@@ -86,16 +85,10 @@ describe('aggregate demo contract', () => {
     expect(exampleSource).toMatch(/\.tab-panel\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
   });
 
-  test('keeps only the proven Toast source-root quarantine', () => {
+  test('keeps all component packages on their canonical entrypoints', () => {
     const packageAliases = [...viteSource.matchAll(/^\s+'(@wornpage\/[^']+)':/gmu)].map((match) => match[1]);
 
-    expect(packageAliases).toEqual(['@wornpage/toast']);
-    expect(adapterFiles).toEqual(['toast.ts']);
-    expect(viteSource).toContain('wornpage/toast#1');
-    expect(viteSource).toContain('https://github.com/wornpage/toast/pull/1');
-    expect(viteSource).toContain('canonical @wornpage/toast re-exports ToastElement.svelte');
-    expect(viteSource).toContain('options_missing_custom_element');
-    expect(viteSource).not.toContain('@wornpage/undo');
+    expect(packageAliases).toEqual([]);
     expect(exampleSource).toContain("from '@wornpage/undo';");
   });
 
