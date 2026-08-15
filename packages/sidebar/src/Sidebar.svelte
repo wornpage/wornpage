@@ -3,6 +3,7 @@
 	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
 	import { filterNavChildren, filterNavItems, hasNavFilterResults, matchesNavItem, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 	import { nextNavFocusIndex } from './keyboard.js';
+	import { filterTransientNavItems, selectCurrentPagePlacement } from './shortcuts.js';
 	import { visibleNavItems } from './visibility.js';
 
 	interface Props {
@@ -159,24 +160,33 @@
 	const visibleItems = $derived(visibleNavItems(items, hiddenItems));
 	const flatItems = $derived(flatten(visibleItems));
 	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && matchesNavItem(i, filterText)));
+	const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));
 
 	const topLevel = $derived(filterNavItems(visibleItems, filterText));
-	const recentItems = $derived(
+	const recentItems = $derived(filterTransientNavItems(
 		recentRoutes
 			.map(href => flatItems.find(i => i.href === href))
-			.filter(Boolean) as NavItem[]
-	);
+			.filter(Boolean) as NavItem[],
+		activeHref,
+		3
+	));
 
-	const attentionItems = $derived(flatItems.filter(i => i.attention || (i.badge && i.badge > 0)));
+	const attentionItems = $derived(filterTransientNavItems(
+		flatItems.filter(i => i.attention || (i.badge && i.badge > 0)),
+		activeHref,
+		3
+	));
 
-	const relatedItems = $derived(
+	const relatedItems = $derived(filterTransientNavItems(
 		activeHref
 			? flatItems.filter(i => {
 					const active = flatItems.find(f => f.href === activeHref);
 					return active && i.relatedTo?.includes(active.id);
 				})
-			: []
-	);
+			: [],
+		activeHref,
+		3
+	));
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (shouldClearNavFilter(e.key, filterText)) {
@@ -202,18 +212,18 @@
 		e.preventDefault(); if (href) onnavigate?.(href);
 	}
 
-	function isActive(item: NavItem): boolean {
-		return item.href ? activeHref === item.href : false;
+	function isCurrentPage(item: NavItem, group: 'pinned' | 'canonical'): boolean {
+		return currentPage?.group === group && currentPage.item.id === item.id;
 	}
 
 	function handleCollapse() { collapsed = !collapsed; oncollapsed?.(collapsed); }
 
 </script>
 
-{#snippet navLink(item: NavItem)}
+{#snippet navLink(item: NavItem, isCurrentPage = false)}
 	<div class="worn-nav-row" class:has-reorder={favorites.has(item.id) && favItems.length > 1}>
-		<a href={item.href || '#'} class="worn-nav-item" class:active={isActive(item)} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
-			aria-current={isActive(item) ? 'page' : undefined}
+		<a href={item.href || '#'} class="worn-nav-item" class:active={isCurrentPage} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
+			aria-current={isCurrentPage ? 'page' : undefined}
 			title={collapsed ? item.label : undefined}
 			onclick={(e) => handleNav(e, item.href)}
 			onkeydown={handleKeydown}
@@ -258,25 +268,25 @@
 
 	{#if recentItems.length > 0 && !filterText}
 		<div class="worn-section-label">Recent</div>
-		{#each recentItems.slice(0, 3) as item (item.id)}{@render navLink(item)}{/each}
+		{#each recentItems as item (item.id)}{@render navLink(item, false)}{/each}
 		<div class="worn-section-divider"></div>
 	{/if}
 
 	{#if attentionItems.length > 0 && !filterText}
 		<div class="worn-section-label">Needs attention</div>
-		{#each attentionItems.slice(0, 3) as item (item.id)}{@render navLink(item)}{/each}
+		{#each attentionItems as item (item.id)}{@render navLink(item, false)}{/each}
 		<div class="worn-section-divider"></div>
 	{/if}
 
 	{#if relatedItems.length > 0 && !filterText}
 		<div class="worn-section-label">You might want</div>
-		{#each relatedItems.slice(0, 3) as item (item.id)}{@render navLink(item)}{/each}
+		{#each relatedItems as item (item.id)}{@render navLink(item, false)}{/each}
 		<div class="worn-section-divider"></div>
 	{/if}
 
 	{#if favItems.length > 0}
 		<div class="worn-section-label">Pinned</div>
-		{#each favItems as item (item.id)}{@render navLink(item)}{/each}
+		{#each favItems as item (item.id)}{@render navLink(item, isCurrentPage(item, 'pinned'))}{/each}
 		<div class="worn-section-divider"></div>
 	{/if}
 
@@ -285,11 +295,11 @@
 			<details class="worn-nav-group" open={shouldOpenNavSection(item, filterText, openSections)} ontoggle={(e) => toggleSection(item.id, (e.currentTarget as HTMLDetailsElement).open)}>
 				<summary class="worn-nav-item worn-nav-summary" class:active={sectionForActiveHref(items, activeHref)?.id === item.id}><span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span><span class="worn-nav-label">{item.label}</span></summary>
 				{#each filterNavChildren(item, filterText).filter(c => !favorites.has(c.id)) as child (child.id)}
-					{@render navLink(child)}
+					{@render navLink(child, isCurrentPage(child, 'canonical'))}
 				{/each}
 			</details>
 		{:else}
-			{@render navLink(item)}
+			{@render navLink(item, isCurrentPage(item, 'canonical'))}
 		{/if}
 	{/each}
 

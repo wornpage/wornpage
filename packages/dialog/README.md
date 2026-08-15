@@ -23,13 +23,16 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
   let open = false;
 </script>
 
-<Dialog bind:open title="Confirm">Content</Dialog>
+<Dialog bind:open title="Confirm" dismissible={!busy}>Content</Dialog>
 ```
 
 `title` supplies the accessible dialog name. Escape, a direct backdrop click, or the close
 button dismisses the dialog. Focus remains inside the dialog while open and returns to the
 previously focused element after close. Long unbroken content wraps or scrolls inside the
 dialog body instead of widening the modal or page.
+
+Set `dismissible={false}` while an action is in flight to disable Escape, backdrop, and
+close-button dismissal as one coherent state. Content actions remain owned by the caller.
 
 ## Browser bundle
 
@@ -42,6 +45,7 @@ dialog body instead of widening the modal or page.
   title="Archive customer workspace?"
   description="Archived history remains available."
   size="sm"
+  dismissible
 ></worn-dialog>
 
 <script type="module">
@@ -54,4 +58,5 @@ dialog body instead of widening the modal or page.
 ```
 
 The bundle registers `<worn-dialog>` with reflected `open`, `title`, `description`, and
-`size` properties. It dispatches `close` after Escape, backdrop, or close-button dismissal.
+`size` and `dismissible` properties. It dispatches `close` after Escape, backdrop, or
+close-button dismissal when dismissal is enabled.

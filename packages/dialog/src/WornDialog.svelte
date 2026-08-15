@@ -9,8 +9,9 @@
 		onclose?: () => void;
 		children?: any;
 		size?: 'sm' | 'md' | 'lg';
+		dismissible?: boolean;
 	}
-	let { open = $bindable(false), title, onclose, children, size = 'md' }: Props = $props();
+	let { open = $bindable(false), title, onclose, children, size = 'md', dismissible = true }: Props = $props();
 
 	const componentId = $props.id();
 	const titleId = `worn-dialog-title-${componentId}`;
@@ -45,7 +46,7 @@
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (!open) return;
-		if (e.key === 'Escape') {
+		if (e.key === 'Escape' && dismissible) {
 			open = false;
 			onclose?.();
 			return;
@@ -70,7 +71,7 @@
 	}
 
 	function handleBackdrop(e: MouseEvent) {
-		if (e.target === e.currentTarget) { open = false; onclose?.(); }
+		if (dismissible && e.target === e.currentTarget) { open = false; onclose?.(); }
 	}
 </script>
 
@@ -92,7 +93,7 @@
 		>
 			<div class="worn-dialog-head">
 				{#if title}<h2 class="worn-dialog-title" id={titleId}>{title}</h2>{/if}
-				<button type="button" class="worn-dialog-close" onclick={() => { open = false; onclose?.(); }} aria-label="Close"></button>
+				<button type="button" class="worn-dialog-close" disabled={!dismissible} onclick={() => { open = false; onclose?.(); }} aria-label="Close"></button>
 			</div>
 			<div class="worn-dialog-body">
 				{@render children?.()}
@@ -179,6 +180,10 @@
 	.worn-dialog-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 	.worn-dialog-close:hover {
 		background: var(--cockpit-hover-bg);
+	}
+	.worn-dialog-close:disabled {
+		cursor: not-allowed;
+		opacity: 0.45;
 	}
 	.worn-dialog-close:focus-visible {
 		outline: 2px dashed var(--cockpit-accent);

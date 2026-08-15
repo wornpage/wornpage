@@ -6,6 +6,7 @@
     title: { reflect: true, type: 'String' },
     description: { reflect: true, type: 'String' },
     size: { reflect: true, type: 'String' },
+    dismissible: { reflect: true, type: 'Boolean' },
   },
 }} />
 
@@ -17,11 +18,13 @@
     title = '',
     description = '',
     size = 'md',
+		dismissible = true,
   }: {
     open?: boolean;
     title?: string;
     description?: string;
     size?: 'sm' | 'md' | 'lg';
+		dismissible?: boolean;
   } = $props();
   const host = $host<HTMLElement>();
 
@@ -31,7 +34,7 @@
   }
 </script>
 
-<Dialog bind:open {title} {size} onclose={handleClose}>
+<Dialog bind:open {title} {size} {dismissible} onclose={handleClose}>
   {#if description}<p class="worn-dialog-element-description">{description}</p>{/if}
 </Dialog>
 
