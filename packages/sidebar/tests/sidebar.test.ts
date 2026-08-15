@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from '../src/filter.js';
 import { nextNavFocusIndex } from '../src/keyboard.js';
 import { visibleNavItems } from '../src/visibility.js';
+import { filterTransientNavItems, selectCurrentPagePlacement } from '../src/shortcuts.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
 const itemSource = readFileSync(new URL('../src/SidebarItem.svelte', import.meta.url), 'utf8');
@@ -11,6 +12,58 @@ const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.me
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+
+describe('current page placement', () => {
+	const shortcuts = [
+		{ id: 'review', href: '/review', label: 'Review', attention: true },
+		{ id: 'inbox', href: '/inbox', label: 'Inbox', attention: true },
+		{ id: 'tasks', href: '/tasks', label: 'Tasks', attention: true },
+		{ id: 'calendar', href: '/calendar', label: 'Calendar', attention: true },
+	];
+
+	test('excludes the active route from every transient group before limiting', () => {
+		expect(filterTransientNavItems(shortcuts, '/review', 3).map((item) => item.href)).toEqual([
+			'/inbox',
+			'/tasks',
+			'/calendar',
+		]);
+	});
+
+	test('backfills a transient group after excluding the active item', () => {
+		expect(filterTransientNavItems(shortcuts, '/inbox', 3).map((item) => item.href)).toEqual([
+			'/review',
+			'/tasks',
+			'/calendar',
+		]);
+	});
+
+	test('selects the active item from exactly one durable group', () => {
+		expect(selectCurrentPagePlacement(shortcuts, '/review', new Set())).toEqual({
+			item: shortcuts[0],
+			group: 'canonical',
+		});
+		expect(selectCurrentPagePlacement(shortcuts, '/review', new Set(['review']))).toEqual({
+			item: shortcuts[0],
+			group: 'pinned',
+		});
+		expect(selectCurrentPagePlacement(shortcuts, '/missing', new Set(['review']))).toBeNull();
+	});
+
+	test('does not change keyboard or search behavior for rendered navigation', () => {
+		expect(nextNavFocusIndex('ArrowDown', 1, 3)).toBe(2);
+		expect(filterNavItems(shortcuts, 'review').map((item) => item.id)).toEqual(['review']);
+	});
+
+	test('uses the shared placement contract and keeps transient links inactive', () => {
+		expect(sidebarSource).toContain("import { filterTransientNavItems, selectCurrentPagePlacement } from './shortcuts.js';");
+		expect(sidebarSource).toContain('const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));');
+		expect(sidebarSource).toContain("@render navLink(item, isCurrentPage(item, 'pinned'))");
+		expect(sidebarSource.match(/isCurrentPage\((?:child|item), 'canonical'\)/gu)?.length).toBe(2);
+		expect(sidebarSource.match(/@render navLink\(item, false\)/gu)?.length).toBe(3);
+		expect(demoSource).toContain("sb.activehref = '#review';");
+		expect(demoSource).toContain('sb.activehref = e.detail.href;');
+	});
+});
 
 describe('filter control', () => {
 	test('owns one accessible clear affordance', () => {

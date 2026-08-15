@@ -75,6 +75,7 @@
   ];
 
   sb.items = DEFAULT_ITEMS;
+  sb.activehref = '#review';
 
   collapseButton.addEventListener('click', () => {
     const collapsed = !sb.collapsed;
@@ -95,6 +96,7 @@
   });
 
   sb.addEventListener('worn-nav', (e) => {
+    sb.activehref = e.detail.href;
     logEvent(`Navigate to: ${e.detail.href}`);
   });
 

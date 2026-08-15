@@ -16,9 +16,18 @@ describe('hydration and interaction contract', () => {
   });
 
   test('keeps keyboard, backdrop, and close-button dismissal', () => {
-    expect(source).toContain("if (e.key === 'Escape')");
-    expect(source).toContain('if (e.target === e.currentTarget)');
+    expect(source).toContain("if (e.key === 'Escape' && dismissible)");
+    expect(source).toContain('if (dismissible && e.target === e.currentTarget)');
     expect(source).toContain('aria-label="Close"');
+  });
+
+  test('locks every dismissal path while an action is in flight', () => {
+    expect(source).toContain('dismissible?: boolean;');
+    expect(source).toContain('dismissible = true');
+    expect(source).toContain('disabled={!dismissible}');
+    expect(source).toContain('.worn-dialog-close:disabled');
+    expect(element).toContain("dismissible: { reflect: true, type: 'Boolean' }");
+    expect(element).toContain('<Dialog bind:open {title} {size} {dismissible} onclose={handleClose}>');
   });
 
   test('keeps static size classes and reduced-motion behavior', () => {
@@ -75,7 +84,7 @@ describe('hydration and interaction contract', () => {
     expect(elementsEntry).toBe("import './DialogElement.svelte';\n");
     expect(element).toContain("tag: 'worn-dialog'");
     expect(element).toContain("shadow: 'none'");
-    expect(element).toContain('<Dialog bind:open {title} {size} onclose={handleClose}>');
+    expect(element).toContain('<Dialog bind:open {title} {size} {dismissible} onclose={handleClose}>');
     expect(element).toContain("setTimeout(() => host.dispatchEvent(new CustomEvent('close')), 0);");
     expect(viteConfig).toContain("entry: 'src/elements.ts'");
     expect(viteConfig).toContain("customElement: filename.endsWith('Element.svelte')");
