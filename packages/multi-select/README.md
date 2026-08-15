@@ -1,6 +1,6 @@
 # @wornpage/multi-select
 
-Svelte 5 native multi-select with shared styling and compact layout support.
+Svelte 5 native multi-select with shared styling, compact sizing, and touch-safe defaults.
 
 <!-- wornpage-delivery:v2 source -->
 ## Delivery
@@ -26,7 +26,8 @@ npm install @wornpage/multi-select
 
   const options = [
     { value: 'low', label: 'Low' },
-    { value: 'high', label: 'High' }
+    { value: 'high', label: 'High' },
+    { value: 'paused', label: 'Paused', disabled: true }
   ];
 </script>
 
@@ -39,6 +40,8 @@ npm install @wornpage/multi-select
 | --- | --- | --- | --- |
 | `value` | `string[]` | `[]` | Bindable selected values |
 | `onchange` | `(event: Event) => void` | - | Commit handler |
-| `options` | `{ value: string; label: string }[]` | - | Available option rows |
+| `options` | `{ value: string; label: string; disabled?: boolean }[]` | - | Available option rows |
 | `disabled` | `boolean` | `false` | Disables the control |
 | `size` | `number` | - | Visible row count |
+
+Give the control an accessible name with an associated `label`, `aria-label`, or `aria-labelledby`. Native listbox selection and keyboard behavior are preserved; `size` controls the visible row count above the component's 44px minimum target.

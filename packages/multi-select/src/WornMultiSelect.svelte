@@ -1,18 +1,5 @@
 <script lang="ts">
-	interface Option {
-		value: string;
-		label: string;
-	}
-
-	interface Props {
-		value?: string[];
-		onchange?: (event: Event) => void;
-		options: Option[];
-		disabled?: boolean;
-		class?: string;
-		size?: number;
-		[key: string]: unknown;
-	}
+	import type { MultiSelectProps } from './types.js';
 
 	let {
 		value = $bindable([]),
@@ -22,7 +9,7 @@
 		class: className = '',
 		size,
 		...rest
-	}: Props = $props();
+	}: MultiSelectProps = $props();
 
 	$effect(() => {
 		if (!Array.isArray(value)) value = [];
@@ -39,26 +26,34 @@
 	{...rest}
 >
 	{#each options as option (option.value)}
-		<option value={option.value}>{option.label}</option>
+		<option value={option.value} disabled={option.disabled}>{option.label}</option>
 	{/each}
 </select>
 
 <style>
 	.worn-multi-select {
-		width: 100%;
+		--worn-multi-select-boundary: color-mix(
+			in srgb,
+			var(--cockpit-border-strong) 30%,
+			var(--cockpit-text-muted)
+		);
 		box-sizing: border-box;
+		inline-size: 100%;
+		max-inline-size: 100%;
+		min-block-size: 44px;
+		min-inline-size: 0;
 		font-family: var(--font-typewriter);
 		font-size: 14px;
 		line-height: 1.4;
 		padding: 9px 12px;
-		border: 1px solid var(--cockpit-border);
+		border: 1px solid var(--worn-multi-select-boundary);
 		border-radius: var(--cockpit-radius-sm);
 		background: var(--cockpit-surface);
 		color: var(--cockpit-text);
-		min-height: 120px;
+		touch-action: manipulation;
 	}
 
-	.worn-multi-select:focus {
+	.worn-multi-select:focus-visible {
 		outline: 2px dashed var(--cockpit-accent);
 		outline-offset: 2px;
 		border-color: var(--cockpit-accent);
@@ -67,7 +62,16 @@
 
 	.worn-multi-select:disabled {
 		background-color: var(--cockpit-bg-secondary);
-		border-color: var(--cockpit-border);
+		border-color: var(--worn-multi-select-boundary);
 		color: var(--cockpit-text-muted);
+		-webkit-text-fill-color: var(--cockpit-text-muted);
+		cursor: not-allowed;
+		opacity: 1;
+	}
+
+	@media (pointer: coarse) {
+		.worn-multi-select {
+			font-size: 16px;
+		}
 	}
 </style>
