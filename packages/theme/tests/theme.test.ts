@@ -17,6 +17,7 @@ const elementSource = readFileSync(new URL('../src/ThemeElement.svelte', import.
 const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
+const lockSource = readFileSync(new URL('../bun.lock', import.meta.url), 'utf8');
 
 function runtimeFixture(dark = false) {
 	const attributes = new Map<string, string>();
@@ -163,6 +164,11 @@ describe('package entrypoints', () => {
 		expect(elementsEntrySource).toBe("import './ThemeElement.svelte';\n");
 		expect(viteSource).toContain("entry: 'src/elements.ts'");
 		expect(viteSource).toContain("filename.endsWith('ThemeElement.svelte')");
+	});
+
+	test('pins the build toolchain used for frozen browser output', () => {
+		expect(lockSource).toContain('"lockfileVersion": 1');
+		expect(lockSource).toContain('"svelte": ["svelte@5.56.9"');
 	});
 });
 
