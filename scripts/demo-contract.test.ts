@@ -91,7 +91,8 @@ describe('aggregate demo contract', () => {
 
     expect(packageAliases).toEqual(['@wornpage/toast']);
     expect(adapterFiles).toEqual(['toast.ts']);
-    expect(viteSource).toContain('task-msufur2a-q3cg');
+    expect(viteSource).toContain('wornpage/toast#1');
+    expect(viteSource).toContain('https://github.com/wornpage/toast/pull/1');
     expect(viteSource).toContain('canonical @wornpage/toast re-exports ToastElement.svelte');
     expect(viteSource).toContain('options_missing_custom_element');
     expect(viteSource).not.toContain('@wornpage/undo');
