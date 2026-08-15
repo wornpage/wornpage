@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   plugins: [svelte({
@@ -8,6 +9,12 @@ export default defineConfig({
     },
   })],
   base: './',
+  resolve: {
+    alias: {
+      // Quarantine wornpage/toast#1 (https://github.com/wornpage/toast/pull/1): canonical @wornpage/toast re-exports ToastElement.svelte, triggering options_missing_custom_element.
+      '@wornpage/toast': fileURLToPath(new URL('./src/adapters/toast.ts', import.meta.url)),
+    },
+  },
   optimizeDeps: { include: ['@wornpage/sync'] },
   build: { outDir: 'dist' }
 });
