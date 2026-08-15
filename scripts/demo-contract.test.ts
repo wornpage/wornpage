@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { COMPONENT_REPOSITORIES } from './component-repositories.ts';
 import { DEMO_CATALOG } from '../demo/src/sections.ts';
 
@@ -11,6 +11,8 @@ const cmdkIndexSource = readFileSync(new URL('../packages/cmdk/src/index.ts', im
 const sidebarIndexSource = readFileSync(new URL('../packages/sidebar/src/index.ts', import.meta.url), 'utf8');
 const sidebarItemSource = readFileSync(new URL('../packages/sidebar/src/SidebarItem.svelte', import.meta.url), 'utf8');
 const themeIndexSource = readFileSync(new URL('../packages/theme/src/index.ts', import.meta.url), 'utf8');
+const tabsSource = readFileSync(new URL('../packages/tabs/src/Tabs.svelte', import.meta.url), 'utf8');
+const adapterFiles = readdirSync(new URL('../demo/src/adapters/', import.meta.url)).sort();
 const demoPackage = JSON.parse(readFileSync(new URL('../demo/package.json', import.meta.url), 'utf8')) as {
   dependencies: Record<string, string>;
 };
@@ -66,6 +68,34 @@ describe('aggregate demo contract', () => {
     expect(appSource).toContain('.demo-main { box-sizing: border-box; min-width: 0;');
     expect(appSource).toContain('--wrn-theme-text: var(--cockpit-text');
     expect(exampleSource).toContain('.table-scroll { max-width: 100%; overflow-x: auto; }');
+    expect(tabsSource).toMatch(/\.worn-tabs\s*\{[^}]*overflow-x:\s*auto;/su);
+    expect(appSource).not.toContain('overflow-x:');
+    expect(exampleSource.match(/overflow-x:\s*auto;/gu)?.length).toBe(1);
+    expect(combinedDemoSource).not.toMatch(/:global\((?:html|body)\)[^{]*\{[^}]*overflow-x:\s*(?:clip|hidden)/su);
+  });
+
+  test('uses the defined readable muted token for secondary catalog text', () => {
+    expect(combinedDemoSource).not.toContain('--cockpit-text-secondary');
+    expect(combinedDemoSource).not.toMatch(/var\(--cockpit-text-secondary,\s*#(?:555|4e5f57)\)/iu);
+    expect(appSource).toMatch(/\.catalog-jump label\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(appSource).toMatch(/\.category-heading\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(appSource).toMatch(/\.section-heading code\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(exampleSource).toMatch(/\.live-output, \.standup\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(exampleSource).toMatch(/\.field-label\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(exampleSource).toMatch(/\.data-list span\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(exampleSource).toMatch(/\.tab-panel\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+  });
+
+  test('keeps only the proven Toast source-root quarantine', () => {
+    const packageAliases = [...viteSource.matchAll(/^\s+'(@wornpage\/[^']+)':/gmu)].map((match) => match[1]);
+
+    expect(packageAliases).toEqual(['@wornpage/toast']);
+    expect(adapterFiles).toEqual(['toast.ts']);
+    expect(viteSource).toContain('task-msufur2a-q3cg');
+    expect(viteSource).toContain('canonical @wornpage/toast re-exports ToastElement.svelte');
+    expect(viteSource).toContain('options_missing_custom_element');
+    expect(viteSource).not.toContain('@wornpage/undo');
+    expect(exampleSource).toContain("from '@wornpage/undo';");
   });
 
   test('fails the build instead of accepting Svelte warnings', () => {

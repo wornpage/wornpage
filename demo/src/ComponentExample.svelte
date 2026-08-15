@@ -277,20 +277,20 @@
   .example-surface { box-sizing: border-box; display: grid; gap: 12px; max-width: 100%; min-width: 0; }
   .example-stack { display: grid; gap: 12px; min-width: 0; }
   .control-row { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; min-width: 0; }
-  .live-output, .standup { color: var(--cockpit-text-secondary, #4e5f57); font-size: 13px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
+  .live-output, .standup { color: var(--cockpit-text-muted, #6b6b6b); font-size: 13px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
   .form-grid { display: grid; gap: 7px; max-width: 32rem; min-width: 0; }
-  .field-label { color: var(--cockpit-text-secondary, #4e5f57); font-size: 12px; font-weight: 650; }
+  .field-label { color: var(--cockpit-text-muted, #6b6b6b); font-size: 12px; font-weight: 650; }
   .selection-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
   .data-list { border-block: 1px solid var(--cockpit-border, #d4cec5); display: grid; min-width: 0; }
   .data-list > div { align-items: baseline; border-bottom: 1px solid var(--cockpit-border, #d4cec5); display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; min-width: 0; padding: 9px 0; }
   .data-list > div:last-child { border-bottom: 0; }
   .data-list strong, .data-list span { min-width: 0; overflow-wrap: anywhere; }
-  .data-list span { color: var(--cockpit-text-muted, #65746d); font-family: var(--font-typewriter, monospace); font-size: 12px; }
+  .data-list span { color: var(--cockpit-text-muted, #6b6b6b); font-family: var(--font-typewriter, monospace); font-size: 12px; }
   .sync-result { align-items: center; display: flex; flex-wrap: wrap; gap: 14px; min-width: 0; }
   .sync-result strong { font-family: var(--font-typewriter, monospace); overflow-wrap: anywhere; }
   .qr-output { box-sizing: border-box; inline-size: 120px; max-inline-size: 100%; }
   .qr-output :global(svg) { display: block; height: auto; max-width: 100%; }
-  .tab-panel { border-bottom: 1px solid var(--cockpit-border, #d4cec5); color: var(--cockpit-text-secondary, #4e5f57); font-size: 13px; min-width: 0; padding: 12px 4px; overflow-wrap: anywhere; }
+  .tab-panel { border-bottom: 1px solid var(--cockpit-border, #d4cec5); color: var(--cockpit-text-muted, #6b6b6b); font-size: 13px; min-width: 0; padding: 12px 4px; overflow-wrap: anywhere; }
   .table-scroll { max-width: 100%; overflow-x: auto; }
   table { border-collapse: collapse; font-size: 13px; min-width: 32rem; width: 100%; }
   th, td { border-bottom: 1px solid var(--cockpit-border, #d4cec5); padding: 8px 10px; text-align: left; }

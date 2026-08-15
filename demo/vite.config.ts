@@ -11,8 +11,8 @@ export default defineConfig({
   base: './',
   resolve: {
     alias: {
+      // Quarantine task-msufur2a-q3cg: canonical @wornpage/toast re-exports ToastElement.svelte, triggering options_missing_custom_element.
       '@wornpage/toast': fileURLToPath(new URL('./src/adapters/toast.ts', import.meta.url)),
-      '@wornpage/undo': fileURLToPath(new URL('./src/adapters/undo.ts', import.meta.url)),
     },
   },
   optimizeDeps: { include: ['@wornpage/sync'] },

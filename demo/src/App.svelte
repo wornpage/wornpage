@@ -150,7 +150,7 @@
 <style>
   :global(*) { box-sizing: border-box; }
   :global(html) { scroll-behavior: smooth; }
-  :global(body) { margin: 0; overflow-x: clip; }
+  :global(body) { margin: 0; }
   .app-shell { display: grid; grid-template-columns: auto minmax(0, 1fr); min-height: 100vh; max-width: 100%; }
   .demo-sidebar { align-self: start; background: var(--cockpit-surface, #fff); border-right: 1px solid var(--cockpit-border, #ddd); height: 100vh; overflow-y: auto; position: sticky; top: 0; width: 248px; z-index: 20; }
   .demo-sidebar.collapsed { width: 72px; }
@@ -175,8 +175,8 @@
   .repo-link:hover { background: var(--cockpit-hover-bg, rgba(0,0,0,.05)); }
   .repo-link:focus-visible { outline: 2px dashed var(--cockpit-accent, currentColor); outline-offset: 2px; }
   .catalog-jump { display: grid; gap: 6px; max-width: 22rem; min-width: 0; }
-  .catalog-jump label { color: var(--cockpit-text-secondary, #4e5f57); font-size: 12px; font-weight: 650; }
-  .category-heading { align-items: center; border-bottom: 2px solid var(--cockpit-border, #ddd); color: var(--cockpit-text-secondary, #555); display: flex; font-size: 12px; font-weight: 700; justify-content: space-between; margin: 36px 0 0; padding: 0 0 8px; text-transform: uppercase; }
+  .catalog-jump label { color: var(--cockpit-text-muted, #6b6b6b); font-size: 12px; font-weight: 650; }
+  .category-heading { align-items: center; border-bottom: 2px solid var(--cockpit-border, #ddd); color: var(--cockpit-text-muted, #6b6b6b); display: flex; font-size: 12px; font-weight: 700; justify-content: space-between; margin: 36px 0 0; padding: 0 0 8px; text-transform: uppercase; }
   .category-heading span:last-child { color: var(--cockpit-text-muted, #666); font-variant-numeric: tabular-nums; }
   .demo-section { border-bottom: 1px solid var(--cockpit-border, #ddd); min-width: 0; padding: 24px 0 28px; scroll-margin-top: 16px; }
   .demo-section.active { border-bottom-color: var(--cockpit-accent, #23796d); }
@@ -184,7 +184,7 @@
   .section-heading > div { flex: 1 1 20rem; min-width: 0; }
   .section-heading h2 { font-size: 19px; letter-spacing: 0; margin: 0 0 4px; }
   .section-heading p { color: var(--cockpit-text-muted, #666); line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
-  .section-heading code { background: var(--cockpit-bg-secondary, var(--cockpit-surface, #fff)); border: 1px solid var(--cockpit-border, #ddd); border-radius: 4px; color: var(--cockpit-text-secondary, #555); flex: 0 1 auto; font-size: 12px; max-width: 100%; overflow-wrap: anywhere; padding: 4px 7px; }
+  .section-heading code { background: var(--cockpit-bg-secondary, var(--cockpit-surface, #fff)); border: 1px solid var(--cockpit-border, #ddd); border-radius: 4px; color: var(--cockpit-text-muted, #6b6b6b); flex: 0 1 auto; font-size: 12px; max-width: 100%; overflow-wrap: anywhere; padding: 4px 7px; }
   footer { align-items: center; color: var(--cockpit-text-muted, #666); display: flex; flex-wrap: wrap; font-size: 12px; gap: 8px 16px; padding-top: 32px; }
   footer a { color: var(--cockpit-accent, #23796d); overflow-wrap: anywhere; }
   @media (max-width: 720px) {
