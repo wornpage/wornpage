@@ -1,48 +1,130 @@
-import { describe, test, expect } from 'bun:test';
-import type { UndoAction, UndoStore } from '../src/types';
-import { MAX_UNDO } from '../src/types';
+import { describe, expect, test } from 'bun:test';
+import { readFileSync } from 'node:fs';
+import { compile } from 'svelte/compiler';
+import { createUndoStack } from '../src/stack.js';
+import { MAX_UNDO, UNDO_LABELS } from '../src/types.js';
 
-function push(stack: UndoAction[], action: UndoAction): UndoAction[] {
-	return [...stack.slice(stack.length - MAX_UNDO + 1), action];
-}
+const source = readFileSync(new URL('../src/UndoReceipt.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const elementSource = readFileSync(new URL('../src/UndoElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const configSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
-function undo(stack: UndoStore): UndoStore {
-	if (stack.index <= 0) return stack;
-	return { ...stack, index: stack.index - 1 };
-}
-
-function redo(stack: UndoStore): UndoStore {
-	if (stack.index >= stack.stack.length - 1) return stack;
-	return { ...stack, index: stack.index + 1 };
-}
-
-describe('undo stack', () => {
-	test('push adds to end', () => {
-		const stack: UndoAction[] = [];
-		const r = push(stack, { type: 'action', packId: 'p1', label: 'Blocked', createdAt: 1 });
-		expect(r.length).toBe(1);
-		expect(r[0].label).toBe('Blocked');
+describe('snapshot stack', () => {
+	test('clones snapshots without retaining source references', () => {
+		const stack = createUndoStack<{ nested: { value: number } }>();
+		const state = { nested: { value: 1 } };
+		const snapshot = stack.snapshot(state);
+		state.nested.value = 2;
+		expect(snapshot.nested.value).toBe(1);
 	});
 
-	test('undo decrements index', () => {
-		const store: UndoStore = { stack: [{ type: 'action', packId: 'p1', label: 'A', createdAt: 1 }, { type: 'action', packId: 'p2', label: 'B', createdAt: 2 }], index: 2 };
-		const r = undo(store);
-		expect(r.index).toBe(1);
+	test('keeps the newest snapshots within its configured bound', () => {
+		const stack = createUndoStack<number>(2);
+		stack.commit(1);
+		stack.commit(2);
+		stack.commit(3);
+		expect(stack.length).toBe(2);
+		expect(stack.pop()).toBe(3);
+		expect(stack.pop()).toBe(2);
+		expect(stack.pop()).toBeNull();
 	});
 
-	test('redo increments index', () => {
-		const store: UndoStore = { stack: [{ type: 'action', packId: 'p1', label: 'A', createdAt: 1 }], index: 0 };
-		const r = redo(store);
-		expect(r.index).toBe(0); // only one item, can't redo
+	test('clears state and keeps a one-entry floor for invalid bounds', () => {
+		const stack = createUndoStack<number>(0);
+		stack.commit(1);
+		stack.commit(2);
+		expect(stack.length).toBe(1);
+		stack.clear();
+		expect(stack.length).toBe(0);
+	});
+});
+
+describe('receipt semantics and interaction', () => {
+	test('compiles both Svelte surfaces', () => {
+		expect(() => compile(source, { generate: 'client', runes: true })).not.toThrow();
+		expect(() => compile(elementSource, { generate: 'client', runes: true, customElement: true })).not.toThrow();
 	});
 
-	test('undo at start is no-op', () => {
-		const store: UndoStore = { stack: [], index: 0 };
-		expect(undo(store).index).toBe(0);
+	test('keeps live status text separate from interactive controls', () => {
+		expect(source).toContain('<div class="wrn-undo-receipt">');
+		expect(source).toContain('role="status" aria-live="polite" aria-atomic="true"');
+		expect(source).toContain('aria-hidden="true"');
+		expect(source).not.toContain('class="wrn-undo-receipt" role="status"');
 	});
 
-	test('MAX_UNDO is reasonable', () => {
-		expect(MAX_UNDO).toBeGreaterThan(10);
-		expect(MAX_UNDO).toBeLessThan(200);
+	test('renders only actions backed by a capability and handler', () => {
+		expect(source).toContain('{#if (canUndo && onundo) || (canRedo && onredo)}');
+		expect(source).toContain('{#if canUndo && onundo}');
+		expect(source).toContain('{#if canRedo && onredo}');
+		expect(source).toContain('aria-label={`Undo ${label}`}');
+		expect(source).toContain('aria-label={`Redo ${label}`}');
+		expect(source).not.toContain('⌘Z');
+	});
+
+	test('contains hostile labels in compact layouts', () => {
+		expect(source).toContain('grid-template-columns: auto minmax(0, 1fr) auto;');
+		expect(source).toContain('max-width: 100%;');
+		expect(source).toContain('min-width: 0;');
+		expect(source).toContain('overflow-wrap: anywhere;');
+		expect(source).toContain('@media (max-width: 480px)');
+		expect(source).toContain('grid-column: 2;');
+	});
+
+	test('owns touch, keyboard-focus, theme, and forced-color behavior', () => {
+		expect(source).toContain('--wrn-undo-boundary: var(');
+		expect(source).toContain('var(--cockpit-border, #c8c2b9) 60%');
+		expect(source).toContain('touch-action: manipulation;');
+		expect(source).toContain('@media (pointer: coarse)');
+		expect(source).toContain('min-height: 44px;');
+		expect(source).toContain('.wrn-undo-btn:focus-visible');
+		expect(source).toContain('var(--cockpit-surface, #fdfbf7)');
+		expect(source).toContain('@media (forced-colors: active)');
+	});
+});
+
+describe('public API and browser delivery', () => {
+	test('exports the stack, receipt, and complete action vocabulary without the wrapper component', () => {
+		expect(indexSource).toContain("export { createUndoStack } from './stack.js';");
+		expect(indexSource).toContain("export { default as UndoReceipt } from './UndoReceipt.svelte';");
+		expect(indexSource).not.toContain('default as UndoElement');
+		for (const key of Object.keys(UNDO_LABELS)) expect(typesSource).toContain(`| '${key}'`);
+		expect(MAX_UNDO).toBe(50);
+	});
+
+	test('provides a side-effect-free stack subpath', () => {
+		expect(packageJson.exports['.'].types).toBe('./src/index.ts');
+		expect(packageJson.exports['./stack']).toEqual({
+			types: './src/stack.ts',
+			default: './src/stack.ts',
+		});
+	});
+
+	test('emits composed, bubbling events from the custom-element host', () => {
+		expect(elementSource).toContain('const host = $host<HTMLElement>();');
+		expect(elementSource).toContain("name: 'wrn-undo' | 'wrn-redo'");
+		expect(elementSource).toContain('detail: { action }');
+		expect(elementSource).toContain('bubbles: true');
+		expect(elementSource).toContain('composed: true');
+		expect(elementSource).not.toContain('bind:this');
+	});
+
+	test('builds the canonical custom element with both capability properties', () => {
+		expect(configSource).toContain("entry: 'src/UndoElement.svelte'");
+		expect(elementSource).toContain("tag: 'worn-undo'");
+		expect(elementSource).toContain("canundo: { type: 'Boolean' }");
+		expect(elementSource).toContain("canredo: { type: 'Boolean' }");
+	});
+
+	test('demo exercises real undo and redo state in light and dark themes', () => {
+		expect(demoSource).toContain('content="width=device-width, initial-scale=1, viewport-fit=cover"');
+		expect(demoSource).toContain('src="./dist/worn-undo.js"');
+		expect(demoSource).toContain("receipt.addEventListener('wrn-undo'");
+		expect(demoSource).toContain("receipt.addEventListener('wrn-redo'");
+		expect(demoSource).toContain('receipt.canundo = previous !== null;');
+		expect(demoSource).toContain('receipt.canredo = next !== null;');
+		expect(demoSource).toContain('@media (prefers-color-scheme: dark)');
 	});
 });

@@ -1,17 +1,52 @@
-<svelte:options customElement={{ tag: 'worn-undo', shadow: 'none', props: { label: {}, packid: {}, canredo: { type: 'Boolean' } } }} />
+<svelte:options customElement={{
+	tag: 'worn-undo',
+	shadow: 'none',
+	props: {
+		label: {},
+		packid: {},
+		canundo: { type: 'Boolean' },
+		canredo: { type: 'Boolean' },
+	},
+}} />
 
 <script lang="ts">
 	import UndoReceipt from './UndoReceipt.svelte';
-	import type { UndoAction } from './types.js';
+	import type { UndoAction, UndoElementEventDetail } from './types.js';
 
-	let { label = 'Action', packid = '', canredo = false }: { label?: string; packid?: string; canredo?: boolean } = $props();
+	let {
+		label = 'Action',
+		packid = '',
+		canundo = true,
+		canredo = false,
+	}: {
+		label?: string;
+		packid?: string;
+		canundo?: boolean;
+		canredo?: boolean;
+	} = $props();
 
-	let el: HTMLElement;
-	function emit(name: string, detail: any) { el?.dispatchEvent(new CustomEvent(name, { detail, bubbles: true })); }
+	const host = $host<HTMLElement>();
 
-	let action: UndoAction = $derived({ type: 'action', packId: packid, label, createdAt: Date.now() });
+	function emit(name: 'wrn-undo' | 'wrn-redo') {
+		host.dispatchEvent(new CustomEvent<UndoElementEventDetail>(name, {
+			detail: { action },
+			bubbles: true,
+			composed: true,
+		}));
+	}
+
+	let action: UndoAction = $derived({
+		type: 'action',
+		packId: packid,
+		label,
+		createdAt: Date.now(),
+	});
 </script>
 
-<div bind:this={el} style="display:contents">
-<UndoReceipt {action} canRedo={canredo} onundo={() => emit('wrn-undo', { action })} onredo={() => emit('wrn-redo', {})} />
-</div>
+<UndoReceipt
+	{action}
+	canUndo={canundo}
+	canRedo={canredo}
+	onundo={() => emit('wrn-undo')}
+	onredo={() => emit('wrn-redo')}
+/>

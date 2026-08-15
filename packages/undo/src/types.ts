@@ -1,5 +1,16 @@
+export type UndoActionType =
+	| 'action'
+	| 'done'
+	| 'block'
+	| 'unblock'
+	| 'open'
+	| 'start'
+	| 'create'
+	| 'memory'
+	| 'snapshot';
+
 export interface UndoAction {
-	type: 'action' | 'create' | 'memory' | 'snapshot';
+	type: UndoActionType;
 	packId: string;
 	label: string;
 	fields?: Record<string, string>;
@@ -12,8 +23,20 @@ export interface UndoStore {
 	index: number;
 }
 
+export interface UndoReceiptProps {
+	action: UndoAction;
+	canUndo?: boolean;
+	canRedo?: boolean;
+	onundo?: (action: UndoAction) => void;
+	onredo?: (action: UndoAction) => void;
+}
+
+export interface UndoElementEventDetail {
+	action: UndoAction;
+}
+
 export const MAX_UNDO = 50;
-export const UNDO_LABELS: Record<string, string> = {
+export const UNDO_LABELS: Partial<Record<UndoActionType, string>> = {
 	done: 'Marked as done',
 	block: 'Set blocker',
 	unblock: 'Cleared blocker',

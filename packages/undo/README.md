@@ -1,7 +1,8 @@
 # @wornpage/undo
 
-Svelte 5 undo system — a generic snapshot stack plus a receipt component that
-offers Undo/Redo on the last action. Zero dependencies.
+Svelte 5 undo system: a generic snapshot stack plus a receipt component that
+offers Undo/Redo on the last action. It has no runtime dependency beyond its
+Svelte peer.
 
 <!-- wornpage-delivery:v2 browser-bundle -->
 ## Delivery
@@ -12,6 +13,9 @@ Repository text is checked out as LF through `.gitattributes`, so generated outp
 
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
+
+This README is the component-specific API and behavior contract; the CLI
+document linked above defines only the shared delivery checks.
 
 ## Install
 
@@ -26,7 +30,7 @@ and commit it only once the mutation succeeds, so a failed write never leaves a
 bogus entry behind.
 
 ```ts
-import { createUndoStack } from '@wornpage/undo';
+import { createUndoStack } from '@wornpage/undo/stack';
 
 const undo = createUndoStack<State>(50);
 
@@ -52,25 +56,35 @@ const previous = undo.pop();         // last committed snapshot, or null
 ```svelte
 <script>
   import { UndoReceipt } from '@wornpage/undo';
+
+  const action = {
+    type: 'done',
+    packId: 'ship-the-thing',
+    label: 'Marked as done',
+    createdAt: Date.now()
+  };
 </script>
 
 <UndoReceipt
-  action={{ type: 'done', packId: 'ship-the-thing' }}
+  {action}
+  canUndo={true}
   canRedo={false}
   onundo={(action) => restore(action)}
-  onredo={() => redo()}
+  onredo={(action) => redo(action)}
 />
 ```
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `action` | `UndoAction` | required | The action being offered for undo |
+| `canUndo` | `boolean` | `true` | Permit Undo when `onundo` is present |
 | `canRedo` | `boolean` | `false` | Show the Redo button |
 | `onundo` | `(action: UndoAction) => void` | — | Undo pressed |
-| `onredo` | `() => void` | — | Redo pressed |
+| `onredo` | `(action: UndoAction) => void` | — | Redo pressed |
 
 The label comes from `UNDO_LABELS[action.type]`, falling back to `action.label`,
-then `'Action'`.
+then `'Action'`. A button is rendered only when both its capability and handler
+are present, so a receipt never exposes a dead action.
 
 ## Web component
 
@@ -79,11 +93,17 @@ and `wrn-redo` events to connect it to application state.
 
 ```html
 <script type="module" src="./dist/worn-undo.js"></script>
-<worn-undo label="Updated venue" packid="venue"></worn-undo>
+<worn-undo label="Updated venue" packid="venue" canundo></worn-undo>
 ```
 
 Generate the browser entry from `src/UndoElement.svelte` with
 `bun run build`; do not edit `dist/worn-undo.js` directly.
+
+`wrn-undo` and `wrn-redo` bubble across component boundaries with
+`composed: true`. Both expose `{ action: UndoAction }` as `event.detail` and
+target the `<worn-undo>` host. Set the `canundo` and `canredo` JavaScript
+properties as history changes; do not pass the string `"false"` to Boolean
+attributes.
 
 ## Scope
 
@@ -94,9 +114,9 @@ snapshots rather than popping.
 
 ## Note on non-browser imports
 
-The built bundle registers a custom element and will not import in a bun or
-node server process. `createUndoStack` itself is pure — import it from source
-via the `svelte` export condition if you need it outside a browser.
+The built bundle registers a custom element and will not import in a Bun or
+Node server process. `@wornpage/undo/stack` is the side-effect-free entry for
+`createUndoStack` and can be used outside a browser.
 
 ## Tests
 

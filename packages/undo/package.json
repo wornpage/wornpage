@@ -1,7 +1,7 @@
 {
   "name": "@wornpage/undo",
-  "version": "0.1.0",
-  "description": "Svelte 5 undo system — receipt stack, snapshot capture, redo",
+  "version": "0.1.1",
+  "description": "Svelte 5 undo receipt and bounded snapshot stack with accessible browser events",
   "type": "module",
   "wornpage": {
     "contractVersion": 2,
@@ -15,9 +15,13 @@
   "svelte": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./src/types.ts",
+      "types": "./src/index.ts",
       "svelte": "./src/index.ts",
       "default": "./dist/worn-undo.js"
+    },
+    "./stack": {
+      "types": "./src/stack.ts",
+      "default": "./src/stack.ts"
     }
   },
   "files": ["dist", "src"],
@@ -31,6 +35,7 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "svelte": "^5.56.8",
     "vite": "^8.1.5"
   }
 }
