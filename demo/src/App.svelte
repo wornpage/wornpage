@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Sidebar } from '@wornpage/sidebar';
   import { Cmdk } from '@wornpage/cmdk';
-  import type { CmdkItem } from '@wornpage/cmdk';
+  import type { CmdkHandle, CmdkItem } from '@wornpage/cmdk';
   import { Theme } from '@wornpage/theme';
   import { WornReceipt } from '@wornpage/receipt';
   import { Button } from '@wornpage/button';
@@ -15,7 +15,7 @@
   let currentTheme = $state('light');
   $effect(() => document.documentElement.setAttribute('data-theme', currentTheme));
 
-  let sidebarCollapsed = $state(false);
+  let sidebarCollapsed = $state(typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches);
   const sections = ['sidebar','button','cmdk','theme','receipt','workflow','toast','undo','sync','cli'];
   let activeSection = $state('sidebar');
 
@@ -33,8 +33,12 @@
     kind: 'section' as const
   }));
 
-  let cmdkRef = $state<unknown>(null);
+  let cmdkRef = $state<CmdkHandle | null>(null);
   const cmdkItems: CmdkItem[] = sidebarItems.map(i => ({ id: i.id, label: i.label, onSelect: () => onnavigate(i.href || "") }));
+
+  function openPalette() {
+    cmdkRef?.open();
+  }
 
   let receiptVisible = $state(false);
   let toasts = $state<Array<{ id: number; message: string; kind: string }>>([]);
@@ -61,7 +65,6 @@
 
   function onnavigate(href: string) {
     activeSection = href.replace('#', '') || 'sidebar';
-    cmdkOpen = false;
   }
 </script>
 
@@ -70,12 +73,14 @@
     <Sidebar items={sidebarItems} activeHref={'#' + activeSection} {onnavigate} collapsed={sidebarCollapsed} oncollapsed={(c: boolean) => sidebarCollapsed = c} />
   </aside>
 
+  <Cmdk bind:this={cmdkRef} items={cmdkItems} />
+
   <main class="demo-main">
     <header class="demo-header">
       <h1>Wornpage</h1>
-      <p>Svelte 5 component library — 9 packages, 66 tests, 1 CLI</p>
+      <p>26 standalone components and one release CLI</p>
       <div class="header-actions">
-        <Button onclick={() => cmdkOpen = !cmdkOpen}>Search</Button>
+        <Button onclick={openPalette}>Search</Button>
         <Theme bind:theme={currentTheme} />
         <a href="https://github.com/wornpage/wornpage" class="demo-btn">GitHub</a>
       </div>
@@ -87,25 +92,29 @@
       <code>bun add @wornpage/sidebar</code>
     </section>
 
+    <section id="button" class="demo-section" class:active={activeSection === 'button'}>
+      <h2>Button</h2>
+      <p>Shared command styling for buttons and links.</p>
+      <code>bun add @wornpage/button</code>
+      <div class="demo-preview">
+        <Button variant="primary">Primary</Button>
+        <Button>Default</Button>
+        <Button variant="danger">Danger</Button>
+      </div>
+    </section>
+
     <section id="cmdk" class="demo-section" class:active={activeSection === 'cmdk'}>
       <h2>Command Palette</h2>
-      <p>Fuzzy-search palette using native dialog. 11 tests. Try it:</p>
+      <p>Fuzzy-search palette using native dialog. Try it:</p>
       <code>bun add @wornpage/cmdk</code>
       <div class="demo-preview">
-        <Button onclick={() => cmdkRef?.open()}>Open palette</Button>
-        {#if cmdkOpen}
-          <div class="cmdk-overlay" role="dialog" aria-label="Command palette" onclick={() => cmdkOpen = false} onkeydown={(e) => { if (e.key === "Escape") cmdkOpen = false }}>
-            <div class="cmdk-wrapper" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
-              <Cmdk items={cmdkItems} onclose={() => cmdkOpen = false} />
-            </div>
-          </div>
-        {/if}
+        <Button onclick={openPalette}>Open palette</Button>
       </div>
     </section>
 
     <section id="theme" class="demo-section" class:active={activeSection === 'theme'}>
       <h2>Theme</h2>
-      <p>8-palette switcher. The toggle in the header IS this component.</p>
+      <p>System-aware palette switcher. The toggle in the header IS this component.</p>
       <code>bun add @wornpage/theme</code>
       <div class="demo-preview">
         <div class="theme-swatches">
@@ -132,24 +141,26 @@
 
     <section id="workflow" class="demo-section" class:active={activeSection === 'workflow'}>
       <h2>Workflow</h2>
-      <p>Pack state machine — pure functions. 21 tests. The core of wornpage.</p>
+      <p>Pack state machine built from pure functions.</p>
       <code>bun add @wornpage/workflow</code>
       <div class="demo-preview">
         <p class="standup"><strong>Standup:</strong> {standup}</p>
-        <table class="packs-table">
-          <thead><tr><th>Title</th><th>Status</th><th>Blocker</th><th>Next</th><th>Energy</th></tr></thead>
-          <tbody>
-            {#each orderPacks(demoPacks) as pack}
-              <tr>
-                <td>{pack.title}</td>
-                <td><span class="status-{pack.status}">{pack.status}</span></td>
-                <td>{pack.blocker}</td>
-                <td>{hasBlocker(pack) ? 'Review' : primaryCommand(pack).label}</td>
-                <td>{pack.energy ?? ''}</td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="packs-table">
+            <thead><tr><th>Title</th><th>Status</th><th>Blocker</th><th>Next</th><th>Energy</th></tr></thead>
+            <tbody>
+              {#each orderPacks(demoPacks) as pack}
+                <tr>
+                  <td>{pack.title}</td>
+                  <td><span class="status-{pack.status}">{pack.status}</span></td>
+                  <td>{pack.blocker}</td>
+                  <td>{hasBlocker(pack) ? 'Review' : primaryCommand(pack).label}</td>
+                  <td>{pack.energy ?? ''}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
@@ -172,7 +183,7 @@
 
     <section id="sync" class="demo-section" class:active={activeSection === 'sync'}>
       <h2>Sync</h2>
-      <p>No-account sharing via sync codes. 10 tests.</p>
+      <p>No-account sharing via sync codes.</p>
       <code>bun add @wornpage/sync</code>
       <div class="demo-preview">
         <Button variant="primary" onclick={() => syncDemoCode = generateSyncCode()}>Generate code</Button>
@@ -190,7 +201,7 @@
     </section>
 
     <footer>
-      <p><a href="https://github.com/wornpage/wornpage">github.com/wornpage/wornpage</a> · MIT · 66 tests · 9 packages</p>
+      <p><a href="https://github.com/wornpage/wornpage">github.com/wornpage/wornpage</a> · MIT · 26 components · 1 CLI</p>
     </footer>
   </main>
 
@@ -202,30 +213,29 @@
 </div>
 
 <style>
-  .app-shell { display: grid; grid-template-columns: auto 1fr; min-height: 100vh; }
+  .app-shell { display: grid; grid-template-columns: auto minmax(0, 1fr); min-height: 100vh; }
   .demo-sidebar { background: var(--cockpit-surface, #fff); border-right: 1px solid var(--cockpit-border, #ddd); }
-  .demo-main { padding: 24px 32px; max-width: 900px; }
+  .demo-main { box-sizing: border-box; min-width: 0; padding: 24px 32px; width: min(100%, 900px); }
   .demo-header { margin-bottom: 32px; }
   .demo-header h1 { margin: 0; font-size: 28px; }
   .demo-header p { color: var(--cockpit-text-muted, #666); margin: 4px 0 16px; }
-  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .demo-btn { padding: 6px 14px; border: 1px solid var(--cockpit-border); border-radius: 999px; background: var(--cockpit-surface); cursor: pointer; font-size: 13px; color: inherit; text-decoration: none; }
   .demo-btn:hover { background: var(--cockpit-hover-bg, rgba(0,0,0,.05)); }
   .demo-section { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid var(--cockpit-border); opacity: 0.5; transition: opacity 0.3s; }
   .demo-section.active { opacity: 1; }
   .demo-section h2 { margin: 0 0 4px; font-size: 20px; }
   .demo-section p { color: var(--cockpit-text-muted); margin: 0 0 8px; line-height: 1.5; }
-  .demo-section :global(code) { padding: 2px 8px; background: var(--cockpit-surface); border: 1px solid var(--cockpit-border); border-radius: 4px; font-size: 13px; }
-  .demo-preview { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .demo-section :global(code) { display: inline-block; max-width: 100%; overflow-wrap: anywhere; padding: 2px 8px; background: var(--cockpit-surface); border: 1px solid var(--cockpit-border); border-radius: 4px; font-size: 13px; }
+  .demo-preview { min-width: 0; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .standup { font-size: 14px; color: var(--cockpit-text-muted); margin-bottom: 12px; }
+  .table-scroll { max-width: 100%; overflow-x: auto; }
   .packs-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
   .packs-table th, .packs-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--cockpit-border); }
   .packs-table th { font-weight: 600; color: var(--cockpit-text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: .05em; }
   .status-blocked { color: #e74c3c; font-weight: 600; }
   .status-active { color: var(--cockpit-accent); font-weight: 600; }
   .status-done { color: var(--cockpit-text-muted); }
-  .cmdk-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding-top: 80px; }
-  .cmdk-wrapper { width: 500px; max-width: 90vw; }
   .theme-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
   .swatch { padding: 8px 14px; border: 2px solid var(--cockpit-border); border-radius: 8px; background: var(--cockpit-surface); cursor: pointer; text-transform: capitalize; font-size: 13px; }
   .swatch.active { border-color: var(--cockpit-accent); }
@@ -236,6 +246,10 @@
   .sync-code-display { font-family: monospace; font-size: 18px; letter-spacing: 2px; margin: 8px 0; }
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--cockpit-border); text-align: center; font-size: 13px; color: var(--cockpit-text-muted); }
   footer a { color: var(--cockpit-accent); text-decoration: none; }
+  @media (max-width: 720px) {
+    .demo-sidebar { position: sticky; top: 0; align-self: start; height: 100vh; z-index: 10; }
+    .demo-main { padding: 16px; }
+  }
 </style> 
 
 

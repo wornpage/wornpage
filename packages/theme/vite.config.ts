@@ -12,7 +12,7 @@ export default defineConfig({
   })],
   build: {
     lib: {
-      entry: 'src/ThemeElement.svelte',
+      entry: 'src/elements.ts',
       formats: ['es'],
       fileName: () => 'worn-theme.js'
     },

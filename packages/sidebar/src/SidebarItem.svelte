@@ -10,9 +10,14 @@
 		children?: any;
 	}
 	let { href = '#', label, icon, badge, badgeVariant = 'default', active = false, onclick, children }: Props = $props();
+
+	function handleClick(event: MouseEvent) {
+		event.preventDefault();
+		onclick?.(event);
+	}
 </script>
 
-<a {href} class="worn-nav-item" class:active on:click|preventDefault={onclick}>
+<a {href} class="worn-nav-item" class:active onclick={handleClick}>
 	{#if icon}
 		<span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html icon}</svg></span>
 	{/if}

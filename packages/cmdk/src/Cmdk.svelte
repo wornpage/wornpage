@@ -1,21 +1,12 @@
-<svelte:options customElement={{ tag: 'worn-cmdk', shadow: 'none', props: { items: { type: 'Array' }, placeholder: {} } }} />
-
 <script lang="ts">
-	import type { CmdkItem } from './types.js';
+	import type { CmdkItem, CmdkProps } from './types.js';
 	import { groupCmdkItems } from './group.js';
 
-	interface Props {
-		items?: string | CmdkItem[];
-		placeholder?: string;
-	}
-
-	let { items = '[]', placeholder = 'Search…' }: Props = $props();
-
-	// Parse items — supports both attribute (JSON string) and property (object array)
-	let parsedItems = $derived<CmdkItem[]>(typeof items === 'string' ? JSON.parse(items) : items);
+	let { items = [], placeholder = 'Search…', onclose }: CmdkProps = $props();
 
 	let dialogEl: HTMLDialogElement;
 	let inputEl: HTMLInputElement;
+	let returnFocus: HTMLElement | null = null;
 	let query = $state('');
 	let selected = $state(0);
 
@@ -41,7 +32,7 @@
 
 	const filtered = $derived.by(() => {
 		const needle = query.trim().toLowerCase();
-		const matched = needle ? parsedItems.filter(i => matches(i, needle)) : parsedItems;
+		const matched = needle ? items.filter(i => matches(i, needle)) : items;
 		return matched.slice(0, MAX_ROWS);
 	});
 
@@ -49,6 +40,8 @@
 
 	export function open() {
 		if (!dialogEl || dialogEl.open) return;
+		const activeElement = document.activeElement;
+		returnFocus = activeElement instanceof HTMLElement && activeElement !== document.body ? activeElement : null;
 		query = ''; selected = 0;
 		if (typeof dialogEl.showModal === 'function') dialogEl.showModal();
 		inputEl?.focus();
@@ -61,6 +54,15 @@
 
 	function handleBackdropClick(e: MouseEvent) {
 		if (e.target === e.currentTarget) closePalette();
+	}
+
+	function handleDialogClose(event: Event) {
+		onclose?.(event);
+		const target = returnFocus;
+		returnFocus = null;
+		setTimeout(() => {
+			if (target?.isConnected) target.focus();
+		}, 0);
 	}
 
 	function onKeydown(e: KeyboardEvent) {
@@ -86,7 +88,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <dialog bind:this={dialogEl} class="cmdk" aria-label="Command palette"
-	onclose={() => dispatchEvent(new CustomEvent('close'))} onclick={handleBackdropClick}>
+	onclose={handleDialogClose} onclick={handleBackdropClick}>
 	<div class="cmdk-search-row">
 		<input bind:this={inputEl} bind:value={query} class="cmdk-input" type="text"
 			autocomplete="off" spellcheck="false" {placeholder}

@@ -55,8 +55,10 @@ needs a versioned or app-specific preference key.
 </script>
 ```
 
-The browser entry is generated from `src/ThemeElement.svelte` with
-`bun run build`; do not edit `dist/worn-theme.js` directly.
+The browser entry is generated from `src/elements.ts`, which registers the
+`ThemeElement.svelte` wrapper. The Svelte entry exports only the picker and
+runtime helpers, so consuming it does not compile custom-element options.
+Run `bun run build`; do not edit `dist/worn-theme.js` directly.
 
 ## Usage (no component)
 
@@ -103,7 +105,6 @@ written, so you never need a `[data-theme="system"]` rule.
 | Export | Type | Description |
 |--------|------|-------------|
 | `Theme` | component | Svelte theme picker |
-| `ThemeElement` | component | Custom-element wrapper |
 | `createThemeController(options)` | `(ThemeControllerOptions) => ThemeController` | Restores, applies, persists, and tracks system changes |
 | `applyTheme(theme, options)` | `(ThemeName, ApplyThemeOptions) => EffectiveTheme` | Applies and optionally persists a theme |
 | `readTheme(options)` | `(ThemeRuntimeOptions) => ThemeName \| null` | Reads and validates the stored logical choice |

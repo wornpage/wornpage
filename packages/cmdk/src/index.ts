@@ -1,2 +1,2 @@
 export { default as Cmdk } from './Cmdk.svelte';
-export type { CmdkItem, CmdkProps } from './types.js';
+export type { CmdkHandle, CmdkItem, CmdkProps } from './types.js';

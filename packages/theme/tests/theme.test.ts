@@ -14,6 +14,9 @@ import {
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const componentSource = readFileSync(new URL('../src/Theme.svelte', import.meta.url), 'utf8');
 const elementSource = readFileSync(new URL('../src/ThemeElement.svelte', import.meta.url), 'utf8');
+const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
+const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 
 function runtimeFixture(dark = false) {
 	const attributes = new Map<string, string>();
@@ -150,6 +153,16 @@ describe('component contract', () => {
 		expect(componentSource).not.toContain('localStorage');
 		expect(elementSource).not.toContain('localStorage');
 		expect(elementSource).toContain('effectiveTheme');
+	});
+});
+
+describe('package entrypoints', () => {
+	test('keeps the custom-element wrapper out of the Svelte consumer entry', () => {
+		expect(indexSource).toContain("export { default as Theme } from './Theme.svelte';");
+		expect(indexSource).not.toContain('ThemeElement');
+		expect(elementsEntrySource).toBe("import './ThemeElement.svelte';\n");
+		expect(viteSource).toContain("entry: 'src/elements.ts'");
+		expect(viteSource).toContain("filename.endsWith('ThemeElement.svelte')");
 	});
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/sidebar",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Svelte 5 sidebar navigation component — collapsible groups, keyboard nav, search, favorites, recent items, drag-to-reorder",
   "type": "module",
   "wornpage": {

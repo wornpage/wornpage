@@ -5,7 +5,11 @@ import { nextNavFocusIndex } from '../src/keyboard.js';
 import { visibleNavItems } from '../src/visibility.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
+const itemSource = readFileSync(new URL('../src/SidebarItem.svelte', import.meta.url), 'utf8');
 const elementSource = readFileSync(new URL('../src/SidebarElement.svelte', import.meta.url), 'utf8');
+const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
+const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 describe('filter control', () => {
@@ -59,6 +63,25 @@ describe('consumer layout', () => {
 		expect(sidebarSource).toContain('.worn-nav-row > .worn-nav-item {');
 		expect(sidebarSource).toContain('inline-size: auto;');
 		expect(sidebarSource).not.toContain('.worn-nav-row > .worn-nav-item { box-sizing: border-box; width: 100%; }');
+	});
+});
+
+describe('package entrypoints', () => {
+	test('keeps the custom-element wrapper out of the Svelte consumer entry', () => {
+		expect(indexSource).toContain("export { default as Sidebar } from './Sidebar.svelte';");
+		expect(indexSource).not.toContain('SidebarElement');
+		expect(elementsEntrySource).toBe("import './SidebarElement.svelte';\n");
+		expect(viteSource).toContain("entry: 'src/elements.ts'");
+		expect(viteSource).toContain("customElement: filename.endsWith('Element.svelte')");
+		expect(viteSource).not.toContain('customElement: true');
+	});
+
+	test('uses the Svelte 5 click property while preserving default prevention', () => {
+		expect(itemSource).toContain('function handleClick(event: MouseEvent)');
+		expect(itemSource).toContain('event.preventDefault();');
+		expect(itemSource).toContain('onclick?.(event);');
+		expect(itemSource).toContain('onclick={handleClick}');
+		expect(itemSource).not.toContain('on:click');
 	});
 });
 

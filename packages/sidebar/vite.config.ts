@@ -3,14 +3,14 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [svelte({
-    compilerOptions: {
-      customElement: true,
-      css: 'injected'
-    }
+    compilerOptions: { css: 'injected' },
+    dynamicCompileOptions: ({ filename }) => ({
+      customElement: filename.endsWith('Element.svelte'),
+    }),
   })],
   build: {
     lib: {
-      entry: 'src/SidebarElement.svelte',
+      entry: 'src/elements.ts',
       formats: ['es'],
       fileName: () => 'worn-sidebar.js'
     },

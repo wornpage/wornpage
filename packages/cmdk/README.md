@@ -34,7 +34,7 @@ bun add @wornpage/cmdk
   import { Cmdk } from '@wornpage/cmdk';
   import type { CmdkItem } from '@wornpage/cmdk';
 
-  let open = $state(false);
+  let palette: { open(): void };
 
   const items: CmdkItem[] = [
     { id: 'home', label: 'Go to Home', hint: 'Screen', onSelect: () => goto('/') },
@@ -43,11 +43,9 @@ bun add @wornpage/cmdk
   ];
 </script>
 
-<button onclick={() => open = true}>Open palette (⌘K)</button>
+<button onclick={() => palette.open()}>Open palette</button>
 
-<Cmdk items={items} placeholder="Search…" onclose={() => open = false} />
-
-<!-- Call open() via exposed method from a ref -->
+<Cmdk bind:this={palette} items={items} placeholder="Search…" />
 ```
 
 ## Props
@@ -74,7 +72,7 @@ bun add @wornpage/cmdk
 Through `bind:this`:
 - `open()` — open the palette dialog
 
-The close control and result rows meet 44px touch-target sizing on coarse pointers. Escape, backdrop dismissal, the close control, and selection all converge on one native dialog close event. Palette motion is disabled when the user prefers reduced motion.
+The close control and result rows meet 44px touch-target sizing on coarse pointers. Escape, backdrop dismissal, the close control, and selection all converge on one native dialog close event, then focus returns to the control that opened the palette. Palette motion is disabled when the user prefers reduced motion.
 
 ## Theming
 

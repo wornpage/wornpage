@@ -4,6 +4,10 @@ import { groupCmdkItems } from '../src/group.js';
 import type { CmdkItem } from '../src/types.js';
 
 const cmdkSource = readFileSync(new URL('../src/Cmdk.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const elementSource = readFileSync(new URL('../src/CmdkElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.meta.url), 'utf8');
+const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
+const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 
 function fuzzyMatch(query: string, target: string): boolean {
@@ -110,15 +114,37 @@ describe('command palette chrome', () => {
 		expect(cmdkSource).toContain('@media (pointer: coarse) { .cmdk-item { min-height: 44px; } }');
 	});
 
-	test('emits one close event from the native dialog close path', () => {
-		expect(cmdkSource.match(/dispatchEvent\(new CustomEvent\('close'\)\)/gu)?.length).toBe(1);
-		expect(cmdkSource).toContain("onclose={() => dispatchEvent(new CustomEvent('close'))}");
+	test('routes one native close callback through the component contract', () => {
+		expect(cmdkSource).toContain('onclose={handleDialogClose}');
+		expect(cmdkSource).toContain('onclose?.(event);');
+		expect(elementSource.match(/new CustomEvent\('close'/gu)?.length).toBe(1);
+		expect(elementSource).toContain("{ bubbles: true, composed: true }");
 		expect(cmdkSource).toContain("if (e.key === 'Escape') { e.preventDefault(); closePalette(); }");
-		expect(cmdkSource).not.toContain("e.key === 'Escape' && dispatchEvent");
+	});
+
+	test('restores focus to the connected opener after close', () => {
+		expect(cmdkSource).toContain('returnFocus = activeElement instanceof HTMLElement');
+		expect(cmdkSource).toContain('if (target?.isConnected) target.focus();');
 	});
 
 	test('honors reduced-motion preferences', () => {
 		expect(cmdkSource).toContain('@media (prefers-reduced-motion: reduce) { .cmdk { animation: none; } }');
+	});
+});
+
+describe('package entrypoints', () => {
+	test('keeps the Svelte component separate from the custom-element wrapper', () => {
+		expect(cmdkSource).not.toContain('<svelte:options customElement');
+		expect(indexSource).toContain("export { default as Cmdk } from './Cmdk.svelte';");
+		expect(indexSource).not.toContain('CmdkElement');
+		expect(elementSource).toContain("tag: 'worn-cmdk'");
+		expect(elementsEntrySource).toBe("import './CmdkElement.svelte';\n");
+	});
+
+	test('compiles custom-element mode only for the browser wrapper', () => {
+		expect(viteSource).toContain("entry: 'src/elements.ts'");
+		expect(viteSource).toContain("customElement: filename.endsWith('Element.svelte')");
+		expect(viteSource).not.toContain('customElement: true');
 	});
 });
 

@@ -9,8 +9,11 @@ export interface CmdkItem {
 }
 
 export interface CmdkProps {
-  open?: boolean;
   items: CmdkItem[];
   placeholder?: string;
-  onclose?: () => void;
+  onclose?: (event: Event) => void;
+}
+
+export interface CmdkHandle {
+  open(): void;
 }

@@ -74,6 +74,8 @@ npm add @wornpage/sidebar
 </script>
 ```
 
+The Svelte entry exports `Sidebar`, `SidebarGroup`, and `SidebarItem`. The generated browser entry registers `worn-sidebar` without compiling its custom-element wrapper into Svelte applications.
+
 ## Props
 
 | Prop | Type | Default | Description |

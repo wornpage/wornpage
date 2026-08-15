@@ -1,5 +1,4 @@
 export { default as Theme } from './Theme.svelte';
-export { default as ThemeElement } from './ThemeElement.svelte';
 export {
 	applyTheme,
 	createThemeController,
