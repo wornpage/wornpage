@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wornpage Dialog</title>
+  <style>
+    :root {
+      --cockpit-bg: #101512;
+      --cockpit-surface: #19221d;
+      --cockpit-hover-bg: #25322b;
+      --cockpit-border: #46584f;
+      --cockpit-text: #f2f7f4;
+      --cockpit-text-muted: #b8c5be;
+      --cockpit-accent: #6fd8be;
+      --cockpit-radius: 6px;
+      --font-family-display: Georgia, serif;
+      color: var(--cockpit-text);
+      background: var(--cockpit-bg);
+      font-family: Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body { min-height: 180vh; margin: 0; padding: 28px 18px 120px; }
+    main { width: min(100%, 680px); margin: 0 auto; }
+    h1 { margin: 0; font-size: 28px; }
+    .intro { color: var(--cockpit-text-muted); line-height: 1.6; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0; }
+    button {
+      min-height: 44px;
+      border: 1px solid var(--cockpit-border);
+      border-radius: 5px;
+      padding: 0 16px;
+      color: var(--cockpit-text);
+      background: var(--cockpit-surface);
+      font: 700 14px/1 Georgia, serif;
+      cursor: pointer;
+    }
+    button:hover { background: var(--cockpit-hover-bg); }
+    button:focus-visible { outline: 2px dashed var(--cockpit-accent); outline-offset: 3px; }
+    .activity { display: grid; gap: 1px; border: 1px solid var(--cockpit-border); background: var(--cockpit-border); }
+    .activity div { display: flex; justify-content: space-between; gap: 18px; padding: 14px; background: var(--cockpit-surface); }
+    .activity span { color: var(--cockpit-text-muted); }
+  </style>
+  <script type="module" src="./dist/worn-dialog.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Dialog</h1>
+    <p class="intro">A viewport-level modal that keeps focus, background interaction, and page position under control.</p>
+    <div class="toolbar">
+      <button id="open-dialog" type="button">Archive workspace</button>
+    </div>
+    <section class="activity" aria-label="Background activity">
+      <div><strong>Release review</strong><span>Ready</span></div>
+      <div><strong>Customer migration</strong><span>In progress</span></div>
+      <div><strong>Security audit</strong><span>3 checks</span></div>
+      <div><strong>Component rollout</strong><span>Queued</span></div>
+    </section>
+    <worn-dialog
+      id="archive-dialog"
+      title="Archive customer workspace?"
+      description="This removes the workspace from active work while preserving its archived history."
+      size="sm"
+    ></worn-dialog>
+  </main>
+  <script type="module">
+    await customElements.whenDefined('worn-dialog');
+    const trigger = document.querySelector('#open-dialog');
+    const dialog = document.querySelector('#archive-dialog');
+
+    trigger.addEventListener('click', () => { dialog.open = true; });
+    dialog.addEventListener('close', () => trigger.focus({ preventScroll: true }));
+  </script>
+</body>
+</html>

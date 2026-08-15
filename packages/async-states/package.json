@@ -1,0 +1,34 @@
+{
+  "name": "@wornpage/async-states",
+  "version": "0.1.0",
+  "description": "Svelte 5 loading, empty, and error states for compact application workflows",
+  "type": "module",
+  "wornpage": {
+    "contractVersion": 2,
+    "delivery": "source"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "main": "./src/index.ts",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "peerDependencies": {
+    "svelte": "^5.56.8"
+  },
+  "dependencies": {
+    "@wornpage/button": "https://codeload.github.com/wornpage/button/tar.gz/a9ca3343502872cdfc437a92ed1f58984443bb12"
+  },
+  "devDependencies": {
+    "svelte": "^5.56.8"
+  },
+  "files": ["src", "README.md"],
+  "keywords": ["svelte", "loading", "empty-state", "error-state", "spinner", "skeleton", "wornpage"],
+  "license": "MIT"
+}

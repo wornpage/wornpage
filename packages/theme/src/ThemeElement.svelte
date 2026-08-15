@@ -1,30 +1,27 @@
-<svelte:options customElement={{ tag: 'worn-theme', shadow: 'none', props: { theme: {} } }} />
+<svelte:options customElement={{ tag: 'worn-theme', shadow: 'none', props: { theme: {}, storageKey: { attribute: 'storage-key' } } }} />
 
 <script lang="ts">
 	import Theme from './Theme.svelte';
-	import { applyTheme, THEMES, resolveTheme } from './types.js';
-	import type { ThemeName } from './types.js';
+	import type { EffectiveTheme, ThemeName } from './types.js';
 
-	let { theme = 'system' }: { theme?: string } = $props();
+	let {
+		theme = $bindable('system' as ThemeName),
+		storageKey = 'wrn-theme',
+	}: {
+		theme?: ThemeName;
+		storageKey?: string;
+	} = $props();
 
-	let el: HTMLElement;
+	let element: HTMLElement;
 
-	function emit(name: string, detail: any) { el?.dispatchEvent(new CustomEvent(name, { detail, bubbles: true })); }
-
-	// Apply on mount (no reactivity — WC handles via property)
-	$effect(() => {
-		try {
-			const saved = localStorage.getItem('wrn-theme') as ThemeName | null;
-			if (saved && THEMES.includes(saved as any)) {
-				theme = saved;
-				applyTheme(saved);
-				emit('wrn-theme-change', { theme: saved });
-				return;
-			}
-		} catch {}
-	});
+	function emitChange(nextTheme: ThemeName, effectiveTheme: EffectiveTheme) {
+		element?.dispatchEvent(new CustomEvent('wrn-theme-change', {
+			detail: { theme: nextTheme, effectiveTheme },
+			bubbles: true,
+		}));
+	}
 </script>
 
-<div bind:this={el} style="display:contents">
-<Theme bind:theme={theme as ThemeName} />
+<div bind:this={element} style="display:contents">
+	<Theme bind:theme {storageKey} onchange={emitChange} />
 </div>

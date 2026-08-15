@@ -6,7 +6,7 @@
 
 	interface Props {
 		value?: string[];
-		onchange?: (e: Event) => void;
+		onchange?: (event: Event) => void;
 		options: Option[];
 		disabled?: boolean;
 		class?: string;
@@ -38,8 +38,8 @@
 	{size}
 	{...rest}
 >
-	{#each options as opt (opt.value)}
-		<option value={opt.value}>{opt.label}</option>
+	{#each options as option (option.value)}
+		<option value={option.value}>{option.label}</option>
 	{/each}
 </select>
 

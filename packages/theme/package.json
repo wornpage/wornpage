@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/theme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 theme system — multi-theme CSS custom properties, persist, auto-detect",
   "type": "module",
   "wornpage": {

@@ -1,31 +1,24 @@
 <script lang="ts">
-	interface Props {
-		variant?: 'primary' | 'default' | 'danger' | 'warning';
-		disabled?: boolean;
-		size?: 'sm' | 'md';
-		type?: 'button' | 'submit';
-		href?: string;
-		onclick?: (e: MouseEvent) => void;
-		children?: any;
-		[key: string]: unknown;
-	}
+	import type { ButtonProps } from './types';
+
 	let {
 		variant = 'default',
 		disabled = false,
 		size = 'md',
 		type = 'button',
 		href,
+		class: className,
 		onclick,
 		children,
 		...rest
-	}: Props = $props();
+	}: ButtonProps = $props();
 </script>
 
 {#if href}
 	<a
 		{href}
 		{...rest}
-		class="worn-btn"
+		class={className ? `worn-btn ${className}` : 'worn-btn'}
 		class:is-primary={variant === 'primary'}
 		class:is-danger={variant === 'danger'}
 		class:is-warning={variant === 'warning'}
@@ -43,7 +36,7 @@
 	<button
 		{type}
 		{...rest}
-		class="worn-btn"
+		class={className ? `worn-btn ${className}` : 'worn-btn'}
 		class:is-primary={variant === 'primary'}
 		class:is-danger={variant === 'danger'}
 		class:is-warning={variant === 'warning'}
@@ -57,26 +50,41 @@
 
 <style>
 	.worn-btn {
+		appearance: none;
+		box-sizing: border-box;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		gap: 6px;
+		max-inline-size: 100%;
+		min-inline-size: 0;
 		font-family: var(--font-typewriter);
 		font-size: 13px;
 		font-weight: 610;
+		letter-spacing: 0;
 		line-height: 1.2;
+		min-height: 36px;
+		overflow-wrap: anywhere;
 		padding: 8px 16px;
 		border: 1px solid var(--cockpit-border);
 		border-radius: var(--cockpit-radius);
 		background: var(--cockpit-surface);
 		color: var(--cockpit-text);
 		cursor: pointer;
+		text-align: center;
+		text-decoration: none;
+		touch-action: manipulation;
 		transition: transform 0.08s ease, box-shadow 0.12s ease, background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
 		user-select: none;
+		white-space: normal;
+	}
+	.worn-btn > :global(*) {
+		max-inline-size: 100%;
+		min-inline-size: 0;
 	}
 	.worn-btn.is-sm {
 		font-size: 12px;
-		min-height: 44px;
+		min-height: 32px;
 		padding: 4px 10px;
 	}
 	.worn-btn.is-primary {
@@ -110,6 +118,18 @@
 	.worn-btn:focus-visible {
 		outline: 2px dashed var(--cockpit-accent);
 		outline-offset: 2px;
+	}
+	@media (pointer: coarse) {
+		.worn-btn,
+		.worn-btn.is-sm {
+			min-width: 44px;
+			min-height: 44px;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.worn-btn {
+			transition: none;
+		}
 	}
 	.worn-btn:global(.is-active) {
 		background: var(--cockpit-accent);

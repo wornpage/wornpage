@@ -1,10 +1,10 @@
 <script lang="ts">
 	interface Props {
 		value?: string;
-		oninput?: (e: Event) => void;
-		onchange?: (e: Event) => void;
-		onkeydown?: (e: KeyboardEvent) => void;
-		onblur?: (e: FocusEvent) => void;
+		oninput?: (event: Event) => void;
+		onchange?: (event: Event) => void;
+		onkeydown?: (event: KeyboardEvent) => void;
+		onblur?: (event: FocusEvent) => void;
 		required?: boolean;
 		disabled?: boolean;
 		placeholder?: string;
@@ -66,6 +66,7 @@
 		background: var(--cockpit-surface);
 		color: var(--cockpit-text);
 		cursor: text;
+		touch-action: manipulation;
 	}
 
 	.worn-date-input:focus {
@@ -85,6 +86,7 @@
 	@media (pointer: coarse) {
 		.worn-date-input {
 			font-size: 16px;
+			min-height: 44px;
 		}
 	}
 </style>

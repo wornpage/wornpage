@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wornpage Alert</title>
+  <style>
+    :root {
+      --cockpit-bg: #f5f0e8;
+      --cockpit-surface: #fdfbf7;
+      --cockpit-border: #d0cac1;
+      --cockpit-text: #21322b;
+      --cockpit-accent: #0f766e;
+      --cockpit-accent-50: #e1f3ee;
+      --cockpit-success-bg: #e7f6ec;
+      --cockpit-success-border: #27824c;
+      --cockpit-success-text: #174f30;
+      --cockpit-warning-bg: #fff3cd;
+      --cockpit-warning-border: #9a6b00;
+      --cockpit-warning-text: #5f4300;
+      --cockpit-danger-bg: #fce8e7;
+      --cockpit-danger-border: #b42318;
+      --cockpit-danger-text: #7a1a14;
+      --cockpit-radius: 6px;
+      --font-typewriter: ui-monospace, SFMono-Regular, Consolas, monospace;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --cockpit-bg: #0f1714;
+        --cockpit-surface: #18241f;
+        --cockpit-border: #3a4d45;
+        --cockpit-text: #f7fffc;
+        --cockpit-accent: #5cc8a9;
+        --cockpit-accent-50: #153e35;
+        --cockpit-success-bg: #173b28;
+        --cockpit-success-border: #5bc487;
+        --cockpit-success-text: #d8f8e5;
+        --cockpit-warning-bg: #403612;
+        --cockpit-warning-border: #d9af36;
+        --cockpit-warning-text: #fff2bd;
+        --cockpit-danger-bg: #451f1c;
+        --cockpit-danger-border: #ed786f;
+        --cockpit-danger-text: #ffe0dd;
+        color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; background: var(--cockpit-bg); color: var(--cockpit-text); font-family: Georgia, serif; }
+    main { max-inline-size: 620px; margin: 0 auto; }
+    h1 { margin: 0 0 18px; font-size: 28px; }
+    .states { display: grid; gap: 2px; min-inline-size: 0; }
+    .narrow { max-inline-size: 280px; min-inline-size: 0; }
+    output { display: block; min-block-size: 22px; margin-top: 12px; font: 12px/1.5 var(--font-typewriter); }
+    @media (max-width: 380px) { body { padding: 14px; } }
+  </style>
+  <script type="module" src="./dist/worn-alert.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Alert</h1>
+    <section class="states" aria-label="Alert states">
+      <worn-alert tone="info" title="Sync scheduled">Next run at 14:30.</worn-alert>
+      <worn-alert tone="success" title="Saved">Changes saved.</worn-alert>
+      <worn-alert tone="warning" title="Review needed">Two checks remain.</worn-alert>
+      <worn-alert tone="danger" title="Deployment failed">Check the build logs and retry.</worn-alert>
+      <div class="narrow">
+        <worn-alert tone="warning" dismissible title="DeploymentEvidenceForCustomerWorkspaceWithAnExceptionallyLongUnbrokenIdentifier">ArchitectureVerificationAndReleaseEvidenceWithoutBreakpoints</worn-alert>
+      </div>
+    </section>
+    <output aria-live="polite">No alerts dismissed.</output>
+  </main>
+  <script>
+    document.addEventListener('dismiss', (event) => {
+      document.querySelector('output').textContent = `Dismissed: ${event.target.getAttribute('title') || 'alert'}`;
+    });
+  </script>
+</body>
+</html>

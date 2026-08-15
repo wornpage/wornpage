@@ -21,23 +21,10 @@
 import { $ } from "bun";
 import { existsSync, rmSync, mkdirSync, cpSync, readdirSync, statSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { STANDALONE_REPOSITORIES } from "./component-repositories.ts";
 
-// Every package with a standalone repo. Monorepo-native code lives in tools/
-// and is deliberately NOT listed here, because sync deletes and replaces
-// whatever it mirrors.
-const PACKAGES = [
-	"button",
-	"cmdk",
-	"receipt",
-	"scenarios",
-	"sidebar",
-	"sync",
-	"theme",
-	"toast",
-	"undo",
-	"workflow",
-	"cli"
-];
+// Monorepo-native code lives in tools/ and is deliberately absent from the
+// shared manifest because sync deletes and replaces every directory it mirrors.
 
 // Build output and local runtime state never belong in the mirror: they are
 // per-machine, and committing them makes every sync a noisy diff.
@@ -85,7 +72,7 @@ mkdirSync(TMP, { recursive: true });
 const drifted: Record<string, string[]> = {};
 const failed: string[] = [];
 
-for (const name of PACKAGES) {
+for (const name of STANDALONE_REPOSITORIES) {
 	const repo = `https://github.com/wornpage/${name}.git`;
 	const cloneDir = join(TMP, name);
 	const targetDir = join(MONOREPO, "packages", name);

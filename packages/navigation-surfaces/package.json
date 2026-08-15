@@ -1,0 +1,35 @@
+{
+  "name": "@wornpage/navigation-surfaces",
+  "version": "0.1.2",
+  "description": "Svelte 5 breadcrumbs and pagination for compact application navigation",
+  "type": "module",
+  "wornpage": {
+    "contractVersion": 2,
+    "delivery": "source"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "main": "./src/index.ts",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": ["src", "README.md"],
+  "peerDependencies": {
+    "svelte": "^5.56.8"
+  },
+  "devDependencies": {
+    "svelte": "^5.56.8"
+  },
+  "keywords": ["svelte", "breadcrumb", "pagination", "navigation", "responsive", "wornpage"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/navigation-surfaces.git"
+  }
+}

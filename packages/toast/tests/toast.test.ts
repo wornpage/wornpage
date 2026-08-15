@@ -51,13 +51,32 @@ describe('toast component', () => {
 		expect(toastSource).toContain("role={kind === 'error' ? 'alert' : 'status'}");
 		expect(toastSource).toContain("aria-live={kind === 'error' ? 'assertive' : 'polite'}");
 		expect(toastSource).toContain('aria-atomic="true"');
-		expect(toastSource).toContain('class="wrn-toast-dismiss" onclick={dismiss} aria-label="Dismiss notification"');
+		expect(toastSource).toContain("dismissLabel = 'Dismiss notification'");
+		expect(toastSource).toContain('class="wrn-toast-dismiss" onclick={dismiss} aria-label={dismissLabel}');
 		expect(toastSource).not.toContain('<button type="button" class="wrn-toast"');
+	});
+
+	test('contains hostile messages inside the notification', () => {
+		expect(toastSource).toContain('max-inline-size: 100%; min-inline-size: 0;');
+		expect(toastSource).toContain('overflow-wrap: anywhere;');
 	});
 
 	test('calls dismissal once when manual and timed dismissal overlap', () => {
 		expect(toastSource).toContain('if (dismissing) return;');
 		expect(toastSource).toContain('dismissing = true;');
+	});
+
+	test('uses stylesheet motion that remains compatible with a strict CSP', () => {
+		expect(toastSource).not.toContain("from 'svelte/transition'");
+		expect(toastSource).toContain('@keyframes wrn-toast-enter');
+		expect(toastSource).toContain('class:is-dismissing={dismissing}');
+		expect(toastSource).toContain('@media (prefers-reduced-motion: reduce)');
+	});
+
+	test('keeps the dismiss action touch-safe', () => {
+		expect(toastSource).toContain('min-block-size: 44px');
+		expect(toastSource).toContain('@media (pointer: coarse)');
+		expect(toastSource).toContain('inline-size: 44px; block-size: 44px');
 	});
 });
 

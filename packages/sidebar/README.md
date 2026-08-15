@@ -43,7 +43,7 @@ npm add @wornpage/sidebar
   import type { NavItem } from '@wornpage/sidebar';
 
   const items: NavItem[] = [
-    { id: 'home', href: '/', label: 'Home', icon: '<path d="M3 9l9-7 9 7..."/>' },
+    { id: 'home', href: '/', label: 'Start', keywords: ['Home'], icon: '<path d="M3 9l9-7 9 7..."/>' },
     { id: 'review', href: '/review', label: 'Review', badge: 3, badgeVariant: 'danger' },
   ];
 </script>
@@ -97,6 +97,7 @@ npm add @wornpage/sidebar
 | `id` | `string` | Unique identifier |
 | `href` | `string` (optional) | Navigation target. Omit for group headers |
 | `label` | `string` | Display text |
+| `keywords` | `string[]` (optional) | Additional case-insensitive filter terms that are not displayed |
 | `icon` | `string` (optional) | Inline SVG path content |
 | `badge` | `number` (optional) | Badge count |
 | `badgeVariant` | `'default' \| 'danger'` | Badge color variant |
@@ -110,6 +111,8 @@ The component uses CSS custom properties. Wrap in a container with `.worn-sideba
 ```css
 .worn-sidebar {
   --worn-nav-radius: 8px;
+  --worn-sidebar-collapsed-width: 72px;
+  --worn-sidebar-collapsed-item-size: 44px;
   --worn-sidebar-accent: #0d9488;
   --worn-sidebar-accent-text: #fff;
   --worn-sidebar-text: #21322b;

@@ -28,6 +28,7 @@ npm install @wornpage/button
 <Button variant="primary" onclick={() => alert('hi')}>Click me</Button>
 <Button variant="danger" href="/danger">Go danger</Button>
 <Button size="sm" disabled>Small disabled</Button>
+<Button class="toolbar-action">Refresh</Button>
 ```
 
 ## Browser bundle
@@ -44,9 +45,10 @@ The generated browser bundle registers `<worn-button>`. Its `label`, `variant`, 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `variant` | `'default' \| 'primary' \| 'danger' \| 'warning'` | `'default'` | Visual style |
-| `size` | `'sm' \| 'md'` | `'md'` | Button size |
+| `size` | `'sm' \| 'md'` | `'md'` | Button size; both sizes keep a 44px target for coarse pointers |
 | `disabled` | `boolean` | `false` | Disabled state |
 | `href` | `string` | — | Renders as `<a>` link |
+| `class` | `string` | — | Additional classes merged with the component class |
 | `onclick` | `(e) => void` | — | Click handler |
 | `type` | `'button' \| 'submit'` | `'button'` | Button type |
 
@@ -59,4 +61,4 @@ The component uses CSS custom properties from the parent theme:
 - `--cockpit-warning-text`, `--cockpit-warning-bg`
 - `--font-typewriter`
 
-An `is-active` class can be passed via Svelte `class:` directive for toggle state.
+Additional classes, including `is-active`, are merged with the component class. Link buttons keep button presentation without inherited underlines, and long labels wrap within their container.

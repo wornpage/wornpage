@@ -17,7 +17,7 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
 - 🔍 Fuzzy search (subsequence match on label, hint, keywords)
 - ⌨ ArrowUp/Down, Enter, Escape — full keyboard support
 - 📂 Grouped results via `group` field on items
-- 🎯 Native `<dialog>` focus trap + backdrop
+- 🎯 Native `<dialog>` focus trap, close control, and backdrop dismissal
 - 🎨 CSS custom properties for theming
 - 🪶 Zero dependencies (Svelte 5 peer only)
 
@@ -73,6 +73,8 @@ bun add @wornpage/cmdk
 
 Through `bind:this`:
 - `open()` — open the palette dialog
+
+The close control and result rows meet 44px touch-target sizing on coarse pointers. Escape, backdrop dismissal, the close control, and selection all converge on one native dialog close event. Palette motion is disabled when the user prefers reduced motion.
 
 ## Theming
 

@@ -42,7 +42,8 @@ bun add @wornpage/theme
 
 The component restores the saved theme on mount, writes every change to
 `localStorage` under `wrn-theme`, and — while set to `system` — follows the OS
-`prefers-color-scheme` setting as it changes.
+`prefers-color-scheme` setting as it changes. Set `storageKey` when a product
+needs a versioned or app-specific preference key.
 
 ## Usage (web component)
 
@@ -62,10 +63,11 @@ The browser entry is generated from `src/ThemeElement.svelte` with
 The theme functions work on their own if you already have your own picker UI:
 
 ```js
-import { applyTheme, resolveTheme, THEMES, THEME_LABELS } from '@wornpage/theme';
+import { createThemeController, THEMES, THEME_LABELS } from '@wornpage/theme';
 
-applyTheme('ocean');        // sets data-theme on <html>
-resolveTheme('system');     // -> 'light' | 'dark', per OS preference
+const themes = createThemeController({ storageKey: 'my-product-theme' });
+themes.start();             // restore once and follow OS preference changes
+themes.set('ocean');        // set data-theme and persist the logical choice
 THEMES;                     // readonly list of theme names
 THEME_LABELS;               // display names, keyed by theme name
 ```
@@ -93,6 +95,8 @@ written, so you never need a `[data-theme="system"]` rule.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `theme` | `ThemeName` | `'system'` | Bindable. One of `THEMES`. |
+| `storageKey` | `string` | `'wrn-theme'` | Persistence key. |
+| `themes` | `readonly ThemeName[]` | `THEMES` | Ordered subset rendered by the Svelte picker. |
 
 ## Exports
 
@@ -100,7 +104,10 @@ written, so you never need a `[data-theme="system"]` rule.
 |--------|------|-------------|
 | `Theme` | component | Svelte theme picker |
 | `ThemeElement` | component | Custom-element wrapper |
-| `applyTheme(theme)` | `(ThemeName) => void` | Applies the theme to `<html>` |
+| `createThemeController(options)` | `(ThemeControllerOptions) => ThemeController` | Restores, applies, persists, and tracks system changes |
+| `applyTheme(theme, options)` | `(ThemeName, ApplyThemeOptions) => EffectiveTheme` | Applies and optionally persists a theme |
+| `readTheme(options)` | `(ThemeRuntimeOptions) => ThemeName \| null` | Reads and validates the stored logical choice |
+| `isThemeName(value, themes)` | type guard | Validates a value against the active theme list |
 | `resolveTheme(theme)` | `(ThemeName) => string` | Resolves `system` to `light`/`dark` |
 | `THEMES` | `readonly ThemeName[]` | Every available theme name |
 | `THEME_LABELS` | `Record<string, string>` | Human-readable labels |

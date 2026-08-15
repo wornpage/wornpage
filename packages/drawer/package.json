@@ -1,0 +1,37 @@
+{
+  "name": "@wornpage/drawer",
+  "version": "0.1.1",
+  "description": "Svelte 5 accessible drawer with focus trapping and reduced-motion transitions",
+  "type": "module",
+  "wornpage": {
+    "contractVersion": 2,
+    "delivery": "browser-bundle"
+  },
+  "scripts": {
+    "test": "bun test",
+    "build": "vite build"
+  },
+  "main": "./dist/worn-drawer.js",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./dist/worn-drawer.js"
+    }
+  },
+  "files": ["dist", "src", "README.md"],
+  "peerDependencies": {
+    "svelte": "^5.56.8"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "svelte": "^5.56.8",
+    "vite": "^8.1.4"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/drawer.git"
+  }
+}

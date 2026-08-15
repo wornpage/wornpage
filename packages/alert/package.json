@@ -1,0 +1,41 @@
+{
+  "name": "@wornpage/alert",
+  "version": "0.1.0",
+  "description": "Svelte 5 inline alerts with live-region semantics, contextual dismissal, and compact containment",
+  "type": "module",
+  "wornpage": {
+    "contractVersion": 2,
+    "delivery": "browser-bundle"
+  },
+  "scripts": {
+    "test": "bun test",
+    "build": "vite build"
+  },
+  "main": "./dist/worn-alert.js",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./dist/worn-alert.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "svelte": "^5.56.8"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/alert.git"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "svelte": "^5.56.8",
+    "vite": "^8.2.1"
+  }
+}

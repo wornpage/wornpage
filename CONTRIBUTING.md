@@ -63,9 +63,14 @@ for standalone use. See `@wornpage/sidebar` for the reference pattern.
 cd wornpage
 bun install
 bun run check:workspace
+bun run check:components
 bun run sync --check
 bun test
 ```
+
+`check:components` is the fleet gate. It checks every mirrored package's
+delivery declaration, exports, README, and release workflow in one pass;
+package tests remain responsible for component behavior.
 
 ## Questions?
 

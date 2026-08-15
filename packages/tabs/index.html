@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wornpage Tabs</title>
+  <style>
+    :root {
+      --cockpit-bg: #111714;
+      --cockpit-surface: #17211c;
+      --cockpit-border: #40534a;
+      --cockpit-text: #eef6f1;
+      --cockpit-text-muted: #b8c8c0;
+      --cockpit-link: #7ddac3;
+      --cockpit-accent: #2b8377;
+      --font-typewriter: ui-monospace, SFMono-Regular, Consolas, monospace;
+      color: var(--cockpit-text);
+      background: var(--cockpit-bg);
+      font-family: Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 18px; }
+    main { width: min(100%, 620px); margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { color: var(--cockpit-text-muted); }
+    .frame { min-width: 0; margin-top: 28px; }
+    worn-tabs { display: block; min-width: 0; }
+    [role="tabpanel"] { min-height: 140px; padding: 18px; border: 1px solid var(--cockpit-border); background: var(--cockpit-surface); }
+    [role="tabpanel"][hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Tabs</h1>
+    <p>Named, keyboard-roving tabs with stable content relationships.</p>
+    <div class="frame">
+      <worn-tabs id="sections"></worn-tabs>
+      <div id="panels"></div>
+    </div>
+  </main>
+  <script type="module" src="./dist/worn-tabs.js"></script>
+  <script type="module">
+    await customElements.whenDefined('worn-tabs');
+    const options = [
+      { id: 'controls', label: 'Controls' },
+      { id: 'feedback', label: 'Feedback' },
+      { id: 'motion', label: 'Motion' },
+      { id: 'layout', label: 'Layout' },
+      { id: 'overlays', label: 'Overlays' },
+      { id: 'web-components', label: 'Web components' }
+    ];
+    const control = document.querySelector('#sections');
+    control.controlId = 'portfolio';
+    control.label = 'Component sections';
+    control.tabs = options;
+    control.active = options[0].id;
+
+    const panels = document.querySelector('#panels');
+    for (const option of options) {
+      const panel = document.createElement('section');
+      panel.id = `portfolio-panel-${option.id}`;
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', `portfolio-tab-${option.id}`);
+      panel.hidden = option.id !== control.active;
+      panel.innerHTML = `<h2>${option.label}</h2><p>${option.label} content is associated with its tab.</p>`;
+      panels.append(panel);
+    }
+
+    control.addEventListener('change', (event) => {
+      for (const panel of panels.children) panel.hidden = panel.id !== `portfolio-panel-${event.detail.id}`;
+    });
+  </script>
+</body>
+</html>

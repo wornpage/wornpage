@@ -4,6 +4,7 @@ export interface ButtonProps {
   size?: 'sm' | 'md';
   type?: 'button' | 'submit';
   href?: string;
+  class?: string;
   onclick?: (e: MouseEvent) => void;
   children?: any;
   [key: string]: unknown;

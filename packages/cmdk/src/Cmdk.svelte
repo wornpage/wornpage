@@ -54,11 +54,21 @@
 		inputEl?.focus();
 	}
 
+	function closePalette() {
+		if (!dialogEl?.open) return;
+		dialogEl.close();
+	}
+
+	function handleBackdropClick(e: MouseEvent) {
+		if (e.target === e.currentTarget) closePalette();
+	}
+
 	function onKeydown(e: KeyboardEvent) {
 		const count = displayedItems.length;
-		if (e.key === 'ArrowDown' && count) { e.preventDefault(); selected = (selected + 1) % count; scrollActive(); }
+		if (e.key === 'Escape') { e.preventDefault(); closePalette(); }
+		else if (e.key === 'ArrowDown' && count) { e.preventDefault(); selected = (selected + 1) % count; scrollActive(); }
 		else if (e.key === 'ArrowUp' && count) { e.preventDefault(); selected = (selected - 1 + count) % count; scrollActive(); }
-		else if (e.key === 'Enter') { e.preventDefault(); displayedItems[selected]?.onSelect?.(); dialogEl?.close(); dispatchEvent(new CustomEvent('close')); }
+		else if (e.key === 'Enter') { e.preventDefault(); displayedItems[selected]?.onSelect?.(); closePalette(); }
 	}
 
 	function scrollActive() {
@@ -67,21 +77,24 @@
 
 	function handleSelect(index: number) {
 		displayedItems[index]?.onSelect?.();
-		dialogEl?.close();
-		dispatchEvent(new CustomEvent('close'));
+		closePalette();
 	}
 
 	const grouped = $derived(groupCmdkItems(filtered));
 	const displayedItems = $derived(grouped.orderedItems);
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <dialog bind:this={dialogEl} class="cmdk" aria-label="Command palette"
-	onclose={() => dispatchEvent(new CustomEvent('close'))} onkeydown={(e) => e.key === 'Escape' && dispatchEvent(new CustomEvent('close'))}>
-	<input bind:this={inputEl} bind:value={query} class="cmdk-input" type="text"
-		autocomplete="off" spellcheck="false" {placeholder}
-		aria-label="Command palette search" role="combobox" aria-expanded="true"
-		aria-controls="cmdk-list" aria-activedescendant={displayedItems.length ? `cmdk-option-${selected}` : undefined}
-		onkeydown={onKeydown} />
+	onclose={() => dispatchEvent(new CustomEvent('close'))} onclick={handleBackdropClick}>
+	<div class="cmdk-search-row">
+		<input bind:this={inputEl} bind:value={query} class="cmdk-input" type="text"
+			autocomplete="off" spellcheck="false" {placeholder}
+			aria-label="Command palette search" role="combobox" aria-expanded="true"
+			aria-controls="cmdk-list" aria-activedescendant={displayedItems.length ? `cmdk-option-${selected}` : undefined}
+			onkeydown={onKeydown} />
+		<button type="button" class="cmdk-close" onclick={closePalette} aria-label="Close command palette"></button>
+	</div>
 	<ul id="cmdk-list" class="cmdk-list" role="listbox" aria-label="Results">
 		{#each grouped.noGroup as item, i (item.id)}
 			<li role="presentation">
@@ -120,10 +133,18 @@
 		background: var(--cmdk-surface, var(--cockpit-surface, #fff)); color: var(--cmdk-text, var(--cockpit-text, #21322b));
 		box-shadow: 0 12px 40px rgba(0,0,0,0.3); margin: 12vh auto auto; }
 	.cmdk::backdrop { background: var(--cmdk-backdrop, rgba(0,0,0,0.45)); }
-	.cmdk-input { width: 100%; box-sizing: border-box; border: 0;
-		border-bottom: 1px solid var(--cmdk-border, var(--cockpit-border, #e2ddd5)); background: transparent;
-		color: inherit; font: inherit; font-size: 15px; padding: 14px 16px; outline: none; }
+	.cmdk-search-row { display: flex; align-items: center; border-bottom: 1px solid var(--cmdk-border, var(--cockpit-border, #e2ddd5)); padding-right: 4px; }
+	.cmdk-input { flex: 1; min-width: 0; box-sizing: border-box; border: 0; background: transparent;
+		color: inherit; font: inherit; font-size: 15px; padding: 14px 8px 14px 16px; outline: none; }
 	.cmdk-input::placeholder { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); opacity: 1; }
+	.cmdk-close { position: relative; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; border: 0;
+		border-radius: 50%; background: transparent; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); cursor: pointer; }
+	.cmdk-close::before, .cmdk-close::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px;
+		border-radius: 1px; background: currentColor; }
+	.cmdk-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+	.cmdk-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+	.cmdk-close:hover { background: var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7)); }
+	.cmdk-close:focus-visible { outline: 2px dashed var(--cockpit-accent, currentColor); outline-offset: 2px; }
 	.cmdk-list { list-style: none; margin: 0; padding: 6px; max-height: 46vh; overflow-y: auto; }
 	.cmdk-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
 		padding: 8px 10px; border-radius: var(--cmdk-radius-sm, 6px); cursor: pointer;
@@ -134,4 +155,6 @@
 	.cmdk-group-label { padding: 8px 10px 4px; font-size: 10px; font-weight: 600;
 		text-transform: uppercase; letter-spacing: 0.04em; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); }
 	.cmdk-empty { padding: 12px 10px; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); font-size: 13px; }
+	@media (pointer: coarse) { .cmdk-item { min-height: 44px; } }
+	@media (prefers-reduced-motion: reduce) { .cmdk { animation: none; } }
 </style>

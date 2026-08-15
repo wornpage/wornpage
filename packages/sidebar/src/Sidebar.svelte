@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { NavItem } from './types.js';
 	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
-	import { filterNavChildren, filterNavItems, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
+	import { filterNavChildren, filterNavItems, hasNavFilterResults, matchesNavItem, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 	import { nextNavFocusIndex } from './keyboard.js';
+	import { visibleNavItems } from './visibility.js';
 
 	interface Props {
 		items: NavItem[];
@@ -20,6 +21,7 @@
 	// any section title flipped ALL sections open/closed together.
 	let filterText = $state('');
 	let favorites = $state<Set<string>>(new Set());
+	let hiddenItems = $state<Set<string>>(new Set());
 	let recentRoutes = $state<string[]>([]);
 	let contextMenu = $state<string | null>(null);
 	let filterInput: HTMLInputElement | undefined = $state();
@@ -61,7 +63,7 @@
 
 	$effect(() => {
 		const path = activeHref;
-		if (!path || path === '/' || path === recentRoutes[0]) return;
+		if (!path || path === '/' || path === recentRoutes[0] || !flatItems.some((item) => item.href === path)) return;
 		try {
 			const stored = JSON.parse(localStorage.getItem('wornpage-sidebar-recent') || '[]');
 			recentRoutes = [path, ...stored.filter((r: string) => r !== path)].slice(0, 5);
@@ -79,6 +81,10 @@
 			if (r) recentRoutes = JSON.parse(r);
 		} catch {}
 		try {
+			const raw = localStorage.getItem('wornpage-sidebar-hidden');
+			if (raw) hiddenItems = new Set(JSON.parse(raw));
+		} catch {}
+		try {
 			// Migrate the legacy single "more-open" flag: '0' meant every
 			// section was collapsed. New per-section state lives under
 			// wornpage-sidebar-open-sections (read above); only apply the old
@@ -93,6 +99,9 @@
 
 	function saveFavorites(set: Set<string>) {
 		try { localStorage.setItem('wornpage-sidebar-favorites', JSON.stringify([...set])); } catch {}
+	}
+	function saveHiddenItems(set: Set<string>) {
+		try { localStorage.setItem('wornpage-sidebar-hidden', JSON.stringify([...set])); } catch {}
 	}
 
 	function toggleFavorite(id: string) {
@@ -119,6 +128,10 @@
 	}
 	function closeContextMenu() { contextMenu = null; }
 	function hideItem(id: string) {
+		const hidden = new Set(hiddenItems);
+		hidden.add(id);
+		hiddenItems = hidden;
+		saveHiddenItems(hidden);
 		const next = new Set(favorites);
 		next.delete(id);
 		favorites = next;
@@ -126,8 +139,10 @@
 		recentRoutes = recentRoutes.filter(r => r !== '/' + id);
 		closeContextMenu();
 	}
-	function resetAll() {
-		favorites = new Set(); saveFavorites(new Set()); recentRoutes = [];
+	function resetShortcuts() {
+		favorites = new Set(); saveFavorites(new Set());
+		hiddenItems = new Set(); saveHiddenItems(new Set());
+		recentRoutes = [];
 		try { localStorage.removeItem('wornpage-sidebar-recent'); } catch {}
 		closeContextMenu();
 	}
@@ -141,10 +156,11 @@
 		return result;
 	}
 
-	const flatItems = $derived(flatten(items));
-	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && (!filterText || i.label.toLowerCase().includes(filterText.toLowerCase()))));
+	const visibleItems = $derived(visibleNavItems(items, hiddenItems));
+	const flatItems = $derived(flatten(visibleItems));
+	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && matchesNavItem(i, filterText)));
 
-	const topLevel = $derived(filterNavItems(items, filterText));
+	const topLevel = $derived(filterNavItems(visibleItems, filterText));
 	const recentItems = $derived(
 		recentRoutes
 			.map(href => flatItems.find(i => i.href === href))
@@ -236,7 +252,7 @@
 
 <nav class="worn-nav" bind:this={navEl}>
 	<div class="worn-active-indicator"></div>
-	{#if filterText.trim() && !hasNavFilterResults(items, filterText)}
+	{#if filterText.trim() && !hasNavFilterResults(visibleItems, filterText)}
 		<div class="worn-filter-empty" role="status">No matches</div>
 	{/if}
 
@@ -276,14 +292,30 @@
 			{@render navLink(item)}
 		{/if}
 	{/each}
+
+	{#if hiddenItems.size > 0}
+		<button type="button" class="worn-sidebar-restore" onclick={resetShortcuts} title="Restore hidden navigation">
+			<svg class="worn-context-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+			<span class="worn-sidebar-restore-label">Restore hidden</span>
+		</button>
+	{/if}
 </nav>
 
 {#if contextMenu}
 	<button type="button" class="worn-menu-backdrop" aria-label="Close menu" onclick={closeContextMenu}></button>
 	<div class="worn-context-menu">
-		<button type="button" onclick={() => { toggleFavorite(contextMenu); closeContextMenu(); }}>{favorites.has(contextMenu) ? '📌 Unpin' : '📌 Pin'}</button>
-		<button type="button" onclick={() => hideItem(contextMenu)}>👁 Hide</button>
-		<button type="button" onclick={resetAll}>🔄 Reset all</button>
+		<button type="button" onclick={() => { toggleFavorite(contextMenu); closeContextMenu(); }}>
+			<svg class="worn-context-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17v5"/><path d="M9 3v4l-3 3v2h12v-2l-3-3V3z"/></svg>
+			{favorites.has(contextMenu) ? 'Unpin' : 'Pin'}
+		</button>
+		<button type="button" onclick={() => hideItem(contextMenu)}>
+			<svg class="worn-context-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m2 2 20 20"/><path d="M6.7 6.7C4.8 8.1 3.4 10.2 3 12c1.7 4 5 7 9 7 1.7 0 3.2-.5 4.6-1.3"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.1A9.7 9.7 0 0 1 12 5c4 0 7.3 3 9 7a12.6 12.6 0 0 1-1.5 2.5"/></svg>
+			Hide from sidebar
+		</button>
+		<button type="button" onclick={resetShortcuts}>
+			<svg class="worn-context-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+			Reset shortcuts
+		</button>
 	</div>
 {/if}
 
@@ -293,11 +325,11 @@
 	.worn-sidebar {
 		inline-size: 100%;
 		min-inline-size: 0;
-		overflow-x: hidden;
+		overflow-x: clip;
 		transition: inline-size 0.2s ease;
 	}
 	.worn-sidebar.is-collapsed {
-		inline-size: var(--worn-sidebar-collapsed-width, 60px);
+		inline-size: var(--worn-sidebar-collapsed-width, 72px);
 	}
 	.worn-sidebar.is-collapsed .worn-sidebar-filter,
 	.worn-sidebar.is-collapsed .worn-nav-badge,
@@ -319,14 +351,35 @@
 		width: 1px;
 	}
 	.worn-sidebar.is-collapsed .worn-nav-item {
+		box-sizing: border-box;
 		gap: 0;
+		inline-size: var(--worn-sidebar-collapsed-item-size, 44px);
 		justify-content: center;
+		margin-inline: auto;
 		padding-inline: 6px;
 	}
 	.worn-sidebar.is-collapsed .worn-nav-group > .worn-nav-row > .worn-nav-item {
 		padding-inline: 6px;
 	}
 	.worn-sidebar.is-collapsed .worn-nav-icon { margin: 0; }
+	.worn-sidebar.is-collapsed .worn-sidebar-restore {
+		inline-size: var(--worn-sidebar-collapsed-item-size, 44px);
+		justify-content: center;
+		margin-inline: auto;
+		padding-inline: 6px;
+	}
+	.worn-sidebar.is-collapsed .worn-sidebar-restore-label {
+		border: 0;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+		padding: 0;
+		position: absolute;
+		white-space: nowrap;
+		width: 1px;
+	}
 
 	.worn-sidebar-filter { position: relative; margin: 4px 8px 8px; }
 	.worn-filter-input {
@@ -365,7 +418,10 @@
 		min-height: 36px;
 	}
 	.worn-nav-row { position: relative; }
-	.worn-nav-row > .worn-nav-item { box-sizing: border-box; width: 100%; }
+	.worn-nav-row > .worn-nav-item {
+		box-sizing: border-box;
+		inline-size: auto;
+	}
 	.worn-nav-row.has-reorder > .worn-nav-item { padding-inline-end: 72px; }
 	.worn-nav-item:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
 	.worn-nav-item.active {
@@ -423,6 +479,25 @@
 	}
 	.worn-nav-group > .worn-nav-summary .worn-nav-icon { transition: transform 0.18s var(--worn-ease, ease); }
 	.worn-nav-group[open] > .worn-nav-summary .worn-nav-icon { transform: rotate(90deg); }
+	.worn-sidebar-restore {
+		align-items: center;
+		background: transparent;
+		border: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd));
+		border-radius: var(--worn-nav-radius, 8px);
+		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		cursor: pointer;
+		display: flex;
+		font: inherit;
+		font-size: 12px;
+		gap: 8px;
+		margin: 8px;
+		min-height: 36px;
+		padding: 6px 10px;
+		text-align: left;
+		width: calc(100% - 16px);
+	}
+	.worn-sidebar-restore:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--cockpit-text, #000)); }
+	.worn-sidebar-restore:focus-visible { outline: 2px dashed var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488)); outline-offset: 2px; }
 
 	.worn-active-indicator {
 		position: absolute; left: 2px; width: calc(100% - 4px);
@@ -493,6 +568,7 @@
 		font: inherit; font-size: 12px;
 		cursor: pointer; text-align: left; min-height: 36px;
 	}
+	.worn-context-menu-icon { fill: none; flex: 0 0 auto; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 16px; }
 	.worn-context-menu button:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
 
 	@media (prefers-reduced-motion: reduce) {

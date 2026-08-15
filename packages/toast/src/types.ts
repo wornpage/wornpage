@@ -7,6 +7,7 @@ export interface ToastItem {
 export interface ToastProps {
   message: string;
   kind?: 'info' | 'error' | 'success';
+  dismissLabel?: string;
   ondismiss?: () => void;
   duration?: number;
 }

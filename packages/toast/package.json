@@ -1,7 +1,7 @@
 {
   "name": "@wornpage/toast",
-  "version": "0.1.1",
-  "description": "Svelte 5 toast notification — fly-in, auto-dismiss, zero deps",
+  "version": "0.1.3",
+  "description": "Svelte 5 toast notification with CSP-compatible motion, contextual dismissal, and compact containment",
   "type": "module",
   "wornpage": {
     "contractVersion": 2,

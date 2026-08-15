@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wornpage Segmented Control</title>
+  <style>
+    :root {
+      --cockpit-bg: #111714;
+      --cockpit-surface: #17211c;
+      --cockpit-border: #40534a;
+      --cockpit-radius: 6px;
+      --cockpit-text: #eef6f1;
+      --cockpit-text-muted: #b8c8c0;
+      --cockpit-accent: #2b8377;
+      --cockpit-accent-50: #25413a;
+      --cockpit-accent-text: #ffffff;
+      --font-typewriter: ui-monospace, SFMono-Regular, Consolas, monospace;
+      color: var(--cockpit-text);
+      background: var(--cockpit-bg);
+      font-family: Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 18px; }
+    main { width: min(100%, 620px); margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { margin: 0 0 24px; color: var(--cockpit-text-muted); }
+    .examples { display: grid; gap: 24px; }
+    .example { min-width: 0; }
+    .example > span { display: block; margin-bottom: 8px; font: 700 11px var(--font-typewriter); text-transform: uppercase; }
+    worn-segmented-control { display: block; min-width: 0; }
+    worn-segmented-control .worn-segmented { inline-size: 100%; }
+    [data-demo="compact"] { inline-size: 168px; max-inline-size: 100%; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Segmented control</h1>
+    <p>Native radio behavior that remains complete in narrow containers.</p>
+    <div class="examples">
+      <div class="example" data-demo="compact">
+        <span>Compact</span>
+        <worn-segmented-control id="compact" label="Period"></worn-segmented-control>
+      </div>
+      <div class="example">
+        <span>Independent group with the same public name</span>
+        <worn-segmented-control id="second" label="Release cadence"></worn-segmented-control>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="./dist/worn-segmented-control.js"></script>
+  <script type="module">
+    await customElements.whenDefined('worn-segmented-control');
+    const compact = document.querySelector('#compact');
+    compact.name = 'period';
+    compact.options = [
+      { id: 'daily', label: 'Daily' },
+      { id: 'weekly', label: 'Weekly' },
+      { id: 'monthly', label: 'Monthly' }
+    ];
+    compact.active = 'daily';
+
+    const second = document.querySelector('#second');
+    second.name = 'period';
+    second.options = [
+      { id: 'weekly', label: 'Weekly' },
+      { id: 'monthly', label: 'Monthly' },
+      { id: 'quarterly', label: 'Quarterly' }
+    ];
+    second.active = 'weekly';
+  </script>
+</body>
+</html>

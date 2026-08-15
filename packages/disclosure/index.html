@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wornpage Disclosure</title>
+  <style>
+    :root {
+      --cockpit-bg: #f5f0e8;
+      --cockpit-surface: #fdfbf7;
+      --cockpit-border: #d0cac1;
+      --cockpit-text: #21322b;
+      --cockpit-text-secondary: #394b43;
+      --cockpit-text-muted: #506058;
+      --cockpit-accent: #0f766e;
+      --cockpit-hover-bg: #eef7f4;
+      --cockpit-radius-sm: 6px;
+      --font-typewriter: ui-monospace, SFMono-Regular, Consolas, monospace;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --cockpit-bg: #0f1714;
+        --cockpit-surface: #18241f;
+        --cockpit-border: #3a4d45;
+        --cockpit-text: #f7fffc;
+        --cockpit-text-secondary: #d9e5dd;
+        --cockpit-text-muted: #b0bcb4;
+        --cockpit-accent: #5cc8a9;
+        --cockpit-hover-bg: #21312a;
+        color-scheme: dark;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; background: var(--cockpit-bg); color: var(--cockpit-text); font-family: Georgia, serif; }
+    main { max-width: 620px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { margin: 0; color: var(--cockpit-text-muted); }
+    .intro { margin-bottom: 22px; }
+    .surface { display: grid; gap: 14px; min-inline-size: 0; }
+    .narrow { max-inline-size: 280px; min-inline-size: 0; }
+    output { display: block; margin-top: 16px; min-height: 22px; font: 12px/1.5 var(--font-typewriter); color: var(--cockpit-text-muted); }
+    @media (max-width: 380px) { body { padding: 14px; } }
+  </style>
+  <script type="module" src="./dist/worn-disclosure.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Disclosure</h1>
+    <p class="intro">Native disclosure controls for compact, themeable product surfaces.</p>
+    <section class="surface" aria-label="Disclosure states">
+      <worn-accordion label="Release notes" description="August 14">
+        <p>Form fields now own their responsive behavior.</p>
+      </worn-accordion>
+      <div class="narrow">
+        <worn-accordion label="DeploymentEvidenceForCustomerWorkspaceWithAnExceptionallyLongUnbrokenIdentifier" description="ArchitectureVerificationAndReleaseEvidenceWithoutBreakpoints">
+          <p>Long labels remain inside the disclosure.</p>
+        </worn-accordion>
+      </div>
+      <worn-collapsible summary="Source" aria-label="Source for Button">
+        <pre><code>&lt;Button&gt;Save&lt;/Button&gt;</code></pre>
+      </worn-collapsible>
+      <worn-collapsible summary="Source" aria-label="Source for Input">
+        <pre><code>&lt;Input aria-label=&quot;Project&quot; /&gt;</code></pre>
+      </worn-collapsible>
+      <div class="narrow">
+        <worn-collapsible summary="DeploymentEvidenceForCustomerWorkspaceWithAnExceptionallyLongUnbrokenIdentifier">
+          <p>Long summaries remain inside the trigger.</p>
+        </worn-collapsible>
+      </div>
+    </section>
+    <output id="state" aria-live="polite">No changes yet.</output>
+  </main>
+  <script>
+    const output = document.querySelector('#state');
+    document.addEventListener('change', (event) => {
+      if (!event.target.matches('worn-accordion, worn-collapsible')) return;
+      output.textContent = `${event.target.localName}: ${event.detail.open ? 'open' : 'closed'}`;
+    });
+  </script>
+</body>
+</html>

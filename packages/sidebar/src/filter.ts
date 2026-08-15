@@ -4,10 +4,14 @@ function normalizeQuery(query: string): string {
 	return query.trim().toLowerCase();
 }
 
+function matchesNavItemSelf(item: NavItem, query: string): boolean {
+	return [item.label, ...(item.keywords ?? [])].some((value) => value.toLowerCase().includes(query));
+}
+
 export function matchesNavItem(item: NavItem, query: string): boolean {
 	const q = normalizeQuery(query);
 	if (!q) return true;
-	return item.label.toLowerCase().includes(q) || item.children?.some((child) => matchesNavItem(child, q)) === true;
+	return matchesNavItemSelf(item, q) || item.children?.some((child) => matchesNavItem(child, q)) === true;
 }
 
 export function filterNavItems(items: NavItem[], query: string): NavItem[] {
@@ -33,7 +37,8 @@ export function shouldClearNavFilter(key: string, query: string): boolean {
 
 export function filterNavChildren(item: NavItem, query: string): NavItem[] {
 	const children = item.children ?? [];
-	if (!query.trim() || item.label.toLowerCase().includes(normalizeQuery(query))) return children;
+	const q = normalizeQuery(query);
+	if (!q || matchesNavItemSelf(item, q)) return children;
 	return filterNavItems(children, query);
 }
 

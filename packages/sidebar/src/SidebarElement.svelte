@@ -37,7 +37,7 @@
 		transition: inline-size 0.2s ease;
 	}
 	.worn-sidebar-element.is-collapsed {
-		inline-size: var(--worn-sidebar-collapsed-width, 60px);
+		inline-size: var(--worn-sidebar-collapsed-width, 72px);
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.worn-sidebar-element { transition: none; }

@@ -2,6 +2,7 @@ import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from '../src/filter.js';
 import { nextNavFocusIndex } from '../src/keyboard.js';
+import { visibleNavItems } from '../src/visibility.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
 const elementSource = readFileSync(new URL('../src/SidebarElement.svelte', import.meta.url), 'utf8');
@@ -13,6 +14,7 @@ describe('filter control', () => {
 		expect(sidebarSource).not.toContain('type="search"');
 		expect(sidebarSource.match(/class="worn-filter-clear"/gu)?.length).toBe(1);
 		expect(sidebarSource).toContain('aria-label="Clear filter"');
+		expect(sidebarSource).toContain('favorites.has(i.id) && matchesNavItem(i, filterText)');
 	});
 });
 
@@ -20,9 +22,13 @@ describe('collapsed web component', () => {
 	test('owns a visual collapsed state without removing link names', () => {
 		expect(sidebarSource).toContain('title={collapsed ? item.label : undefined}');
 		expect(sidebarSource).toContain('.worn-sidebar.is-collapsed {');
-		expect(sidebarSource).toContain('inline-size: var(--worn-sidebar-collapsed-width, 60px);');
+		expect(sidebarSource).toContain('inline-size: var(--worn-sidebar-collapsed-width, 72px);');
+		expect(sidebarSource).toContain('overflow-x: clip;');
+		expect(sidebarSource).not.toContain('overflow-x: hidden;');
 		expect(sidebarSource).toContain('.worn-sidebar.is-collapsed .worn-nav-label {');
 		expect(sidebarSource).toContain('clip-path: inset(50%);');
+		expect(sidebarSource).toContain('inline-size: var(--worn-sidebar-collapsed-item-size, 44px);');
+		expect(sidebarSource).toContain('margin-inline: auto;');
 		expect(sidebarSource).toContain('@media (prefers-reduced-motion: reduce)');
 	});
 
@@ -30,6 +36,7 @@ describe('collapsed web component', () => {
 		expect(elementSource).toContain('class="worn-sidebar-element" class:is-collapsed={collapsed}');
 		expect(elementSource).toContain('inline-size: var(--worn-sidebar-width, 240px);');
 		expect(elementSource).toContain('.worn-sidebar-element.is-collapsed');
+		expect(elementSource).toContain('inline-size: var(--worn-sidebar-collapsed-width, 72px);');
 		expect(demoSource).toContain('aria-controls="sidebar-demo" aria-pressed="false">Collapse sidebar</button>');
 		expect(demoSource).toContain("collapseButton.setAttribute('aria-pressed', String(collapsed));");
 		expect(demoSource).toContain("collapseButton.textContent = collapsed ? 'Expand sidebar' : 'Collapse sidebar';");
@@ -44,6 +51,14 @@ describe('standalone demo', () => {
 		expect(demoSource).not.toContain('Standalone web component');
 		expect(demoSource).not.toContain('How to use');
 		expect(demoSource).not.toContain('Bundle size');
+	});
+});
+
+describe('consumer layout', () => {
+	test('lets expanded rows fill available width and bounds collapsed rows away from scrollbars', () => {
+		expect(sidebarSource).toContain('.worn-nav-row > .worn-nav-item {');
+		expect(sidebarSource).toContain('inline-size: auto;');
+		expect(sidebarSource).not.toContain('.worn-nav-row > .worn-nav-item { box-sizing: border-box; width: 100%; }');
 	});
 });
 
@@ -105,6 +120,31 @@ describe('context menu', () => {
 	test('uses a real control for backdrop dismissal', () => {
 		expect(sidebarSource).toContain('<button type="button" class="worn-menu-backdrop" aria-label="Close menu" onclick={closeContextMenu}></button>');
 		expect(sidebarSource).not.toContain('<div class="worn-menu-backdrop"');
+		expect(sidebarSource).toContain('Hide from sidebar');
+		expect(sidebarSource).toContain('Reset shortcuts');
+		expect(sidebarSource).not.toContain('📌');
+		expect(sidebarSource).not.toContain('👁');
+		expect(sidebarSource).not.toContain('🔄');
+	});
+});
+
+describe('hidden navigation', () => {
+	test('removes hidden routes and any group left without visible children', () => {
+		const items = [
+			{ id: 'today', label: 'Today', children: [{ id: 'home', label: 'Home' }, { id: 'review', label: 'Review' }] },
+			{ id: 'settings', label: 'Settings' }
+		];
+
+		expect(visibleNavItems(items, new Set(['home']))).toEqual([
+			{ id: 'today', label: 'Today', children: [{ id: 'review', label: 'Review' }] },
+			{ id: 'settings', label: 'Settings' }
+		]);
+		expect(visibleNavItems(items, new Set(['home', 'review']))).toEqual([{ id: 'settings', label: 'Settings' }]);
+	});
+
+	test('keeps the canonical hierarchy untouched when nothing is hidden', () => {
+		const items = [{ id: 'home', label: 'Home' }];
+		expect(visibleNavItems(items, new Set())).toEqual(items);
 	});
 });
 
@@ -151,6 +191,10 @@ describe('filterNavItems', () => {
 		expect(filterNavItems(items, 'SETTINGS').map((item) => item.id)).toEqual(['settings']);
 	});
 
+	test('matches non-visible search keywords', () => {
+		expect(filterNavItems([{ id: 'start', label: 'Start', keywords: ['Home'] }], 'h').map((item) => item.id)).toEqual(['start']);
+	});
+
 	test('no match returns empty', () => {
 		expect(filterNavItems(items, 'zzz')).toEqual([]);
 	});
@@ -187,6 +231,10 @@ describe('filterNavLinks', () => {
 
 	test('does not duplicate favorite links in the filtered navigation list', () => {
 		expect(filterNavLinks(items, 'h', new Set(['home'])).map((item) => item.id)).toEqual([]);
+	});
+
+	test('keeps keyword matches selectable', () => {
+		expect(filterNavLinks([{ id: 'start', label: 'Start', keywords: ['Home'] }], 'home').map((item) => item.id)).toEqual(['start']);
 	});
 });
 

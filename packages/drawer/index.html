@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wornpage Drawer</title>
+  <style>
+    :root {
+      --cockpit-bg: #101512;
+      --cockpit-surface: #19221d;
+      --cockpit-hover-bg: #25322b;
+      --cockpit-border: #46584f;
+      --cockpit-text: #f2f7f4;
+      --cockpit-text-muted: #b8c5be;
+      --cockpit-accent: #6fd8be;
+      --cockpit-radius: 6px;
+      --font-family-display: Georgia, serif;
+      color: var(--cockpit-text);
+      background: var(--cockpit-bg);
+      font-family: Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    body { min-height: 180vh; margin: 0; padding: 28px 18px 120px; }
+    main { width: min(100%, 720px); margin: 0 auto; }
+    h1 { margin: 0; font-size: 28px; }
+    .intro { color: var(--cockpit-text-muted); line-height: 1.6; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0; }
+    button {
+      min-height: 44px;
+      border: 1px solid var(--cockpit-border);
+      border-radius: 5px;
+      padding: 0 16px;
+      color: var(--cockpit-text);
+      background: var(--cockpit-surface);
+      font: 700 14px/1 Georgia, serif;
+      cursor: pointer;
+    }
+    button:hover { background: var(--cockpit-hover-bg); }
+    button:focus-visible { outline: 2px dashed var(--cockpit-accent); outline-offset: 3px; }
+    .activity { display: grid; gap: 1px; border: 1px solid var(--cockpit-border); background: var(--cockpit-border); }
+    .activity div { display: flex; justify-content: space-between; gap: 18px; padding: 14px; background: var(--cockpit-surface); }
+    .activity span { color: var(--cockpit-text-muted); }
+  </style>
+  <script type="module" src="./dist/worn-drawer.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Drawer</h1>
+    <p class="intro">A viewport-level secondary surface that preserves focus, background state, and page position from every supported edge.</p>
+    <div class="toolbar" aria-label="Drawer edges">
+      <button type="button" data-side="start">Open from start</button>
+      <button type="button" data-side="end">Open from end</button>
+      <button type="button" data-side="bottom">Open from bottom</button>
+    </div>
+    <section class="activity" aria-label="Background activity">
+      <div><strong>Release review</strong><span>Ready</span></div>
+      <div><strong>Customer migration</strong><span>In progress</span></div>
+      <div><strong>Security audit</strong><span>3 checks</span></div>
+      <div><strong>Component rollout</strong><span>Queued</span></div>
+    </section>
+    <worn-drawer
+      id="project-drawer"
+      title="Project details"
+      description="Review ownership, evidence, and the next release step without losing the current page position."
+      side="end"
+    ></worn-drawer>
+  </main>
+  <script type="module">
+    await customElements.whenDefined('worn-drawer');
+    const drawer = document.querySelector('#project-drawer');
+    let activeTrigger = null;
+
+    for (const trigger of document.querySelectorAll('[data-side]')) {
+      trigger.addEventListener('click', () => {
+        activeTrigger = trigger;
+        drawer.side = trigger.dataset.side;
+        drawer.open = true;
+      });
+    }
+    drawer.addEventListener('close', () => activeTrigger?.focus({ preventScroll: true }));
+  </script>
+</body>
+</html>

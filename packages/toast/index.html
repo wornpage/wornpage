@@ -22,6 +22,7 @@
     <button type="button" data-kind="info">Info</button>
     <button type="button" data-kind="success">Success</button>
     <button type="button" data-kind="error">Error</button>
+    <button type="button" data-kind="long">Long message</button>
   </div>
 </main>
 <div id="container" aria-label="Notifications"></div>
@@ -32,13 +33,16 @@
   const messages = {
     info: 'Background sync started',
     success: 'Changes saved',
-    error: 'Could not save changes'
+    error: 'Could not save changes',
+    long: 'DeploymentEvidenceForCustomerWorkspaceWithAnExceptionallyLongUnbrokenIdentifier'
   };
 
   function showToast(kind) {
     const toast = document.createElement('worn-toast');
     toast.message = messages[kind];
-    toast.kind = kind;
+    toast.kind = kind === 'long' ? 'info' : kind;
+    toast.dismissLabel = `Dismiss notification: ${messages[kind]}`;
+    toast.duration = 0;
     toast.addEventListener('worn-dismiss', () => toast.remove());
     container.appendChild(toast);
   }

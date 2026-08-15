@@ -101,6 +101,25 @@ describe('command palette chrome', () => {
 		expect(cmdkSource).toContain('var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a))');
 		expect(cmdkSource).toContain('.cmdk-input::placeholder');
 	});
+
+	test('offers mobile-safe close and backdrop dismissal', () => {
+		expect(cmdkSource).toContain('function closePalette()');
+		expect(cmdkSource).toContain('if (e.target === e.currentTarget) closePalette();');
+		expect(cmdkSource).toContain('<button type="button" class="cmdk-close" onclick={closePalette} aria-label="Close command palette"></button>');
+		expect(cmdkSource).toContain('.cmdk-close { position: relative; flex: 0 0 auto; width: 44px; height: 44px;');
+		expect(cmdkSource).toContain('@media (pointer: coarse) { .cmdk-item { min-height: 44px; } }');
+	});
+
+	test('emits one close event from the native dialog close path', () => {
+		expect(cmdkSource.match(/dispatchEvent\(new CustomEvent\('close'\)\)/gu)?.length).toBe(1);
+		expect(cmdkSource).toContain("onclose={() => dispatchEvent(new CustomEvent('close'))}");
+		expect(cmdkSource).toContain("if (e.key === 'Escape') { e.preventDefault(); closePalette(); }");
+		expect(cmdkSource).not.toContain("e.key === 'Escape' && dispatchEvent");
+	});
+
+	test('honors reduced-motion preferences', () => {
+		expect(cmdkSource).toContain('@media (prefers-reduced-motion: reduce) { .cmdk { animation: none; } }');
+	});
 });
 
 describe('browser demo', () => {

@@ -25,6 +25,9 @@ jobs:
       - name: Check workspace dependency contract
         run: bun run check:workspace
 
+      - name: Check every component delivery contract
+        run: bun run check:components
+
       - name: Install workspace dependencies
         run: bun install --frozen-lockfile
 
