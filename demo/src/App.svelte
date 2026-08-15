@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { Sidebar } from '@wornpage/sidebar';
   import { Cmdk } from '@wornpage/cmdk';
   import type { CmdkHandle, CmdkItem } from '@wornpage/cmdk';
@@ -15,9 +16,26 @@
   let currentTheme = $state('light');
   $effect(() => document.documentElement.setAttribute('data-theme', currentTheme));
 
-  let sidebarCollapsed = $state(typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches);
   const sections = ['sidebar','button','cmdk','theme','receipt','workflow','toast','undo','sync','cli'];
-  let activeSection = $state('sidebar');
+
+  function sectionFromHash(hash: string) {
+    const section = hash.replace(/^#/, '');
+    return sections.includes(section) ? section : 'sidebar';
+  }
+
+  let sidebarCollapsed = $state(typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches);
+  let activeSection = $state(typeof window === 'undefined' ? 'sidebar' : sectionFromHash(window.location.hash));
+
+  onMount(() => {
+    const syncActiveSection = () => activeSection = sectionFromHash(window.location.hash);
+    window.addEventListener('hashchange', syncActiveSection);
+    window.addEventListener('popstate', syncActiveSection);
+
+    return () => {
+      window.removeEventListener('hashchange', syncActiveSection);
+      window.removeEventListener('popstate', syncActiveSection);
+    };
+  });
 
   const sidebarItems = sections.map(id => ({
     id, href: '#' + id, label: id.charAt(0).toUpperCase() + id.slice(1),
@@ -64,7 +82,12 @@
   const standup = buildStandupText(orderPacks(demoPacks));
 
   function onnavigate(href: string) {
-    activeSection = href.replace('#', '') || 'sidebar';
+    const section = sectionFromHash(href);
+    const hash = '#' + section;
+
+    activeSection = section;
+    if (window.location.hash !== hash) window.history.pushState(null, '', hash);
+    document.getElementById(section)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 </script>
 
