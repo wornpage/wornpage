@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 
 const buttonSource = readFileSync(new URL('../src/WornButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const iconButtonSource = readFileSync(new URL('../src/WornIconButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const elementSource = readFileSync(new URL('../src/ButtonElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
@@ -11,7 +12,17 @@ describe('public contract', () => {
 		expect(typesSource).toContain('class?: string;');
 		expect(buttonSource).toContain('class: className,');
 		expect(buttonSource.match(/class=\{className \? `worn-btn \$\{className\}` : 'worn-btn'\}/gu)).toHaveLength(2);
-		expect(indexSource).toContain("export type { ButtonProps } from './types';");
+		expect(indexSource).toContain("export type { ButtonProps, IconButtonProps } from './types';");
+	});
+
+	test('exports an accessible icon-button primitive', () => {
+		expect(indexSource).toContain("export { default as IconButton } from './WornIconButton.svelte';");
+		expect(indexSource).toContain('ButtonProps, IconButtonProps');
+		expect(typesSource).toContain('label: string;');
+		expect(iconButtonSource).toContain('aria-label={label}');
+		expect(iconButtonSource).toContain('title = label,');
+		expect(iconButtonSource).toContain('{@render children?.()}');
+		expect(iconButtonSource).toContain('{...rest}');
 	});
 
 	test('owns link presentation and long-label containment', () => {
@@ -54,6 +65,25 @@ describe('compact and touch interactions', () => {
 		expect(buttonSource).toContain('touch-action: manipulation;');
 		expect(buttonSource).toContain('@media (prefers-reduced-motion: reduce) {');
 		expect(buttonSource).toContain('transition: none;');
+	});
+
+	test('keeps icon actions measurable and pointer-safe', () => {
+		expect(iconButtonSource).toContain('flex: 0 0 44px;');
+		expect(iconButtonSource).toContain('inline-size: 44px;');
+		expect(iconButtonSource).toContain('min-block-size: 44px;');
+		expect(iconButtonSource).toContain('touch-action: manipulation;');
+		expect(iconButtonSource).toContain('@media (pointer: coarse) {');
+		expect(iconButtonSource).toContain('@media (prefers-reduced-motion: reduce) {');
+	});
+
+	test('owns icon-button theme and focus states', () => {
+		expect(iconButtonSource).toContain('color: var(--cockpit-text-secondary);');
+		expect(iconButtonSource).toContain('background: var(--cockpit-bg-secondary);');
+		expect(iconButtonSource).toContain('color: var(--cockpit-danger-text);');
+		expect(iconButtonSource).toContain('.worn-icon-btn:focus-visible {');
+		expect(iconButtonSource).toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(iconButtonSource).toContain('.worn-icon-btn:disabled {');
+		expect(iconButtonSource).toContain('opacity: 1;');
 	});
 });
 

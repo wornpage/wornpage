@@ -1,2 +1,3 @@
 export { default as Button } from './WornButton.svelte';
-export type { ButtonProps } from './types';
+export { default as IconButton } from './WornIconButton.svelte';
+export type { ButtonProps, IconButtonProps } from './types';

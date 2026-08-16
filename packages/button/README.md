@@ -1,6 +1,6 @@
 # @wornpage/button
 
-Svelte 5 button component — primary, danger, warning variants, link mode (`href`), size `sm`/`md`, keyboard-friendly `focus-visible` outline.
+Svelte 5 button primitives: text and link buttons plus accessible icon-only actions.
 
 <!-- wornpage-delivery:v2 browser-bundle -->
 ## Delivery
@@ -22,13 +22,15 @@ npm install @wornpage/button
 
 ```svelte
 <script>
-  import { Button } from '@wornpage/button';
+  import { Button, IconButton } from '@wornpage/button';
+  import { X } from 'lucide-svelte';
 </script>
 
 <Button variant="primary" onclick={() => alert('hi')}>Click me</Button>
 <Button variant="danger" href="/danger">Go danger</Button>
 <Button size="sm" disabled>Small disabled</Button>
 <Button class="toolbar-action">Refresh</Button>
+<IconButton label="Dismiss notification"><X aria-hidden="true" /></IconButton>
 ```
 
 ## Browser bundle
@@ -44,13 +46,15 @@ The generated browser bundle registers `<worn-button>`. Its `label`, `variant`, 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | `'default' \| 'primary' \| 'danger' \| 'warning'` | `'default'` | Visual style |
+| `variant` | `'default' \| 'primary' \| 'danger' \| 'warning'` | `'default'` | Visual style; `IconButton` supports `default` and `danger` |
 | `size` | `'sm' \| 'md'` | `'md'` | Button size; both sizes keep a 44px target for coarse pointers |
 | `disabled` | `boolean` | `false` | Disabled state |
 | `href` | `string` | — | Renders as `<a>` link |
 | `class` | `string` | — | Additional classes merged with the component class |
 | `onclick` | `(e) => void` | — | Click handler |
 | `type` | `'button' \| 'submit'` | `'button'` | Button type |
+
+`IconButton` requires `label`, uses it as the accessible name and default tooltip, and accepts any icon component as its child. Its default target is 44px; `size="sm"` is 36px on fine pointers and remains 44px on coarse pointers. The browser bundle still registers only `<worn-button>` because Svelte icon children are a source-component capability.
 
 ## CSS API
 
