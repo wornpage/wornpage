@@ -64,5 +64,6 @@ The component uses CSS custom properties from the parent theme:
 - `--cockpit-danger-bg`, `--cockpit-danger-border`, `--cockpit-danger-text`
 - `--cockpit-warning-text`, `--cockpit-warning-bg`
 - `--font-typewriter`
+- `--worn-button-focus` (optional focus-ring override; defaults to `--cockpit-text`)
 
 Additional classes, including `is-active`, are merged with the component class. Link buttons keep button presentation without inherited underlines, and long labels wrap within their container.

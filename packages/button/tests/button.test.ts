@@ -63,6 +63,7 @@ describe('compact and touch interactions', () => {
 
 	test('suppresses browser gesture delay and decorative transitions when appropriate', () => {
 		expect(buttonSource).toContain('touch-action: manipulation;');
+		expect(buttonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));');
 		expect(buttonSource).toContain('@media (prefers-reduced-motion: reduce) {');
 		expect(buttonSource).toContain('transition: none;');
 	});
@@ -81,7 +82,7 @@ describe('compact and touch interactions', () => {
 		expect(iconButtonSource).toContain('background: var(--cockpit-bg-secondary);');
 		expect(iconButtonSource).toContain('color: var(--cockpit-danger-text);');
 		expect(iconButtonSource).toContain('.worn-icon-btn:focus-visible {');
-		expect(iconButtonSource).toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(iconButtonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));');
 		expect(iconButtonSource).toContain('.worn-icon-btn:disabled {');
 		expect(iconButtonSource).toContain('opacity: 1;');
 	});

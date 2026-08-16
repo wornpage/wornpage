@@ -78,7 +78,7 @@
 	}
 	.worn-icon-btn:active:not(:disabled) { transform: translateY(1px); }
 	.worn-icon-btn:focus-visible {
-		outline: 2px dashed var(--cockpit-accent);
+		outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));
 		outline-offset: 2px;
 	}
 	.worn-icon-btn:disabled {
