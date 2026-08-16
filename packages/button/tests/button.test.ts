@@ -77,7 +77,7 @@ describe('compact and touch interactions', () => {
 	});
 
 	test('owns icon-button theme and focus states', () => {
-		expect(iconButtonSource).toContain('color: var(--cockpit-text-secondary);');
+		expect(iconButtonSource).toContain('color: var(--cockpit-text);');
 		expect(iconButtonSource).toContain('background: var(--cockpit-bg-secondary);');
 		expect(iconButtonSource).toContain('color: var(--cockpit-danger-text);');
 		expect(iconButtonSource).toContain('.worn-icon-btn:focus-visible {');

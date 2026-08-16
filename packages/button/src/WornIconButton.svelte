@@ -37,7 +37,7 @@
 		border: 1px solid transparent;
 		border-radius: 50%;
 		box-sizing: border-box;
-		color: var(--cockpit-text-secondary);
+		color: var(--cockpit-text);
 		cursor: pointer;
 		display: inline-flex;
 		flex: 0 0 44px;

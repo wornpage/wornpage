@@ -12,9 +12,9 @@ describe('@wornpage/async-states', () => {
 	it('declares source delivery and exact shared dependencies', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/async-states');
-		expect(pkg.version).toBe('0.1.1');
+		expect(pkg.version).toBe('0.1.2');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
-		expect(pkg.dependencies['@wornpage/button']).toContain('e6295a98f33a24075579e7424b11a7f9a40eca5d');
+		expect(pkg.dependencies['@wornpage/button']).toContain('f2ca41be8fa9cfb7b6086cb1e13edaad82bd0095');
 	});
 
 	it('exports all four stable component surfaces', async () => {
