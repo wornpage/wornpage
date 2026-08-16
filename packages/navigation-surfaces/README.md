@@ -65,7 +65,7 @@ the page. Empty item arrays render no empty landmark.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | `Array<{ label: string; href: string; description?: string; current?: boolean }>` | required | Ordered native-link destinations |
+| `items` | `readonly Array<{ label: string; href: string; description?: string; current?: boolean }>` | required | Ordered native-link destinations |
 | `label` | `string` | `Navigation` | Accessible navigation landmark name |
 
 ## Pagination

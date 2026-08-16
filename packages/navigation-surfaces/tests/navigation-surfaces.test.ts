@@ -28,6 +28,7 @@ describe('@wornpage/navigation-surfaces', () => {
 
 	it('renders a named native destination list without empty landmarks', () => {
 		expect(navigationList).toContain('export interface NavigationListItem');
+		expect(navigationList).toContain('items: readonly NavigationListItem[];');
 		expect(navigationList).toContain('{#if items.length > 0}');
 		expect(navigationList).toContain('aria-label={label}');
 		expect(navigationList).toContain('<ul>');

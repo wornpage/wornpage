@@ -7,7 +7,7 @@
 	}
 
 	interface Props {
-		items: NavigationListItem[];
+		items: readonly NavigationListItem[];
 		label?: string;
 	}
 
