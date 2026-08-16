@@ -1,19 +1,27 @@
 import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
+import { compile } from 'svelte/compiler';
 
 const buttonSource = readFileSync(new URL('../src/WornButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const iconButtonSource = readFileSync(new URL('../src/WornIconButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const reactionButtonSource = readFileSync(new URL('../src/ReactionButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const elementSource = readFileSync(new URL('../src/ButtonElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 
 describe('public contract', () => {
+	test('compiles every Svelte surface', () => {
+		for (const source of [buttonSource, iconButtonSource, reactionButtonSource, elementSource]) {
+			expect(() => compile(source, { generate: 'client', runes: true })).not.toThrow();
+		}
+	});
+
 	test('merges consumer classes for button and link modes', () => {
 		expect(typesSource).toContain('class?: string;');
 		expect(buttonSource).toContain('class: className,');
 		expect(buttonSource.match(/class=\{className \? `worn-btn \$\{className\}` : 'worn-btn'\}/gu)).toHaveLength(2);
-		expect(indexSource).toContain("export type { ButtonProps, IconButtonProps } from './types';");
+		expect(indexSource).toContain("export type { ButtonProps, IconButtonProps, ReactionButtonProps } from './types';");
 	});
 
 	test('exports an accessible icon-button primitive', () => {
@@ -24,6 +32,15 @@ describe('public contract', () => {
 		expect(iconButtonSource).toContain('title = label,');
 		expect(iconButtonSource).toContain('{@render children?.()}');
 		expect(iconButtonSource).toContain('{...rest}');
+	});
+
+	test('exports a controlled reaction-button primitive', () => {
+		expect(indexSource).toContain("export { default as ReactionButton } from './ReactionButton.svelte';");
+		expect(typesSource).toContain('export interface ReactionButtonProps');
+		expect(reactionButtonSource).toContain('aria-label={accessibleLabel}');
+		expect(reactionButtonSource).toContain('aria-pressed={pressed}');
+		expect(reactionButtonSource).toContain('onclick={onclick}');
+		expect(reactionButtonSource).not.toContain('fetch(');
 	});
 
 	test('owns link presentation and long-label containment', () => {
@@ -93,6 +110,19 @@ describe('compact and touch interactions', () => {
 		expect(iconButtonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
 		expect(iconButtonSource).toContain('.worn-icon-btn:disabled {');
 		expect(iconButtonSource).toContain('opacity: 1;');
+	});
+
+	test('keeps reactions touch-safe, legible, and theme-aware', () => {
+		expect(reactionButtonSource).toContain('min-block-size: 44px;');
+		expect(reactionButtonSource).toContain('min-inline-size: 44px;');
+		expect(reactionButtonSource).toContain('touch-action: manipulation;');
+		expect(reactionButtonSource).toContain('overflow-wrap: anywhere;');
+		expect(reactionButtonSource).toContain('.worn-reaction-btn:focus-visible {');
+		expect(reactionButtonSource).toContain('var(--cockpit-focus, var(--cockpit-text, #21322b))');
+		expect(reactionButtonSource).toContain('.worn-reaction-btn.is-pressed {');
+		expect(reactionButtonSource).toContain('@media (prefers-reduced-motion: reduce)');
+		expect(reactionButtonSource).toContain('@media (forced-colors: active)');
+		expect(reactionButtonSource).toContain('opacity: 1;');
 	});
 });
 

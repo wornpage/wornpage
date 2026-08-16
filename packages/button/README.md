@@ -22,7 +22,7 @@ npm install @wornpage/button
 
 ```svelte
 <script>
-  import { Button, IconButton } from '@wornpage/button';
+  import { Button, IconButton, ReactionButton } from '@wornpage/button';
   import { X } from 'lucide-svelte';
 </script>
 
@@ -32,6 +32,7 @@ npm install @wornpage/button
 <Button class="toolbar-action">Refresh</Button>
 <IconButton label="Dismiss notification"><X aria-hidden="true" /></IconButton>
 <IconButton label="Open navigation" size="lg"><Menu aria-hidden="true" /></IconButton>
+<ReactionButton reaction="Like" label="React with like" count={4} pressed onclick={toggleLike} />
 ```
 
 ## Browser bundle
@@ -54,6 +55,22 @@ The generated browser bundle registers `<worn-button>`. Its `label`, `variant`, 
 | `class` | `string` | — | Additional classes merged with the component class |
 | `onclick` | `(e) => void` | — | Click handler |
 | `type` | `'button' \| 'submit'` | `'button'` | Button type |
+
+### ReactionButton
+
+`ReactionButton` is a controlled pressed-state action for emoji, symbols, or
+short reaction text. The host owns the reaction data and mutation; the
+component owns button semantics, count presentation, focus, and a stable 44px
+target.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `reaction` | `string` | required | Visible reaction mark or short text |
+| `label` | `string` | `"React {reaction}"` | Accessible action label; a positive count is appended |
+| `count` | `number` | `0` | Positive counts are rendered beside the reaction |
+| `pressed` | `boolean` | `false` | Controlled selected state exposed through `aria-pressed` |
+| `disabled` | `boolean` | `false` | Disables the native button without dimming its content |
+| `onclick` | `(event) => void` | — | Host mutation callback |
 
 `IconButton` requires `label`, uses it as the accessible name and default tooltip, and accepts any icon component as its child. Its default target is 44px; `size="sm"` is 36px on fine pointers and remains 44px on coarse pointers, while `size="lg"` provides a 48px floating-control target. The browser bundle still registers only `<worn-button>` because Svelte icon children are a source-component capability.
 

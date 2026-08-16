@@ -22,3 +22,15 @@ export interface IconButtonProps {
   children?: any;
   [key: string]: unknown;
 }
+
+export interface ReactionButtonProps {
+  reaction: string;
+  label?: string;
+  count?: number;
+  pressed?: boolean;
+  disabled?: boolean;
+  type?: 'button' | 'submit';
+  class?: string;
+  onclick?: (e: MouseEvent) => void;
+  [key: string]: unknown;
+}
