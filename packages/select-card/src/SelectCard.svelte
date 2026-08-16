@@ -48,6 +48,7 @@
 		overflow-wrap: anywhere;
 	}
 	.worn-select-card strong {
+		font-size: var(--worn-select-card-title-size, 15px);
 		font-weight: 600;
 		line-height: 1.3;
 	}

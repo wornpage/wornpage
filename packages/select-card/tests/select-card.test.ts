@@ -26,6 +26,7 @@ describe('responsive interaction contract', () => {
 		expect(source).toContain('min-inline-size: 0;');
 		expect(source).toContain('min-block-size: 44px;');
 		expect(source).toContain('overflow-wrap: anywhere;');
+		expect(source).toContain('font-size: var(--worn-select-card-title-size, 15px);');
 	});
 
 	test('supports touch, keyboard focus, and reduced motion', () => {
