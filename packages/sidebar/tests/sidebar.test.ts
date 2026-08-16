@@ -2,6 +2,7 @@ import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from '../src/filter.js';
 import { nextNavFocusIndex } from '../src/keyboard.js';
+import { shouldInterceptNavigationClick } from '../src/navigation.js';
 import { visibleNavItems } from '../src/visibility.js';
 import { filterTransientNavItems, selectCurrentPagePlacement } from '../src/shortcuts.js';
 
@@ -129,12 +130,40 @@ describe('package entrypoints', () => {
 		expect(viteSource).not.toContain('customElement: true');
 	});
 
-	test('uses the Svelte 5 click property while preserving default prevention', () => {
+	test('uses the Svelte 5 click property while preserving native link gestures', () => {
 		expect(itemSource).toContain('function handleClick(event: MouseEvent)');
+		expect(itemSource).toContain('if (!shouldInterceptNavigationClick(event, Boolean(onclick))) return;');
 		expect(itemSource).toContain('event.preventDefault();');
 		expect(itemSource).toContain('onclick?.(event);');
 		expect(itemSource).toContain('onclick={handleClick}');
 		expect(itemSource).not.toContain('on:click');
+	});
+});
+
+describe('native link interactions', () => {
+	const click = (overrides: Partial<Parameters<typeof shouldInterceptNavigationClick>[0]> = {}) => ({
+		altKey: false,
+		button: 0,
+		ctrlKey: false,
+		defaultPrevented: false,
+		metaKey: false,
+		shiftKey: false,
+		...overrides,
+	});
+
+	test('intercepts only a plain primary click with a navigation handler', () => {
+		expect(shouldInterceptNavigationClick(click(), true)).toBe(true);
+		expect(shouldInterceptNavigationClick(click(), false)).toBe(false);
+		expect(shouldInterceptNavigationClick(click({ defaultPrevented: true }), true)).toBe(false);
+		expect(shouldInterceptNavigationClick(click({ button: 1 }), true)).toBe(false);
+	});
+
+	test('leaves modified anchor gestures to the browser', () => {
+		for (const modifier of ['altKey', 'ctrlKey', 'metaKey', 'shiftKey'] as const) {
+			expect(shouldInterceptNavigationClick(click({ [modifier]: true }), true)).toBe(false);
+		}
+		expect(sidebarSource).toContain('if (!href || !shouldInterceptNavigationClick(e, Boolean(onnavigate))) return;');
+		expect(sidebarSource).toMatch(/e\.preventDefault\(\);\s*onnavigate\?\.\(href\);/u);
 	});
 });
 

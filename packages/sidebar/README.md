@@ -51,6 +51,10 @@ npm add @wornpage/sidebar
 <Sidebar {items} activeHref="/work" onnavigate={(href) => goto(href)} />
 ```
 
+When `onnavigate` is present, plain primary clicks are delegated to it for
+client-side routing. Modified clicks, non-primary clicks, previously prevented
+events, and links without a handler retain the browser's native anchor behavior.
+
 ### Web component (any framework)
 
 ```html
@@ -89,7 +93,7 @@ The Svelte entry exports `Sidebar`, `SidebarGroup`, and `SidebarItem`. The gener
 
 | Event | Detail | Description |
 |-------|--------|-------------|
-| `worn-nav` | `{ href: string }` | Fired when user clicks a nav link |
+| `worn-nav` | `{ href: string }` | Fired for an unmodified primary click on a nav link |
 | `worn-collapse` | `{ collapsed: boolean }` | Fired when collapse state changes |
 
 ### NavItem

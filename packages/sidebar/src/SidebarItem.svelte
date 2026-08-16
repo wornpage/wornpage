@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { shouldInterceptNavigationClick } from './navigation.js';
+
 	interface Props {
 		href?: string;
 		label: string;
@@ -12,6 +14,7 @@
 	let { href = '#', label, icon, badge, badgeVariant = 'default', active = false, onclick, children }: Props = $props();
 
 	function handleClick(event: MouseEvent) {
+		if (!shouldInterceptNavigationClick(event, Boolean(onclick))) return;
 		event.preventDefault();
 		onclick?.(event);
 	}

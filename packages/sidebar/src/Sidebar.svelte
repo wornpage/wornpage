@@ -3,6 +3,7 @@
 	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
 	import { filterNavChildren, filterNavItems, hasNavFilterResults, matchesNavItem, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 	import { nextNavFocusIndex } from './keyboard.js';
+	import { shouldInterceptNavigationClick } from './navigation.js';
 	import { filterTransientNavItems, selectCurrentPagePlacement } from './shortcuts.js';
 	import { visibleNavItems } from './visibility.js';
 
@@ -209,7 +210,9 @@
 	}
 
 	function handleNav(e: MouseEvent, href?: string) {
-		e.preventDefault(); if (href) onnavigate?.(href);
+		if (!href || !shouldInterceptNavigationClick(e, Boolean(onnavigate))) return;
+		e.preventDefault();
+		onnavigate?.(href);
 	}
 
 	function isCurrentPage(item: NavItem, group: 'pinned' | 'canonical'): boolean {
