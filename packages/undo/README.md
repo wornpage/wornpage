@@ -86,6 +86,36 @@ The label comes from `UNDO_LABELS[action.type]`, falling back to `action.label`,
 then `'Action'`. A button is rendered only when both its capability and handler
 are present, so a receipt never exposes a dead action.
 
+## Browsable history
+
+`UndoHistoryList` is a controlled view for hosts that keep an indexed snapshot
+timeline. It does not store or restore snapshots; the host derives item state
+and handles selection.
+
+```svelte
+<script>
+  import { UndoHistoryList } from '@wornpage/undo';
+
+  const items = [
+    { id: 2, label: 'Renamed launch pack', meta: '10:42:17', state: 'current' },
+    { id: 1, label: 'Opened the project', meta: '10:40:03', state: 'past' }
+  ];
+</script>
+
+<UndoHistoryList {items} onselect={(item) => restore(Number(item.id))} />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `UndoHistoryItem[]` | required | Stable id, label, meta text, and `past`, `current`, or `undone` state |
+| `onselect` | `(item) => void \| Promise<void>` | required | Restore the selected item; current items are disabled |
+| `ariaLabel` | `string` | `"Undo history"` | Ordered-list accessible name |
+| `emptyText` | `string` | `"Nothing recorded yet."` | Empty timeline message |
+
+The component owns ordered-list and button semantics, current and redo styling,
+44px targets, hostile-label containment, theme-aware focus, forced colors, and
+reduced motion. `--worn-undo-focus` optionally overrides its focus ring.
+
 ## Web component
 
 The generated browser entry registers `<worn-undo>`. Listen for `wrn-undo`
@@ -107,10 +137,10 @@ attributes.
 
 ## Scope
 
-This is a single-step stack: `pop()` removes the newest entry and there is no
-cursor, so it does not model redo-after-undo or jumping to an arbitrary earlier
-point. If you need a browsable history, keep an index into an array of
-snapshots rather than popping.
+`createUndoStack` is a single-step stack: `pop()` removes the newest entry and
+there is no cursor, so it does not model redo-after-undo or jumping to an
+arbitrary earlier point. `UndoHistoryList` can render an indexed timeline, but
+the host still owns that timeline and its restore behavior.
 
 ## Note on non-browser imports
 

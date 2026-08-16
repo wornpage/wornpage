@@ -31,6 +31,22 @@ export interface UndoReceiptProps {
 	onredo?: (action: UndoAction) => void;
 }
 
+export type UndoHistoryItemState = 'past' | 'current' | 'undone';
+
+export interface UndoHistoryItem {
+	id: string | number;
+	label: string;
+	meta: string;
+	state: UndoHistoryItemState;
+}
+
+export interface UndoHistoryListProps {
+	items: UndoHistoryItem[];
+	onselect: (item: UndoHistoryItem) => void | Promise<void>;
+	ariaLabel?: string;
+	emptyText?: string;
+}
+
 export interface UndoElementEventDetail {
 	action: UndoAction;
 }

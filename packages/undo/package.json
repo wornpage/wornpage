@@ -1,7 +1,7 @@
 {
   "name": "@wornpage/undo",
   "version": "0.1.1",
-  "description": "Svelte 5 undo receipt and bounded snapshot stack with accessible browser events",
+  "description": "Svelte 5 undo receipt, controlled history list, and bounded snapshot stack with accessible browser events",
   "type": "module",
   "wornpage": {
     "contractVersion": 2,

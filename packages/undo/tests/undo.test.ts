@@ -5,6 +5,7 @@ import { createUndoStack } from '../src/stack.js';
 import { MAX_UNDO, UNDO_LABELS } from '../src/types.js';
 
 const source = readFileSync(new URL('../src/UndoReceipt.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const historySource = readFileSync(new URL('../src/UndoHistoryList.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const elementSource = readFileSync(new URL('../src/UndoElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
@@ -43,8 +44,9 @@ describe('snapshot stack', () => {
 });
 
 describe('receipt semantics and interaction', () => {
-	test('compiles both Svelte surfaces', () => {
+	test('compiles all Svelte surfaces', () => {
 		expect(() => compile(source, { generate: 'client', runes: true })).not.toThrow();
+		expect(() => compile(historySource, { generate: 'client', runes: true })).not.toThrow();
 		expect(() => compile(elementSource, { generate: 'client', runes: true, customElement: true })).not.toThrow();
 	});
 
@@ -82,6 +84,36 @@ describe('receipt semantics and interaction', () => {
 		expect(source).toContain('.wrn-undo-btn:focus-visible');
 		expect(source).toContain('var(--cockpit-surface, #fdfbf7)');
 		expect(source).toContain('@media (forced-colors: active)');
+	});
+});
+
+describe('browsable history', () => {
+	test('exports a controlled typed timeline without owning snapshots', () => {
+		expect(indexSource).toContain("export { default as UndoHistoryList } from './UndoHistoryList.svelte';");
+		for (const type of ['UndoHistoryItem', 'UndoHistoryItemState', 'UndoHistoryListProps']) expect(indexSource).toContain(type);
+		expect(typesSource).toContain("export type UndoHistoryItemState = 'past' | 'current' | 'undone';");
+		expect(historySource).toContain('items,');
+		expect(historySource).toContain('onselect,');
+		expect(historySource).not.toContain('createUndoStack');
+	});
+
+	test('owns timeline semantics, current state, and redo visibility', () => {
+		expect(historySource).toContain('<ol class="wrn-history-list" aria-label={ariaLabel}>');
+		expect(historySource).toContain('{#each items as item (item.id)}');
+		expect(historySource).toContain("disabled={item.state === 'current'}");
+		expect(historySource).toContain("aria-current={item.state === 'current' ? 'true' : undefined}");
+		expect(historySource).toContain("{#if item.state === 'undone'} · undone{/if}");
+		expect(historySource).toContain('onclick={() => onselect(item)}');
+		expect(historySource).not.toContain('opacity: 0');
+	});
+
+	test('owns accessible focus, touch geometry, hostile text, themes, and motion', () => {
+		expect(historySource).toContain('min-block-size: 44px;');
+		expect(historySource).toContain('touch-action: manipulation;');
+		expect(historySource).toContain('overflow-wrap: anywhere;');
+		expect(historySource).toContain('outline: 2px dashed var(--worn-undo-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
+		expect(historySource).toContain('@media (prefers-reduced-motion: reduce)');
+		expect(historySource).toContain('@media (forced-colors: active)');
 	});
 });
 
