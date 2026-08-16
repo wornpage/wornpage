@@ -116,7 +116,7 @@
 		transform: translateY(1px);
 	}
 	.worn-btn:focus-visible {
-		outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));
+		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
 		outline-offset: 2px;
 	}
 	@media (pointer: coarse) {

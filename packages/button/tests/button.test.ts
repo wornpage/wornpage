@@ -6,6 +6,7 @@ const iconButtonSource = readFileSync(new URL('../src/WornIconButton.svelte', im
 const elementSource = readFileSync(new URL('../src/ButtonElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 
 describe('public contract', () => {
 	test('merges consumer classes for button and link modes', () => {
@@ -63,7 +64,7 @@ describe('compact and touch interactions', () => {
 
 	test('suppresses browser gesture delay and decorative transitions when appropriate', () => {
 		expect(buttonSource).toContain('touch-action: manipulation;');
-		expect(buttonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));');
+		expect(buttonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
 		expect(buttonSource).toContain('@media (prefers-reduced-motion: reduce) {');
 		expect(buttonSource).toContain('transition: none;');
 	});
@@ -73,6 +74,13 @@ describe('compact and touch interactions', () => {
 		expect(iconButtonSource).toContain('inline-size: 44px;');
 		expect(iconButtonSource).toContain('min-block-size: 44px;');
 		expect(iconButtonSource).toContain('touch-action: manipulation;');
+		expect(iconButtonSource).toContain('-webkit-tap-highlight-color: transparent;');
+		expect(iconButtonSource).toContain("class:is-lg={size === 'lg'}");
+		expect(iconButtonSource).toContain('flex-basis: 48px;');
+		expect(iconButtonSource).toContain('inline-size: 48px;');
+		expect(iconButtonSource).toContain('min-block-size: 48px;');
+		expect(typesSource).toContain("size?: 'sm' | 'md' | 'lg';");
+		expect(readme).toContain('`size="lg"` provides a 48px floating-control target');
 		expect(iconButtonSource).toContain('@media (pointer: coarse) {');
 		expect(iconButtonSource).toContain('@media (prefers-reduced-motion: reduce) {');
 	});
@@ -82,7 +90,7 @@ describe('compact and touch interactions', () => {
 		expect(iconButtonSource).toContain('background: var(--cockpit-bg-secondary);');
 		expect(iconButtonSource).toContain('color: var(--cockpit-danger-text);');
 		expect(iconButtonSource).toContain('.worn-icon-btn:focus-visible {');
-		expect(iconButtonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));');
+		expect(iconButtonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
 		expect(iconButtonSource).toContain('.worn-icon-btn:disabled {');
 		expect(iconButtonSource).toContain('opacity: 1;');
 	});

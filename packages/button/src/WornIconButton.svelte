@@ -23,6 +23,7 @@
 	class={className ? `worn-icon-btn ${className}` : 'worn-icon-btn'}
 	class:is-danger={variant === 'danger'}
 	class:is-sm={size === 'sm'}
+	class:is-lg={size === 'lg'}
 	{disabled}
 	{onclick}
 >
@@ -48,11 +49,17 @@
 		touch-action: manipulation;
 		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, transform 0.08s ease;
 		user-select: none;
+		-webkit-tap-highlight-color: transparent;
 	}
 	.worn-icon-btn.is-sm {
 		flex-basis: 36px;
 		inline-size: 36px;
 		min-block-size: 36px;
+	}
+	.worn-icon-btn.is-lg {
+		flex-basis: 48px;
+		inline-size: 48px;
+		min-block-size: 48px;
 	}
 	.worn-icon-btn-glyph {
 		align-items: center;
@@ -64,6 +71,10 @@
 	.worn-icon-btn-glyph > :global(svg) {
 		block-size: 18px;
 		inline-size: 18px;
+	}
+	.worn-icon-btn.is-lg .worn-icon-btn-glyph > :global(svg) {
+		block-size: 20px;
+		inline-size: 20px;
 	}
 	.worn-icon-btn.is-danger { color: var(--cockpit-danger-text); }
 	.worn-icon-btn:hover:not(:disabled) {
@@ -78,7 +89,7 @@
 	}
 	.worn-icon-btn:active:not(:disabled) { transform: translateY(1px); }
 	.worn-icon-btn:focus-visible {
-		outline: 2px dashed var(--worn-button-focus, var(--cockpit-text, #21322b));
+		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
 		outline-offset: 2px;
 	}
 	.worn-icon-btn:disabled {

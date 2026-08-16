@@ -31,6 +31,7 @@ npm install @wornpage/button
 <Button size="sm" disabled>Small disabled</Button>
 <Button class="toolbar-action">Refresh</Button>
 <IconButton label="Dismiss notification"><X aria-hidden="true" /></IconButton>
+<IconButton label="Open navigation" size="lg"><Menu aria-hidden="true" /></IconButton>
 ```
 
 ## Browser bundle
@@ -47,14 +48,14 @@ The generated browser bundle registers `<worn-button>`. Its `label`, `variant`, 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `variant` | `'default' \| 'primary' \| 'danger' \| 'warning'` | `'default'` | Visual style; `IconButton` supports `default` and `danger` |
-| `size` | `'sm' \| 'md'` | `'md'` | Button size; both sizes keep a 44px target for coarse pointers |
+| `size` | `'sm' \| 'md'` (`Button`), `'sm' \| 'md' \| 'lg'` (`IconButton`) | `'md'` | `IconButton` uses 36px, 44px, or 48px targets; small targets recover to 44px on coarse pointers |
 | `disabled` | `boolean` | `false` | Disabled state |
 | `href` | `string` | — | Renders as `<a>` link |
 | `class` | `string` | — | Additional classes merged with the component class |
 | `onclick` | `(e) => void` | — | Click handler |
 | `type` | `'button' \| 'submit'` | `'button'` | Button type |
 
-`IconButton` requires `label`, uses it as the accessible name and default tooltip, and accepts any icon component as its child. Its default target is 44px; `size="sm"` is 36px on fine pointers and remains 44px on coarse pointers. The browser bundle still registers only `<worn-button>` because Svelte icon children are a source-component capability.
+`IconButton` requires `label`, uses it as the accessible name and default tooltip, and accepts any icon component as its child. Its default target is 44px; `size="sm"` is 36px on fine pointers and remains 44px on coarse pointers, while `size="lg"` provides a 48px floating-control target. The browser bundle still registers only `<worn-button>` because Svelte icon children are a source-component capability.
 
 ## CSS API
 
@@ -64,6 +65,6 @@ The component uses CSS custom properties from the parent theme:
 - `--cockpit-danger-bg`, `--cockpit-danger-border`, `--cockpit-danger-text`
 - `--cockpit-warning-text`, `--cockpit-warning-bg`
 - `--font-typewriter`
-- `--worn-button-focus` (optional focus-ring override; defaults to `--cockpit-text`)
+- `--worn-button-focus` (optional focus-ring override; defaults to `--cockpit-focus`, then `--cockpit-text`)
 
 Additional classes, including `is-active`, are merged with the component class. Link buttons keep button presentation without inherited underlines, and long labels wrap within their container.

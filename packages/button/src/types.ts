@@ -15,7 +15,7 @@ export interface IconButtonProps {
   title?: string;
   variant?: 'default' | 'danger';
   disabled?: boolean;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
   type?: 'button' | 'submit';
   class?: string;
   onclick?: (e: MouseEvent) => void;
