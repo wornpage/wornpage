@@ -3,6 +3,7 @@
 
   let {
     value = $bindable(0),
+    valueText = '',
     min = 0,
     max = 100,
     step = 1,
@@ -21,7 +22,7 @@
       : 0
   );
   let bucket = $derived(Math.round(percentage / 5) * 5);
-  let visibleValue = $derived(`${value}${suffix}`);
+  let visibleValue = $derived(valueText || `${value}${suffix}`);
 </script>
 
 <div
@@ -43,6 +44,7 @@
       {onchange}
       {disabled}
       aria-label={label || 'Value'}
+      aria-valuetext={valueText || undefined}
       {...rest}
     />
     <div class="worn-range-track">

@@ -57,6 +57,7 @@ export interface SelectProps {
 
 export interface RangeProps {
   value?: number;
+  valueText?: string;
   min?: number;
   max?: number;
   step?: number;

@@ -3,6 +3,7 @@
   shadow: 'open',
   props: {
     value: { reflect: true, type: 'Number' },
+    valueText: { attribute: 'value-text', reflect: true, type: 'String' },
     min: { reflect: true, type: 'Number' },
     max: { reflect: true, type: 'Number' },
     step: { reflect: true, type: 'Number' },
@@ -17,6 +18,7 @@
 
   let {
     value = 0,
+    valueText = '',
     min = 0,
     max = 100,
     step = 1,
@@ -37,6 +39,7 @@
 
 <Range
   bind:value
+  {valueText}
   {min}
   {max}
   {step}

@@ -13,6 +13,7 @@ const rangeElement = read('../src/RangeElement.svelte');
 const index = read('../src/index.ts');
 const demo = read('../index.html');
 const packageJson = JSON.parse(read('../package.json'));
+const types = read('../src/types.ts');
 
 describe('native field contract', () => {
   test('preserves bindable values and forwards remaining native attributes', () => {
@@ -53,6 +54,16 @@ describe('native field contract', () => {
     expect(range).toContain('max-inline-size: 40%;');
     expect(range).toContain('text-overflow: ellipsis;');
     expect(range).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
+  test('lets mapped numeric values expose one formatted visible and accessible value', () => {
+    expect(types).toContain('valueText?: string;');
+    expect(range).toContain("valueText = ''");
+    expect(range).toContain('let visibleValue = $derived(valueText || `${value}${suffix}`);');
+    expect(range).toContain('aria-valuetext={valueText || undefined}');
+    expect(rangeElement).toContain("valueText: { attribute: 'value-text', reflect: true, type: 'String' }");
+    expect(rangeElement).toContain('{valueText}');
+    expect(read('../README.md')).toContain('`valueText`');
   });
 });
 
@@ -121,6 +132,7 @@ describe('delivery contract', () => {
     }
     expect(selectElement).toContain("options: { type: 'Array' }");
     expect(rangeElement).toContain("value: { reflect: true, type: 'Number' }");
+    expect(rangeElement).toContain("valueText: { attribute: 'value-text', reflect: true, type: 'String' }");
     expect(rangeElement).toContain("ariaLabel: { attribute: 'aria-label'");
   });
 });

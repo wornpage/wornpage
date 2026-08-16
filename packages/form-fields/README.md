@@ -42,6 +42,8 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
 
 The components preserve native input, textarea, select, and range semantics. Remaining attributes are forwarded to the native control. `autocomplete` is omitted unless a consumer supplies it, so browsers and password managers are not suppressed by a component default.
 
+For mapped numeric scales, pass `valueText` to replace the visible value and set the native range's `aria-valuetext` without changing its numeric `value`, `min`, `max`, or `step` semantics.
+
 Every field owns its minimum touch size, responsive containment, focus-visible treatment, disabled/read-only states, coarse-pointer sizing, and reduced-motion behavior. The select arrow derives from `currentColor` instead of a fixed palette value. Range values remain contained without collapsing the visible track, and its native input owns keyboard behavior.
 
 Keyboard focus uses `--worn-field-focus`, falling back through `--cockpit-focus`, `--cockpit-text`, and `#21322b`. Set `--worn-range-focus` only when the range track needs a control-specific override.
@@ -57,7 +59,7 @@ Keyboard focus uses `--worn-field-focus`, falling back through `--cockpit-focus`
   aria-label="Owner"
   options='[{"value":"priya","label":"Priya Shah"}]'
 ></worn-select>
-<worn-range aria-label="Progress" value="50" suffix="%"></worn-range>
+<worn-range aria-label="Progress" value="4" value-text="High" min="0" max="4"></worn-range>
 ```
 
 The bundle registers `<worn-input>`, `<worn-textarea>`, `<worn-select>`, and `<worn-range>`. Set `aria-label` on each custom element because labels outside a shadow root cannot label the internal native control.
