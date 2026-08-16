@@ -44,6 +44,8 @@ The components preserve native input, textarea, select, and range semantics. Rem
 
 Every field owns its minimum touch size, responsive containment, focus-visible treatment, disabled/read-only states, coarse-pointer sizing, and reduced-motion behavior. The select arrow derives from `currentColor` instead of a fixed palette value. Range values remain contained without collapsing the visible track, and its native input owns keyboard behavior.
 
+Keyboard focus uses `--worn-field-focus`, falling back through `--cockpit-focus`, `--cockpit-text`, and `#21322b`. Set `--worn-range-focus` only when the range track needs a control-specific override.
+
 ## Browser bundle
 
 ```html
@@ -71,5 +73,6 @@ The bundle registers `<worn-input>`, `<worn-textarea>`, `<worn-select>`, and `<w
 - `--cockpit-text-muted`
 - `--cockpit-accent`
 - `--cockpit-accent-50`
+- `--cockpit-focus`
 - `--cockpit-radius-sm`
 - `--font-typewriter`

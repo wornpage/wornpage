@@ -57,6 +57,16 @@ describe('native field contract', () => {
 });
 
 describe('theme and state behavior', () => {
+  test('uses one semantic focus token while preserving the range override', () => {
+    const focusToken = 'var(--worn-field-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)))';
+    for (const source of [input, textarea, select]) {
+      expect(source).toContain(`outline: 2px dashed ${focusToken};`);
+    }
+    expect(range).toContain(`outline: 2px dashed var(--worn-range-focus, ${focusToken});`);
+    expect(read('../README.md')).toContain('`--worn-field-focus`');
+    expect(read('../README.md')).toContain('`--worn-range-focus`');
+  });
+
   test('uses a theme-derived boundary and select arrow', () => {
     for (const source of [input, textarea, select]) {
       expect(source).toContain('--worn-field-boundary: color-mix(');

@@ -77,7 +77,7 @@
   }
 
   .worn-textarea:focus-visible {
-    outline: 2px dashed var(--cockpit-accent);
+    outline: 2px dashed var(--worn-field-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
     outline-offset: 2px;
     border-color: var(--cockpit-accent);
     box-shadow: 0 0 0 1px var(--cockpit-accent-50);

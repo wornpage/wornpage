@@ -103,7 +103,7 @@
   }
 
   .worn-range-input:focus-visible + .worn-range-track {
-    outline: 2px dashed var(--worn-range-focus, var(--cockpit-accent, #0f766e));
+    outline: 2px dashed var(--worn-range-focus, var(--worn-field-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))));
     outline-offset: 3px;
   }
 
