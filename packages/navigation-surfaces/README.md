@@ -1,6 +1,6 @@
 # @wornpage/navigation-surfaces
 
-Compact Svelte 5 breadcrumbs and pagination with native navigation, named
+Compact Svelte 5 breadcrumbs, destination lists, and pagination with native navigation, named
 landmarks, hostile-label containment, complete touch targets, reduced-motion
 support, and standalone theme fallbacks.
 
@@ -24,13 +24,21 @@ bun add @wornpage/navigation-surfaces
 
 ```svelte
 <script>
-  import { Breadcrumb, Pagination } from '@wornpage/navigation-surfaces';
+  import { Breadcrumb, NavigationList, Pagination } from '@wornpage/navigation-surfaces';
 
   let page = $state(1);
 </script>
 
 <Breadcrumb
   items={[{ label: 'Work', href: '/work' }, { label: 'Release evidence' }]}
+/>
+
+<NavigationList
+  label="Workspace tools"
+  items={[
+    { label: 'Search', href: '/search', description: 'Find work and evidence.' },
+    { label: 'Settings', href: '/settings', description: 'Manage workspace preferences.' }
+  ]}
 />
 
 <Pagination bind:current={page} total={12} label="Search results pages" />
@@ -46,6 +54,19 @@ plain text. Empty item arrays render no empty navigation landmark.
 |------|------|---------|-------------|
 | `items` | `Array<{ label: string; href?: string }>` | required | Ordered path from ancestor to current page |
 | `label` | `string` | `Breadcrumb` | Accessible navigation landmark name |
+
+## NavigationList
+
+NavigationList renders a named navigation landmark containing native full-row
+links. Optional descriptions add scanning context without changing the link's
+accessible name. The list uses one column in compact containers and two columns
+when its own available width reaches 520px; hostile labels wrap without widening
+the page. Empty item arrays render no empty landmark.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `Array<{ label: string; href: string; description?: string; current?: boolean }>` | required | Ordered native-link destinations |
+| `label` | `string` | `Navigation` | Accessible navigation landmark name |
 
 ## Pagination
 
@@ -63,6 +84,6 @@ Consumers with multiple paginators should give each one a distinct `label`.
 
 ## Theme tokens
 
-Both components consume the existing `--cockpit-*` and `--font-typewriter`
+All components consume the existing `--cockpit-*` and `--font-typewriter`
 tokens with complete light fallbacks. They do not impose outer page spacing;
 the pagination control only owns its 16px leading separation from results.

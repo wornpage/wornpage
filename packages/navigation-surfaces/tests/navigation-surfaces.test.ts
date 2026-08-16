@@ -4,25 +4,52 @@ import { compile } from 'svelte/compiler';
 
 const read = (name: string) => readFileSync(new URL(`../src/${name}.svelte`, import.meta.url), 'utf8');
 const breadcrumb = read('Breadcrumb');
+const navigationList = read('NavigationList');
 const pagination = read('Pagination');
 
 describe('@wornpage/navigation-surfaces', () => {
 	it('declares one source-delivered v2 package', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/navigation-surfaces');
-		expect(pkg.version).toBe('0.1.2');
+		expect(pkg.version).toBe('0.2.0');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.main).toBe('./src/index.ts');
 		expect(pkg.files).not.toContain('dist');
 	});
 
-	it('exports and compiles both navigation surfaces without warnings', async () => {
+	it('exports and compiles every navigation surface without warnings', async () => {
 		const mod = await import('../src/index.ts');
-		expect(Object.keys(mod).sort()).toEqual(['Breadcrumb', 'Pagination']);
-		for (const [name, source] of Object.entries({ Breadcrumb: breadcrumb, Pagination: pagination })) {
+		expect(Object.keys(mod).sort()).toEqual(['Breadcrumb', 'NavigationList', 'Pagination']);
+		for (const [name, source] of Object.entries({ Breadcrumb: breadcrumb, NavigationList: navigationList, Pagination: pagination })) {
 			const result = compile(source, { filename: `${name}.svelte`, generate: 'client' });
 			expect(result.warnings).toHaveLength(0);
 		}
+	});
+
+	it('renders a named native destination list without empty landmarks', () => {
+		expect(navigationList).toContain('export interface NavigationListItem');
+		expect(navigationList).toContain('{#if items.length > 0}');
+		expect(navigationList).toContain('aria-label={label}');
+		expect(navigationList).toContain('<ul>');
+		expect(navigationList).toContain('<a href={item.href} aria-current={item.current ? \'page\' : undefined}>');
+		expect(navigationList).toContain('data-worn-navigation-list');
+	});
+
+	it('contains hostile destination content in full-row touch targets', () => {
+		expect(navigationList).toMatch(/\.worn-navigation-list \{[\s\S]*?container-type: inline-size;[\s\S]*?max-inline-size: 100%;[\s\S]*?min-inline-size: 0;/u);
+		expect(navigationList).toMatch(/a \{[\s\S]*?inline-size: 100%;[\s\S]*?min-block-size: 52px;[\s\S]*?min-inline-size: 0;/u);
+		expect(navigationList).toContain('overflow-wrap: anywhere;');
+		expect(navigationList).toContain('touch-action: manipulation;');
+		expect(navigationList).toContain('@container (min-width: 520px)');
+		expect(navigationList).toContain('grid-template-columns: repeat(2, minmax(0, 1fr));');
+	});
+
+	it('owns focus, theme, selected, forced-color, and reduced-motion presentation', () => {
+		expect(navigationList).toContain('outline: 2px dashed var(--cockpit-accent, #287f73);');
+		expect(navigationList).toContain("a[aria-current='page']");
+		expect(navigationList).toContain('var(--cockpit-selected-bg, var(--cockpit-accent-50, #e5f2ef))');
+		expect(navigationList).toContain('@media (forced-colors: active)');
+		expect(navigationList).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?a \{[\s\S]*?transition: none;/u);
 	});
 
 	it('gives only the final breadcrumb item current-page ownership', () => {
