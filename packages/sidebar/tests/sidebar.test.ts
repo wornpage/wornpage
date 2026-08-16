@@ -192,6 +192,24 @@ describe('pinned reorder controls', () => {
 	});
 });
 
+describe('keyboard focus', () => {
+	test('owns one high-contrast focus token across every sidebar control', () => {
+		const focusToken = 'var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)))';
+		expect(sidebarSource.match(new RegExp(`outline: 2px dashed ${focusToken.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g'))).toHaveLength(4);
+		expect(sidebarSource).toContain('.worn-filter-input:focus-visible');
+		expect(sidebarSource).not.toContain('.worn-filter-input:focus {');
+		expect(sidebarSource).toContain('.worn-nav-item:focus-visible');
+		expect(sidebarSource).toContain('.worn-sidebar-restore:focus-visible');
+		expect(sidebarSource).toContain('.worn-reorder-btn:focus-visible');
+		expect(readFileSync(new URL('../README.md', import.meta.url), 'utf8')).toContain('--worn-sidebar-focus');
+	});
+
+	test('keeps interactive controls touch-safe on coarse pointers', () => {
+		expect(sidebarSource).toMatch(/@media \(pointer: coarse\) \{[\s\S]*?\.worn-filter-input,[\s\S]*?\.worn-filter-clear,[\s\S]*?\.worn-nav-item,[\s\S]*?\.worn-sidebar-restore,[\s\S]*?\.worn-reorder-btn,[\s\S]*?\.worn-context-menu button \{[\s\S]*?min-block-size: 44px;/u);
+		expect(sidebarSource).toMatch(/@media \(pointer: coarse\) \{[\s\S]*?\.worn-nav-row\.has-reorder > \.worn-nav-item \{[\s\S]*?padding-inline-end: 104px;/u);
+	});
+});
+
 describe('context menu', () => {
 	test('uses a real control for backdrop dismissal', () => {
 		expect(sidebarSource).toContain('<button type="button" class="worn-menu-backdrop" aria-label="Close menu" onclick={closeContextMenu}></button>');

@@ -401,7 +401,7 @@
 		font: inherit; font-size: 12px;
 		box-sizing: border-box;
 	}
-	.worn-filter-input:focus { outline: 2px dashed var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488)); outline-offset: -2px; }
+	.worn-filter-input:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: -2px; }
 	.worn-filter-clear {
 		position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
 		background: none; border: 0;
@@ -434,6 +434,7 @@
 	}
 	.worn-nav-row.has-reorder > .worn-nav-item { padding-inline-end: 72px; }
 	.worn-nav-item:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
+	.worn-nav-item:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: 2px; }
 	.worn-nav-item.active {
 		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
 		color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff));
@@ -507,7 +508,7 @@
 		width: calc(100% - 16px);
 	}
 	.worn-sidebar-restore:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--cockpit-text, #000)); }
-	.worn-sidebar-restore:focus-visible { outline: 2px dashed var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488)); outline-offset: 2px; }
+	.worn-sidebar-restore:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: 2px; }
 
 	.worn-active-indicator {
 		position: absolute; left: 2px; width: calc(100% - 4px);
@@ -546,7 +547,7 @@
 		width: 28px;
 	}
 	.worn-reorder-btn:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--cockpit-text, #000)); }
-	.worn-reorder-btn:focus-visible { outline: 2px dashed var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488)); outline-offset: 1px; }
+	.worn-reorder-btn:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: 1px; }
 	.worn-reorder-btn svg { fill: none; height: 14px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 14px; }
 	.worn-nav-row:has(.worn-nav-item.active) .worn-reorder-btn { color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff)); }
 
@@ -580,6 +581,21 @@
 	}
 	.worn-context-menu-icon { fill: none; flex: 0 0 auto; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 16px; }
 	.worn-context-menu button:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
+
+	@media (pointer: coarse) {
+		.worn-filter-input,
+		.worn-filter-clear,
+		.worn-nav-item,
+		.worn-sidebar-restore,
+		.worn-reorder-btn,
+		.worn-context-menu button {
+			min-block-size: 44px;
+		}
+
+		.worn-nav-row.has-reorder > .worn-nav-item {
+			padding-inline-end: 104px;
+		}
+	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.worn-sidebar { transition: none; }

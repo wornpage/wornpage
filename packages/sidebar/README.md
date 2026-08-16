@@ -117,6 +117,7 @@ The component uses CSS custom properties. Wrap in a container with `.worn-sideba
   --worn-sidebar-collapsed-item-size: 44px;
   --worn-sidebar-accent: #0d9488;
   --worn-sidebar-accent-text: #fff;
+  --worn-sidebar-focus: #21322b;
   --worn-sidebar-text: #21322b;
   --worn-sidebar-text-muted: #506058;
   --worn-sidebar-hover: #eaf4f0;
