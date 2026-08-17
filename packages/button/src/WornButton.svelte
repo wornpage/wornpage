@@ -122,6 +122,7 @@
 	@media (pointer: coarse) {
 		.worn-btn,
 		.worn-btn.is-sm {
+			font-size: 14px;
 			min-width: 44px;
 			min-height: 44px;
 		}

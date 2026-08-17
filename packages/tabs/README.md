@@ -2,7 +2,7 @@
 
 Svelte 5 tabs with named tablists, roving keyboard selection, stable tab-panel
 relationships, bounded long labels, compact horizontal overflow, visible focus,
-and touch-safe targets.
+touch-safe targets, and measured previous/next overflow controls.
 
 <!-- wornpage-delivery:v2 browser-bundle -->
 ## Delivery
@@ -47,7 +47,10 @@ matching `tabpanel` element in the DOM for every tab, hiding inactive panels as
 needed. Visual labels are capped with an ellipsis while their full text remains
 the tab's accessible name. When `active` is set externally, including from a
 deep link, the selected tab is brought fully into the strip without scrolling
-the page.
+the page. When the strip has real horizontal overflow, labeled previous and
+next buttons appear outside the tablist. They scroll a bounded horizontal page,
+remain disabled at their respective edges, respect reduced-motion preferences,
+and disappear when every tab fits.
 
 ## Props
 

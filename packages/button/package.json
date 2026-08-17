@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/button",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Svelte 5 text, icon, and reaction button primitives",
   "type": "module",
   "wornpage": {

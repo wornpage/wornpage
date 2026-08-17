@@ -21,3 +21,16 @@ export function visibleScrollLeft({
 
 	return Math.max(0, Math.min(Math.max(0, scrollWidth - clientWidth), next));
 }
+
+interface PagedScrollOptions {
+	scrollLeft: number;
+	clientWidth: number;
+	scrollWidth: number;
+	direction: -1 | 1;
+}
+
+export function pagedScrollLeft({ scrollLeft, clientWidth, scrollWidth, direction }: PagedScrollOptions) {
+	const maxScrollLeft = Math.max(0, scrollWidth - clientWidth);
+	const pageSize = Math.max(1, Math.floor(clientWidth * 0.8));
+	return Math.max(0, Math.min(maxScrollLeft, scrollLeft + direction * pageSize));
+}

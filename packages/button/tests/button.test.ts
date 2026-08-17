@@ -73,8 +73,11 @@ describe('disabled state', () => {
 
 describe('compact and touch interactions', () => {
 	test('keeps compact desktop controls while reserving 44px targets for touch input', () => {
+		expect(buttonSource).toContain('font-size: 13px;');
+		expect(buttonSource).toContain(".worn-btn.is-sm {\n\t\tfont-size: 12px;");
 		expect(buttonSource).toContain('min-height: 36px;');
 		expect(buttonSource).toContain("@media (pointer: coarse) {");
+		expect(buttonSource).toContain(".worn-btn,\n\t\t.worn-btn.is-sm {\n\t\t\tfont-size: 14px;");
 		expect(buttonSource).toContain('min-width: 44px;');
 		expect(buttonSource).toContain('min-height: 44px;');
 	});

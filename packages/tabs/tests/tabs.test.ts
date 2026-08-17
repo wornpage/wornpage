@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { tabDomIds } from '../src/ids.js';
-import { visibleScrollLeft } from '../src/scroll.js';
+import { pagedScrollLeft, visibleScrollLeft } from '../src/scroll.js';
 
 const source = readFileSync(new URL('../src/Tabs.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const elementSource = readFileSync(new URL('../src/TabsElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
@@ -9,7 +9,7 @@ const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8
 
 describe('tab semantics', () => {
 	test('names an oriented tablist and exposes stable panel relationships', () => {
-		expect(source).toContain('role="tablist" aria-label={label} aria-orientation="horizontal"');
+		expect(source).toMatch(/role="tablist"\s+aria-label=\{label\}\s+aria-orientation="horizontal"/u);
 		expect(source).toContain('role="tab"');
 		expect(source).toContain('id={domIds.tabId}');
 		expect(source).toContain('aria-controls={domIds.panelId}');
@@ -45,7 +45,11 @@ describe('keyboard and compact behavior', () => {
 		expect(source).toContain('overflow-x: auto;');
 		expect(source).toContain('overscroll-behavior-inline: contain;');
 		expect(source).toContain('min-block-size: 44px;');
-		expect(source).toContain('touch-action: manipulation;');
+	});
+
+	test('keeps tab-button touch manipulation without restricting strip panning', () => {
+		expect(source).toMatch(/\.worn-tab\s*\{[^}]*touch-action: manipulation;/u);
+		expect(source).not.toContain('touch-action: pan-x;');
 	});
 
 	test('keeps externally selected tabs inside the compact viewport', () => {
@@ -63,7 +67,8 @@ describe('keyboard and compact behavior', () => {
 			itemLeft: -205,
 			itemRight: -110,
 		})).toBe(0);
-		expect(source).toContain('requestAnimationFrame(ensureActiveTabVisible)');
+		expect(source).toContain('requestAnimationFrame(() => {');
+		expect(source).toContain('ensureActiveTabVisible();');
 		expect(source).toContain("'[role=\"tab\"][aria-selected=\"true\"]'");
 		expect(source).toContain("tablist.scrollTo({ left: nextLeft, behavior: 'auto' });");
 	});
@@ -80,6 +85,41 @@ describe('keyboard and compact behavior', () => {
 	test('honors reduced-motion preferences', () => {
 		expect(source).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(source).toContain('transition: none;');
+	});
+});
+
+describe('overflow controls', () => {
+	test('calculates bounded horizontal scroll pages without touching the document', () => {
+		expect(pagedScrollLeft({ scrollLeft: 0, clientWidth: 314, scrollWidth: 553, direction: 1 })).toBe(239);
+		expect(pagedScrollLeft({ scrollLeft: 239, clientWidth: 314, scrollWidth: 553, direction: -1 })).toBe(0);
+		expect(pagedScrollLeft({ scrollLeft: 120, clientWidth: 300, scrollWidth: 1000, direction: 1 })).toBe(360);
+	});
+
+	test('shows regular controls only for measured real overflow and updates edge state', () => {
+		expect(source).toContain('tablist.scrollWidth > tabstrip.clientWidth + 1');
+		expect(source).toContain('new ResizeObserver(updateScrollState)');
+		expect(source).toContain('onscroll={updateScrollState}');
+		expect(source).toContain('disabled={!canScrollBackward}');
+		expect(source).toContain('disabled={!canScrollForward}');
+		expect(source).toContain('{#if hasOverflow}');
+		expect(source).toContain('role="tablist"');
+	});
+
+	test('keeps controls touch-safe, labelled, and motion-aware', () => {
+		expect(source).toContain('aria-label="Scroll to previous tabs"');
+		expect(source).toContain('aria-label="Scroll to next tabs"');
+		expect(source).toContain('inline-size: 44px;');
+		expect(source).toContain('min-block-size: 44px;');
+		expect(source).toMatch(/\.worn-tabs-control\s*\{[\s\S]*touch-action: manipulation;/u);
+		expect(source).toContain("behavior: prefersReducedMotion() ? 'auto' : 'smooth'");
+	});
+
+	test('rechecks selected-tab visibility after overflow controls commit their layout', () => {
+		expect(source).toContain('const overflowChanged = nextHasOverflow !== hasOverflow;');
+		expect(source).toContain('if (overflowChanged) scheduleActiveTabVisibility();');
+		expect(source).toContain('overflowVisibilityFrame = requestAnimationFrame(() => {');
+		expect(source).toContain('ensureActiveTabVisible();');
+		expect(source).toContain('if (overflowVisibilityFrame !== undefined) cancelAnimationFrame(overflowVisibilityFrame);');
 	});
 });
 
