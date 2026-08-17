@@ -15,6 +15,7 @@
 	let hasOverflow = $state(false);
 	let canScrollBackward = $state(false);
 	let canScrollForward = $state(false);
+	let scrollStateFrame: number | undefined;
 	let overflowVisibilityFrame: number | undefined;
 
 	$effect(() => {
@@ -23,10 +24,10 @@
 
 	$effect(() => {
 		const selectedId = active;
-		const tabCount = tabs.length;
+		const tabSignature = tabs.map((tab) => `${tab.id}\u0000${tab.label}`).join('\u0001');
 		const frame = requestAnimationFrame(() => {
 			updateScrollState();
-			if (selectedId && tabCount) ensureActiveTabVisible();
+			if (selectedId && tabSignature) ensureActiveTabVisible();
 		});
 		return () => cancelAnimationFrame(frame);
 	});
@@ -34,11 +35,13 @@
 	$effect(() => {
 		if (!tabstrip || !tablist) return;
 
-		const observer = new ResizeObserver(updateScrollState);
+		const observer = new ResizeObserver(scheduleScrollStateUpdate);
 		observer.observe(tabstrip);
-		observer.observe(tablist);
-		updateScrollState();
-		return () => observer.disconnect();
+		scheduleScrollStateUpdate();
+		return () => {
+			observer.disconnect();
+			if (scrollStateFrame !== undefined) cancelAnimationFrame(scrollStateFrame);
+		};
 	});
 
 	$effect(() => {
@@ -57,6 +60,14 @@
 		canScrollBackward = hasOverflow && tablist.scrollLeft > 1;
 		canScrollForward = hasOverflow && tablist.scrollLeft < maxScrollLeft - 1;
 		if (overflowChanged) scheduleActiveTabVisibility();
+	}
+
+	function scheduleScrollStateUpdate() {
+		if (scrollStateFrame !== undefined) cancelAnimationFrame(scrollStateFrame);
+		scrollStateFrame = requestAnimationFrame(() => {
+			scrollStateFrame = undefined;
+			updateScrollState();
+		});
 	}
 
 	function scheduleActiveTabVisibility() {

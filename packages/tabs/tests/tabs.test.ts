@@ -95,14 +95,26 @@ describe('overflow controls', () => {
 		expect(pagedScrollLeft({ scrollLeft: 120, clientWidth: 300, scrollWidth: 1000, direction: 1 })).toBe(360);
 	});
 
-	test('shows regular controls only for measured real overflow and updates edge state', () => {
+	test('measures overflow from a stable shell outside ResizeObserver delivery', () => {
 		expect(source).toContain('tablist.scrollWidth > tabstrip.clientWidth + 1');
-		expect(source).toContain('new ResizeObserver(updateScrollState)');
+		expect(source).toContain('new ResizeObserver(scheduleScrollStateUpdate)');
+		expect(source).toMatch(/observer\.observe\(tabstrip\);/u);
+		expect(source).not.toMatch(/observer\.observe\(tablist\);/u);
+		expect(source).toContain('scrollStateFrame = requestAnimationFrame(() => {');
+		expect(source).toContain('scrollStateFrame = undefined;');
+		expect(source).toContain('updateScrollState();');
 		expect(source).toContain('onscroll={updateScrollState}');
 		expect(source).toContain('disabled={!canScrollBackward}');
 		expect(source).toContain('disabled={!canScrollForward}');
 		expect(source).toContain('{#if hasOverflow}');
 		expect(source).toContain('role="tablist"');
+	});
+
+	test('remeasures after tab id or label changes and cleans up scheduled frames', () => {
+		expect(source).toContain("tabs.map((tab) => `${tab.id}\\u0000${tab.label}`).join('\\u0001')");
+		expect(source).toContain('if (selectedId && tabSignature) ensureActiveTabVisible();');
+		expect(source).toContain('if (scrollStateFrame !== undefined) cancelAnimationFrame(scrollStateFrame);');
+		expect(source).toContain('if (overflowVisibilityFrame !== undefined) cancelAnimationFrame(overflowVisibilityFrame);');
 	});
 
 	test('keeps controls touch-safe, labelled, and motion-aware', () => {
