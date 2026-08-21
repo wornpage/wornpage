@@ -59,7 +59,7 @@
 
 	.worn-breadcrumb-item {
 		display: flex;
-		align-items: center;
+		align-items: baseline;
 		flex: 0 1 auto;
 		gap: 6px;
 	}

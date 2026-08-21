@@ -82,4 +82,5 @@ Empty and ErrorState contain hostile text within their parent and leave outer
 spacing to the consuming layout. ErrorState exposes assertive error semantics
 and serializes asynchronous retry work. Spinner announces one polite status by
 default; `announce={false}` removes the visual example from the accessibility
-tree. Skeleton exposes its busy state and stops shimmer under reduced motion.
+tree. Skeleton is a named, polite loading status with a busy state and stops
+shimmer under reduced motion.

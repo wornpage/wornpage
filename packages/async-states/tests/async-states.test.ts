@@ -12,7 +12,7 @@ describe('@wornpage/async-states', () => {
 	it('declares source delivery and exact shared dependencies', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/async-states');
-		expect(pkg.version).toBe('0.1.3');
+		expect(pkg.version).toBe('0.1.4');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.dependencies['@wornpage/button']).toContain('f7066fe9d932b42291f77765d6a405b02489389e');
 	});
@@ -65,8 +65,8 @@ describe('@wornpage/async-states', () => {
 		expect(spinner).toContain('.worn-spinner.is-sm .worn-spinner-dots { gap: 4px; }');
 	});
 
-	it('keeps skeleton width presets bounded and shimmer optional', () => {
-		expect(skeleton).toContain('aria-busy="true" aria-label="Loading"');
+	it('keeps skeleton as a named, non-interactive loading status with bounded presets and optional shimmer', () => {
+		expect(skeleton).toContain('role="status" aria-busy="true" aria-label="Loading"');
 		expect(skeleton).toContain('max-inline-size: 100%;');
 		expect(skeleton).toContain('min-inline-size: 0;');
 		expect(skeleton).toContain('.worn-skeleton.is-half { inline-size: 50%; }');

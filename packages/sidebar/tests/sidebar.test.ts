@@ -13,6 +13,7 @@ const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.me
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const readmeSource = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 
 describe('current page placement', () => {
 	const shortcuts = [
@@ -73,6 +74,15 @@ describe('filter control', () => {
 		expect(sidebarSource.match(/class="worn-filter-clear"/gu)?.length).toBe(1);
 		expect(sidebarSource).toContain('aria-label="Clear filter"');
 		expect(sidebarSource).toContain('favorites.has(i.id) && matchesNavItem(i, filterText)');
+	});
+});
+
+describe('danger badge theming', () => {
+	test('uses independent semantic background and foreground fallback chains', () => {
+		expect(sidebarSource).toContain('background: var(--worn-sidebar-danger, var(--cockpit-danger-badge-bg, #e74c3c));');
+		expect(sidebarSource).toContain('color: var(--worn-sidebar-danger-text, var(--cockpit-danger-badge-text, #fff));');
+		expect(readmeSource).toContain('--worn-sidebar-danger: #e74c3c;');
+		expect(readmeSource).toContain('--worn-sidebar-danger-text: #fff;');
 	});
 });
 
@@ -233,9 +243,12 @@ describe('keyboard focus', () => {
 		expect(readFileSync(new URL('../README.md', import.meta.url), 'utf8')).toContain('--worn-sidebar-focus');
 	});
 
-	test('keeps interactive controls touch-safe on coarse pointers', () => {
-		expect(sidebarSource).toMatch(/@media \(pointer: coarse\) \{[\s\S]*?\.worn-filter-input,[\s\S]*?\.worn-filter-clear,[\s\S]*?\.worn-nav-item,[\s\S]*?\.worn-sidebar-restore,[\s\S]*?\.worn-reorder-btn,[\s\S]*?\.worn-context-menu button \{[\s\S]*?min-block-size: 44px;/u);
-		expect(sidebarSource).toMatch(/@media \(pointer: coarse\) \{[\s\S]*?\.worn-nav-row\.has-reorder > \.worn-nav-item \{[\s\S]*?padding-inline-end: 104px;/u);
+	test('prevents filter focus zoom while keeping coarse-pointer targets touch-safe', () => {
+		const coarsePointerBlock = sidebarSource.match(/@media \(pointer: coarse\) \{([\s\S]*?)\n\t\}/u)?.[1];
+
+		expect(coarsePointerBlock).toMatch(/\.worn-filter-input \{\s*font-size: 16px;\s*\}/u);
+		expect(coarsePointerBlock).toMatch(/\.worn-filter-input,[\s\S]*?\.worn-filter-clear,[\s\S]*?\.worn-nav-item,[\s\S]*?\.worn-sidebar-restore,[\s\S]*?\.worn-reorder-btn,[\s\S]*?\.worn-context-menu button \{[\s\S]*?min-block-size: 44px;/u);
+		expect(coarsePointerBlock).toMatch(/\.worn-nav-row\.has-reorder > \.worn-nav-item \{[\s\S]*?padding-inline-end: 104px;/u);
 	});
 });
 

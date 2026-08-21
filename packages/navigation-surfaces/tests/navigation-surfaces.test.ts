@@ -11,7 +11,7 @@ describe('@wornpage/navigation-surfaces', () => {
 	it('declares one source-delivered v2 package', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/navigation-surfaces');
-		expect(pkg.version).toBe('0.2.0');
+		expect(pkg.version).toBe('0.2.1');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.main).toBe('./src/index.ts');
 		expect(pkg.files).not.toContain('dist');
@@ -63,6 +63,7 @@ describe('@wornpage/navigation-surfaces', () => {
 
 	it('contains hostile breadcrumb labels and gives links complete touch targets', () => {
 		expect(breadcrumb).toMatch(/\.worn-breadcrumb,[\s\S]*?max-inline-size: 100%;[\s\S]*?min-inline-size: 0;/u);
+		expect(breadcrumb).toMatch(/\.worn-breadcrumb-item \{[\s\S]*?align-items: baseline;/u);
 		expect(breadcrumb).toContain('overflow-wrap: anywhere;');
 		expect(breadcrumb).toContain('min-block-size: 44px;');
 		expect(breadcrumb).toContain('min-inline-size: 44px;');

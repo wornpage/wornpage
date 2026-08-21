@@ -461,7 +461,10 @@
 		font-size: 9px; font-weight: 700; line-height: 16px;
 		text-align: center;
 	}
-	.worn-nav-badge.is-danger { background: var(--worn-sidebar-danger, var(--cockpit-danger-text, #e74c3c)); color: #fff; }
+	.worn-nav-badge.is-danger {
+		background: var(--worn-sidebar-danger, var(--cockpit-danger-badge-bg, #e74c3c));
+		color: var(--worn-sidebar-danger-text, var(--cockpit-danger-badge-text, #fff));
+	}
 	.worn-nav-badge.is-warning { background: var(--worn-sidebar-warning, var(--cockpit-warning-text, #d97706)); color: #fff; }
 
 	.worn-section-label {
@@ -586,6 +589,10 @@
 	.worn-context-menu button:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
 
 	@media (pointer: coarse) {
+		.worn-filter-input {
+			font-size: 16px;
+		}
+
 		.worn-filter-input,
 		.worn-filter-clear,
 		.worn-nav-item,

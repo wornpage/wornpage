@@ -129,7 +129,10 @@
 </dialog>
 
 <style>
-	@keyframes cmdk-in { from { opacity: 0; transform: scale(0.96) translateY(-6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+	@keyframes cmdk-in {
+		from { opacity: 0; transform: translateY(-6px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
 	.cmdk { animation: cmdk-in 0.15s ease-out; width: min(520px, 92vw); max-width: 92vw; padding: 0;
 		border: 1px solid var(--cmdk-border, var(--cockpit-border-strong, #d0cac1)); border-radius: var(--cmdk-radius, 8px);
 		background: var(--cmdk-surface, var(--cockpit-surface, #fff)); color: var(--cmdk-text, var(--cockpit-text, #21322b));
@@ -137,7 +140,7 @@
 	.cmdk::backdrop { background: var(--cmdk-backdrop, rgba(0,0,0,0.45)); }
 	.cmdk-search-row { display: flex; align-items: center; border-bottom: 1px solid var(--cmdk-border, var(--cockpit-border, #e2ddd5)); padding-right: 4px; }
 	.cmdk-input { flex: 1; min-width: 0; box-sizing: border-box; border: 0; background: transparent;
-		color: inherit; font: inherit; font-size: 15px; padding: 14px 8px 14px 16px; outline: none; }
+		color: inherit; font: inherit; font-size: 16px; padding: 14px 8px 14px 16px; outline: none; }
 	.cmdk-input::placeholder { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); opacity: 1; }
 	.cmdk-close { position: relative; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; border: 0;
 		border-radius: 50%; background: transparent; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); cursor: pointer; }

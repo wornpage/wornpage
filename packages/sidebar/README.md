@@ -128,7 +128,8 @@ The component uses CSS custom properties. Wrap in a container with `.worn-sideba
   --worn-sidebar-border: #e2ddd5;
   --worn-sidebar-surface: #fdfbf7;
   --worn-sidebar-bg: #f5f0e8;
-  --worn-sidebar-danger: #e74c3c;
+  --worn-sidebar-danger: #e74c3c; /* Danger badge background */
+  --worn-sidebar-danger-text: #fff; /* Danger badge foreground */
 }
 ```
 

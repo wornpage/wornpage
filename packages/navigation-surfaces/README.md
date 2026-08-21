@@ -48,7 +48,8 @@ bun add @wornpage/navigation-surfaces
 
 Breadcrumb uses native anchors for linked ancestors and assigns
 `aria-current="page"` only to the final item. Intermediate unlinked items remain
-plain text. Empty item arrays render no empty navigation landmark.
+plain text. Separators align with the first line when a hostile label wraps.
+Empty item arrays render no empty navigation landmark.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|

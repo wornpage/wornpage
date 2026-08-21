@@ -72,7 +72,7 @@ bun add @wornpage/cmdk
 Through `bind:this`:
 - `open()` — open the palette dialog
 
-The close control and result rows meet 44px touch-target sizing on coarse pointers. Escape, backdrop dismissal, the close control, and selection all converge on one native dialog close event, then focus returns to the control that opened the palette. Palette motion is disabled when the user prefers reduced motion.
+The search input stays at 16px and the dialog entrance uses only opacity and vertical translation, so iOS sees the native-size input when `open()` focuses it and does not zoom the page. The close control and result rows meet 44px touch-target sizing on coarse pointers. Escape, backdrop dismissal, the close control, and selection all converge on one native dialog close event, then focus returns to the control that opened the palette. Palette motion is disabled when the user prefers reduced motion.
 
 ## Theming
 

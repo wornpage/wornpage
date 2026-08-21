@@ -10,7 +10,7 @@
 </script>
 
 {#if loading}
-	<div class="worn-skeleton" class:is-half={width === 'half'} class:is-third={width === 'third'} aria-busy="true" aria-label="Loading">
+	<div class="worn-skeleton" class:is-half={width === 'half'} class:is-third={width === 'third'} role="status" aria-busy="true" aria-label="Loading">
 		<div class="worn-skeleton-line worn-skeleton-line--1"></div>
 		{#if lines > 1}
 			<div class="worn-skeleton-line worn-skeleton-line--2"></div>
