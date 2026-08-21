@@ -24,3 +24,14 @@ export function selectCurrentPagePlacement(
 export function filterTransientNavItems(items: NavItem[], activeHref: string, limit: number): NavItem[] {
 	return items.filter((item) => !activeHref || item.href !== activeHref).slice(0, limit);
 }
+
+/** Decide whether a canonical row remains visible after shortcut promotion. */
+export function shouldRenderCanonicalNavItem(
+	item: NavItem,
+	attentionIds: Set<string>,
+	normalizedFilterText: string,
+	favoriteIds: Set<string>
+): boolean {
+	if (favoriteIds.has(item.id)) return false;
+	return Boolean(normalizedFilterText) || !attentionIds.has(item.id);
+}

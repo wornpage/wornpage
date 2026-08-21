@@ -4,7 +4,7 @@
 	import { filterNavChildren, filterNavItems, hasNavFilterResults, matchesNavItem, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 	import { nextNavFocusIndex } from './keyboard.js';
 	import { shouldInterceptNavigationClick } from './navigation.js';
-	import { filterTransientNavItems, selectCurrentPagePlacement } from './shortcuts.js';
+	import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';
 	import { visibleNavItems } from './visibility.js';
 
 	interface Props {
@@ -28,6 +28,7 @@
 	let contextMenu = $state<string | null>(null);
 	let filterInput: HTMLInputElement | undefined = $state();
 	let navEl: HTMLElement | undefined = $state();
+	const normalizedFilterText = $derived(filterText.trim());
 
 	// Sections default open; persisted per-section state (wornpage-sidebar-
 	// open-sections) is honored, with any NEW section defaulting open; the
@@ -160,10 +161,8 @@
 
 	const visibleItems = $derived(visibleNavItems(items, hiddenItems));
 	const flatItems = $derived(flatten(visibleItems));
-	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && matchesNavItem(i, filterText)));
-	const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));
 
-	const topLevel = $derived(filterNavItems(visibleItems, filterText));
+	const topLevel = $derived(filterNavItems(visibleItems, normalizedFilterText));
 	const recentItems = $derived(filterTransientNavItems(
 		recentRoutes
 			.map(href => flatItems.find(i => i.href === href))
@@ -171,12 +170,17 @@
 		activeHref,
 		3
 	));
-
+	// Attention promotion owns the row for non-pinned destinations. Keep
+	// favorites in their durable group so the promotion does not hide them.
 	const attentionItems = $derived(filterTransientNavItems(
-		flatItems.filter(i => i.attention || (i.badge && i.badge > 0)),
+		flatItems.filter(i => !favorites.has(i.id) && (i.attention || (i.badge && i.badge > 0))),
 		activeHref,
 		3
 	));
+	const attentionIds = $derived(new Set(attentionItems.map((item) => item.id)));
+	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && matchesNavItem(i, normalizedFilterText)));
+	const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));
+
 
 	const relatedItems = $derived(filterTransientNavItems(
 		activeHref
@@ -265,23 +269,23 @@
 
 <nav class="worn-nav" bind:this={navEl}>
 	<div class="worn-active-indicator"></div>
-	{#if filterText.trim() && !hasNavFilterResults(visibleItems, filterText)}
+	{#if normalizedFilterText && !hasNavFilterResults(visibleItems, normalizedFilterText)}
 		<div class="worn-filter-empty" role="status">No matches</div>
 	{/if}
 
-	{#if recentItems.length > 0 && !filterText}
+	{#if recentItems.length > 0 && !normalizedFilterText}
 		<div class="worn-section-label">Recent</div>
 		{#each recentItems as item (item.id)}{@render navLink(item, false)}{/each}
 		<div class="worn-section-divider"></div>
 	{/if}
 
-	{#if attentionItems.length > 0 && !filterText}
+	{#if attentionItems.length > 0 && !normalizedFilterText}
 		<div class="worn-section-label">Needs attention</div>
 		{#each attentionItems as item (item.id)}{@render navLink(item, false)}{/each}
 		<div class="worn-section-divider"></div>
 	{/if}
 
-	{#if relatedItems.length > 0 && !filterText}
+	{#if relatedItems.length > 0 && !normalizedFilterText}
 		<div class="worn-section-label">You might want</div>
 		{#each relatedItems as item (item.id)}{@render navLink(item, false)}{/each}
 		<div class="worn-section-divider"></div>
@@ -293,11 +297,11 @@
 		<div class="worn-section-divider"></div>
 	{/if}
 
-	{#each topLevel.filter(i => !favorites.has(i.id)) as item (item.id)}
+	{#each topLevel.filter(i => shouldRenderCanonicalNavItem(i, attentionIds, normalizedFilterText, favorites)) as item (item.id)}
 		{#if item.children}
-			<details class="worn-nav-group" open={shouldOpenNavSection(item, filterText, openSections)} ontoggle={(e) => toggleSection(item.id, (e.currentTarget as HTMLDetailsElement).open)}>
+			<details class="worn-nav-group" open={shouldOpenNavSection(item, normalizedFilterText, openSections)} ontoggle={(e) => toggleSection(item.id, (e.currentTarget as HTMLDetailsElement).open)}>
 				<summary class="worn-nav-item worn-nav-summary" class:active={sectionForActiveHref(items, activeHref)?.id === item.id}><span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span><span class="worn-nav-label">{item.label}</span></summary>
-				{#each filterNavChildren(item, filterText).filter(c => !favorites.has(c.id)) as child (child.id)}
+				{#each filterNavChildren(item, normalizedFilterText).filter(c => shouldRenderCanonicalNavItem(c, attentionIds, normalizedFilterText, favorites)) as child (child.id)}
 					{@render navLink(child, isCurrentPage(child, 'canonical'))}
 				{/each}
 			</details>

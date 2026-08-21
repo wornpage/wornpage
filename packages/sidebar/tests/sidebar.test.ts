@@ -4,7 +4,7 @@ import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults,
 import { nextNavFocusIndex } from '../src/keyboard.js';
 import { shouldInterceptNavigationClick } from '../src/navigation.js';
 import { visibleNavItems } from '../src/visibility.js';
-import { filterTransientNavItems, selectCurrentPagePlacement } from '../src/shortcuts.js';
+import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from '../src/shortcuts.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
 const itemSource = readFileSync(new URL('../src/SidebarItem.svelte', import.meta.url), 'utf8');
@@ -20,8 +20,9 @@ describe('current page placement', () => {
 		{ id: 'review', href: '/review', label: 'Review', attention: true },
 		{ id: 'inbox', href: '/inbox', label: 'Inbox', attention: true },
 		{ id: 'tasks', href: '/tasks', label: 'Tasks', attention: true },
-		{ id: 'calendar', href: '/calendar', label: 'Calendar', attention: true },
+	{ id: 'calendar', href: '/calendar', label: 'Calendar', attention: true },
 	];
+	const attentionIds = new Set(filterTransientNavItems(shortcuts, '/review', 3).map((item) => item.id));
 
 	test('excludes the active route from every transient group before limiting', () => {
 		expect(filterTransientNavItems(shortcuts, '/review', 3).map((item) => item.href)).toEqual([
@@ -57,13 +58,27 @@ describe('current page placement', () => {
 	});
 
 	test('uses the shared placement contract and keeps transient links inactive', () => {
-		expect(sidebarSource).toContain("import { filterTransientNavItems, selectCurrentPagePlacement } from './shortcuts.js';");
+		expect(sidebarSource).toContain("import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';");
 		expect(sidebarSource).toContain('const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));');
 		expect(sidebarSource).toContain("@render navLink(item, isCurrentPage(item, 'pinned'))");
 		expect(sidebarSource.match(/isCurrentPage\((?:child|item), 'canonical'\)/gu)?.length).toBe(2);
 		expect(sidebarSource.match(/@render navLink\(item, false\)/gu)?.length).toBe(3);
 		expect(demoSource).toContain("sb.activehref = '#review';");
 		expect(demoSource).toContain('sb.activehref = e.detail.href;');
+	});
+
+	test('uses production canonical visibility for empty, whitespace, matching, active, and favorite states', () => {
+		const review = shortcuts[0];
+		const calendar = shortcuts[3];
+		const normalizedWhitespace = '   '.trim();
+		expect(shouldRenderCanonicalNavItem(review, attentionIds, '', new Set())).toBe(true);
+		expect(shouldRenderCanonicalNavItem(calendar, attentionIds, '', new Set())).toBe(false);
+		expect(shouldRenderCanonicalNavItem(calendar, attentionIds, normalizedWhitespace, new Set())).toBe(false);
+		expect(shouldRenderCanonicalNavItem(review, attentionIds, 'review', new Set())).toBe(true);
+		expect(shouldRenderCanonicalNavItem(calendar, attentionIds, 'calendar', new Set())).toBe(true);
+		expect(shouldRenderCanonicalNavItem(review, attentionIds, '', new Set(['review']))).toBe(false);
+		expect(sidebarSource).toContain('const normalizedFilterText = $derived(filterText.trim());');
+		expect(sidebarSource.match(/shouldRenderCanonicalNavItem\((?:i|c), attentionIds, normalizedFilterText, favorites\)/gu)?.length).toBe(2);
 	});
 });
 
@@ -73,7 +88,7 @@ describe('filter control', () => {
 		expect(sidebarSource).not.toContain('type="search"');
 		expect(sidebarSource.match(/class="worn-filter-clear"/gu)?.length).toBe(1);
 		expect(sidebarSource).toContain('aria-label="Clear filter"');
-		expect(sidebarSource).toContain('favorites.has(i.id) && matchesNavItem(i, filterText)');
+		expect(sidebarSource).toContain('favorites.has(i.id) && matchesNavItem(i, normalizedFilterText)');
 	});
 });
 
