@@ -47,7 +47,7 @@
 		min-block-size: 44px;
 		padding: 0;
 		touch-action: manipulation;
-		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, transform 0.08s ease;
+		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
 		user-select: none;
 		-webkit-tap-highlight-color: transparent;
 	}
@@ -87,7 +87,10 @@
 		border-color: var(--cockpit-danger-border);
 		color: var(--cockpit-danger-text);
 	}
-	.worn-icon-btn:active:not(:disabled) { transform: translateY(1px); }
+	.worn-icon-btn:active:not(:disabled) {
+		filter: brightness(0.94);
+		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
+	}
 	.worn-icon-btn:focus-visible {
 		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
 		outline-offset: 2px;
@@ -98,7 +101,7 @@
 		color: var(--cockpit-text-muted);
 		cursor: not-allowed;
 		opacity: 1;
-		transform: none;
+		box-shadow: none;
 	}
 	@media (pointer: coarse) {
 		.worn-icon-btn.is-sm {

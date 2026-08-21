@@ -1,12 +1,17 @@
 import { describe, expect, test } from 'bun:test';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { compile } from 'svelte/compiler';
 
 const buttonSource = readFileSync(new URL('../src/WornButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const iconButtonSource = readFileSync(new URL('../src/WornIconButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const reactionButtonSource = readFileSync(new URL('../src/ReactionButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const distUrl = new URL('../dist/worn-button.js', import.meta.url);
+const distSource = existsSync(distUrl)
+	? readFileSync(distUrl, 'utf8').replace(/\r\n/gu, '\n')
+	: null;
 const elementSource = readFileSync(new URL('../src/ButtonElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const viteConfigSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 
@@ -50,6 +55,43 @@ describe('public contract', () => {
 		expect(buttonSource).toContain('overflow-wrap: anywhere;');
 		expect(buttonSource).toContain('text-decoration: none;');
 		expect(buttonSource).toContain('white-space: normal;');
+	});
+
+	test('uses restrained non-geometric primary hover and pressed states', () => {
+		expect(buttonSource).not.toContain('rotate(');
+		expect(buttonSource).not.toContain('transition: transform');
+		expect(buttonSource).toContain('{href}');
+		expect(buttonSource).toContain('if (disabled) { e.preventDefault(); return; }');
+		expect(buttonSource).toContain('tabindex={disabled ? -1 : undefined}');
+		expect(buttonSource).toContain('{disabled}');
+		expect(buttonSource).toContain('.worn-btn.is-primary:hover:not(:disabled):not([aria-disabled=\'true\']) {');
+		expect(buttonSource).toContain('box-shadow: 0 2px 4px rgb(0 0 0 / 0.14);');
+		expect(buttonSource).toContain('.worn-btn.is-primary:active:not(:disabled):not([aria-disabled=\'true\']) {');
+		expect(buttonSource).toContain('box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.16);');
+		expect(buttonSource).toContain('filter: brightness(0.94);');
+	});
+
+	test('uses restrained non-geometric press states across every control', () => {
+		for (const source of [buttonSource, iconButtonSource, reactionButtonSource]) {
+			expect(source).not.toContain('translateY(');
+			expect(source).not.toContain('rotate(');
+			expect(source).not.toContain('transition: transform');
+			expect(source).toContain('box-shadow: inset 0 1px 2px');
+			expect(source).toContain('filter: brightness(0.94);');
+		}
+	});
+
+	test('keeps source-only controls out of the browser bundle', () => {
+		expect(indexSource).toContain("export { default as IconButton } from './WornIconButton.svelte';");
+		expect(indexSource).toContain("export { default as ReactionButton } from './ReactionButton.svelte';");
+		expect(viteConfigSource).toContain("entry: 'src/ButtonElement.svelte'");
+		expect(viteConfigSource).toContain("fileName: () => 'worn-button.js'");
+		if (distSource === null) return;
+		expect(distSource).toContain('worn-button');
+		expect(distSource).not.toContain('worn-icon-btn');
+		expect(distSource).not.toContain('worn-reaction-btn');
+		expect(distSource).not.toContain('rotate(');
+		expect(distSource).not.toContain('translateY(');
 	});
 });
 

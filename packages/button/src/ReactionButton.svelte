@@ -52,7 +52,7 @@
 		overflow-wrap: anywhere;
 		padding: 6px 10px;
 		touch-action: manipulation;
-		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, transform 0.1s ease;
+		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
 		-webkit-tap-highlight-color: transparent;
 	}
 	.worn-reaction-btn:hover:not(:disabled) {
@@ -60,7 +60,8 @@
 		border-color: var(--cockpit-border, #c8c2b9);
 	}
 	.worn-reaction-btn:active:not(:disabled) {
-		transform: translateY(1px);
+		filter: brightness(0.94);
+		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
 	}
 	.worn-reaction-btn:focus-visible {
 		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
@@ -77,7 +78,7 @@
 		color: var(--cockpit-text-muted, #596a61);
 		cursor: not-allowed;
 		opacity: 1;
-		transform: none;
+		box-shadow: none;
 	}
 	.worn-reaction-mark {
 		flex: none;

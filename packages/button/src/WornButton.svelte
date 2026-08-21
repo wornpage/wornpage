@@ -74,7 +74,7 @@
 		text-align: center;
 		text-decoration: none;
 		touch-action: manipulation;
-		transition: transform 0.08s ease, box-shadow 0.12s ease, background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+		transition: box-shadow 0.12s ease, background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease, filter 0.1s ease;
 		user-select: none;
 		white-space: normal;
 	}
@@ -91,10 +91,14 @@
 		background: var(--cockpit-accent);
 		border-color: var(--cockpit-accent);
 		color: var(--cockpit-accent-text);
-		transform: rotate(-0.3deg);
+	}
+	.worn-btn.is-primary:hover:not(:disabled):not([aria-disabled='true']) {
+		filter: brightness(0.98);
+		box-shadow: 0 2px 4px rgb(0 0 0 / 0.14);
 	}
 	.worn-btn.is-primary:active:not(:disabled):not([aria-disabled='true']) {
-		transform: rotate(0deg) translateY(1px);
+		filter: brightness(0.94);
+		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.16);
 	}
 	.worn-btn.is-danger {
 		background: var(--cockpit-danger-bg);
@@ -113,7 +117,7 @@
 		filter: brightness(0.96);
 	}
 	.worn-btn:active:not(:disabled):not([aria-disabled='true']) {
-		transform: translateY(1px);
+		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
 	}
 	.worn-btn:focus-visible {
 		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
@@ -146,8 +150,6 @@
 		cursor: not-allowed;
 		filter: none;
 		opacity: 1;
-		transform: none;
-		translate: 0 0;
 		box-shadow: none;
 		animation: none;
 	}
