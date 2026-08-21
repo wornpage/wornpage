@@ -119,6 +119,13 @@
 	.worn-btn:active:not(:disabled):not([aria-disabled='true']) {
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
 	}
+	.worn-btn[aria-pressed='true']:not(:disabled):not([aria-disabled='true']) {
+		background: var(--cockpit-accent);
+		border-color: var(--cockpit-accent);
+		color: var(--cockpit-accent-text);
+		filter: brightness(0.98);
+		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.14);
+	}
 	.worn-btn:focus-visible {
 		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
 		outline-offset: 2px;

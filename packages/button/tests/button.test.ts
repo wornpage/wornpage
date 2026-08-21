@@ -69,6 +69,8 @@ describe('public contract', () => {
 		expect(buttonSource).toContain('.worn-btn.is-primary:active:not(:disabled):not([aria-disabled=\'true\']) {');
 		expect(buttonSource).toContain('box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.16);');
 		expect(buttonSource).toContain('filter: brightness(0.94);');
+		expect(buttonSource).toContain(".worn-btn[aria-pressed='true']:not(:disabled):not([aria-disabled='true']) {");
+		expect(buttonSource).toContain('box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.14);');
 	});
 
 	test('uses restrained non-geometric press states across every control', () => {
@@ -92,6 +94,8 @@ describe('public contract', () => {
 		expect(distSource).not.toContain('worn-reaction-btn');
 		expect(distSource).not.toContain('rotate(');
 		expect(distSource).not.toContain('translateY(');
+		expect(distSource).toContain("[aria-pressed='true']");
+		expect(distSource).toContain('brightness(0.98)');
 	});
 });
 
@@ -108,8 +112,11 @@ describe('disabled state', () => {
 	test('does not apply interactive states to disabled links', () => {
 		expect(buttonSource).toContain(":hover:not(:disabled):not([aria-disabled='true'])");
 		expect(buttonSource).toContain(":active:not(:disabled):not([aria-disabled='true'])");
+		expect(buttonSource).toContain("[aria-pressed='true']:not(:disabled):not([aria-disabled='true'])");
 		expect(buttonSource).not.toContain('.worn-btn:hover:not(:disabled) {');
 		expect(buttonSource).not.toContain('.worn-btn:active:not(:disabled) {');
+		expect(buttonSource.indexOf("[aria-pressed='true']:not(:disabled):not([aria-disabled='true'])"))
+		.toBeLessThan(buttonSource.indexOf(".worn-btn.worn-btn[aria-disabled='true'] {"));
 	});
 });
 
