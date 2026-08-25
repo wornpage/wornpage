@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import type { NavItem } from './types.js';
 	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
 	import { filterNavChildren, filterNavItems, hasNavFilterResults, matchesNavItem, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 	import { nextNavFocusIndex } from './keyboard.js';
 	import { shouldInterceptNavigationClick } from './navigation.js';
-	import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';
+	import { filterTransientNavItems, orderedFavoriteItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';
 	import { visibleNavItems } from './visibility.js';
 
 	interface Props {
@@ -114,7 +115,7 @@
 		saveFavorites(next);
 	}
 
-	function moveFavorite(id: string, delta: number) {
+	async function moveFavorite(id: string, delta: number) {
 		const arr = [...favorites];
 		const idx = arr.indexOf(id);
 		if (idx < 0) return;
@@ -123,6 +124,13 @@
 		[arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
 		favorites = new Set(arr);
 		saveFavorites(favorites);
+		await tick();
+		const movedRow = Array.from(navEl?.querySelectorAll<HTMLElement>('.worn-nav-row') ?? [])
+			.find((row) => row.querySelector<HTMLElement>('[data-nav-id]')?.dataset.navId === id);
+		const reorderControls = Array.from(movedRow?.querySelectorAll<HTMLButtonElement>('.worn-reorder-btn') ?? []);
+		const nextControl = reorderControls.find((control) => control.dataset.reorderDelta === String(delta))
+			?? reorderControls[0];
+		nextControl?.focus({ preventScroll: true });
 	}
 
 	function showContextMenu(e: MouseEvent, id: string) {
@@ -178,7 +186,7 @@
 		3
 	));
 	const attentionIds = $derived(new Set(attentionItems.map((item) => item.id)));
-	const favItems = $derived(flatItems.filter(i => favorites.has(i.id) && matchesNavItem(i, normalizedFilterText)));
+	const favItems = $derived(orderedFavoriteItems(flatItems, favorites).filter(i => matchesNavItem(i, normalizedFilterText)));
 	const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));
 
 
@@ -247,12 +255,12 @@
 		{#if favorites.has(item.id) && favItems.length > 1}
 			<span class="worn-nav-reorder">
 				{#if favItems.indexOf(item) > 0}
-					<button type="button" class="worn-reorder-btn" onclick={() => moveFavorite(item.id, -1)} title="Move up" aria-label={`Move ${item.label} up`}>
+					<button type="button" class="worn-reorder-btn" data-reorder-delta="-1" onclick={() => moveFavorite(item.id, -1)} title="Move up" aria-label={`Move ${item.label} up`}>
 						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg>
 					</button>
 				{/if}
 				{#if favItems.indexOf(item) < favItems.length - 1}
-					<button type="button" class="worn-reorder-btn" onclick={() => moveFavorite(item.id, 1)} title="Move down" aria-label={`Move ${item.label} down`}>
+					<button type="button" class="worn-reorder-btn" data-reorder-delta="1" onclick={() => moveFavorite(item.id, 1)} title="Move down" aria-label={`Move ${item.label} down`}>
 						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19 12-7 7-7-7"></path><path d="M12 5v14"></path></svg>
 					</button>
 				{/if}
@@ -604,6 +612,10 @@
 		.worn-reorder-btn,
 		.worn-context-menu button {
 			min-block-size: 44px;
+		}
+
+		.worn-reorder-btn {
+			min-inline-size: 44px;
 		}
 
 		.worn-nav-row.has-reorder > .worn-nav-item {

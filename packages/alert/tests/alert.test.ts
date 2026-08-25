@@ -22,6 +22,16 @@ describe('alert semantics', () => {
     expect(alert).toContain('ondismiss?.();');
     expect(alert).toContain('if (!visible) return;');
   });
+
+  test('hands keyboard focus to the next surviving control after dismissal', () => {
+    expect(alert).toContain('bind:this={dismissButton}');
+    expect(alert).toContain("dismissButton?.matches(':focus-visible')");
+    expect(alert).toContain("dismissButton.closest('.worn-alert')");
+    expect(alert).toContain('Node.DOCUMENT_POSITION_FOLLOWING');
+    expect(alert).toContain('Node.DOCUMENT_POSITION_PRECEDING');
+    expect(alert).toContain('recoveryTarget?.focus();');
+    expect(alert.indexOf('recoveryTarget?.focus();')).toBeLessThan(alert.indexOf('visible = false;'));
+  });
 });
 
 describe('standalone behavior', () => {
@@ -33,6 +43,11 @@ describe('standalone behavior', () => {
     expect(alert).toContain('min-inline-size: 44px;');
     expect(alert).toContain('min-block-size: 44px;');
     expect(alert).toContain('touch-action: manipulation;');
+  });
+
+  test('gives dismiss focus a public token and a high-contrast shared fallback', () => {
+    expect(alert).toContain('outline: 2px dashed var(--worn-alert-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));');
+    expect(alert).not.toContain('outline: 2px dashed var(--cockpit-accent);');
   });
 
   test('uses theme-safe mask icons and reduced-motion entry', () => {

@@ -50,7 +50,10 @@ deep link, the selected tab is brought fully into the strip without scrolling
 the page. When the strip has real horizontal overflow, labeled previous and
 next buttons appear outside the tablist. They scroll a bounded horizontal page,
 remain disabled at their respective edges, respect reduced-motion preferences,
-and disappear when every tab fits.
+and disappear when every tab fits. When a keyboard-triggered scroll reaches an
+edge and disables its source control, focus moves to the enabled opposite
+control. Tabs and overflow controls share the public `--worn-tabs-focus` token;
+its state-aware fallback is each control's current foreground color.
 
 ## Props
 

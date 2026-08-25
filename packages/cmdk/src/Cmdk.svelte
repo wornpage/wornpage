@@ -82,6 +82,8 @@
 		closePalette();
 	}
 
+	function selectPointerItem(index: number) { selected = index; }
+
 	const grouped = $derived(groupCmdkItems(filtered));
 	const displayedItems = $derived(grouped.orderedItems);
 </script>
@@ -102,6 +104,7 @@
 			<li role="presentation">
 				<button id={`cmdk-option-${i}`} type="button" class="cmdk-item" class:is-active={selected === i}
 					role="option" aria-selected={selected === i}
+					onpointerenter={() => selectPointerItem(i)}
 					onclick={() => handleSelect(i)}>
 					<span>{item.label}</span>
 					{#if item.hint}<small>{item.hint}</small>{/if}
@@ -115,6 +118,7 @@
 				<li role="presentation">
 					<button id={`cmdk-option-${idx}`} type="button" class="cmdk-item" class:is-active={selected === idx}
 						role="option" aria-selected={selected === idx}
+						onpointerenter={() => selectPointerItem(idx)}
 						onclick={() => handleSelect(idx)}>
 						<span>{item.label}</span>
 						{#if item.hint}<small>{item.hint}</small>{/if}
@@ -140,16 +144,19 @@
 	.cmdk::backdrop { background: var(--cmdk-backdrop, rgba(0,0,0,0.45)); }
 	.cmdk-search-row { display: flex; align-items: center; border-bottom: 1px solid var(--cmdk-border, var(--cockpit-border, #e2ddd5)); padding-right: 4px; }
 	.cmdk-input { flex: 1; min-width: 0; box-sizing: border-box; border: 0; background: transparent;
-		color: inherit; font: inherit; font-size: 16px; padding: 14px 8px 14px 16px; outline: none; }
+		color: inherit; font: inherit; font-size: 16px; padding: 14px 8px 14px 16px; }
 	.cmdk-input::placeholder { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); opacity: 1; }
+	.cmdk-input:focus-visible { outline: 2px solid var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: -2px; }
 	.cmdk-close { position: relative; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; border: 0;
 		border-radius: 50%; background: transparent; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); cursor: pointer; }
 	.cmdk-close::before, .cmdk-close::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px;
 		border-radius: 1px; background: currentColor; }
 	.cmdk-close::before { transform: translate(-50%, -50%) rotate(45deg); }
 	.cmdk-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
-	.cmdk-close:hover { background: var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7)); }
-	.cmdk-close:focus-visible { outline: 2px dashed var(--cockpit-accent, currentColor); outline-offset: 2px; }
+	@media (hover: hover) and (pointer: fine) {
+		.cmdk-close:hover { background: var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7)); }
+	}
+	.cmdk-close:focus-visible { outline: 2px dashed var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: 2px; }
 	.cmdk-list { list-style: none; margin: 0; padding: 6px; max-height: 46vh; overflow-y: auto; }
 	.cmdk-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
 		padding: 8px 10px; border-radius: var(--cmdk-radius-sm, 6px); cursor: pointer;

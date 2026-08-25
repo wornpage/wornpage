@@ -22,6 +22,11 @@ describe('hydration and interaction contract', () => {
     expect(source).toContain('aria-label="Close"');
   });
 
+  test('gives close focus a public token and a high-contrast shared fallback', () => {
+    expect(source).toContain('outline: 2px dashed var(--worn-drawer-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));');
+    expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+  });
+
   test('owns mobile viewport, every edge, and reduced-motion behavior', () => {
     expect(source).toContain('height: 100dvh;');
     expect(source).toContain('height: var(--worn-visual-viewport-height, 100dvh);');

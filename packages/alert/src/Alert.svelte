@@ -13,10 +13,33 @@
   }: AlertProps = $props();
 
   let visible = $state(true);
+  let dismissButton = $state<HTMLButtonElement>();
   let accessibleDismissLabel = $derived(dismissLabel || (title ? `Dismiss ${title}` : 'Dismiss alert'));
+
+  const focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',');
+
+  function adjacentFocusTarget() {
+    if (!dismissButton) return undefined;
+    const componentRoot = dismissButton.getRootNode();
+    const anchor = componentRoot instanceof ShadowRoot ? componentRoot.host : dismissButton.closest('.worn-alert')!;
+    const candidates = [...document.querySelectorAll<HTMLElement>(focusableSelector)].filter((candidate) => (
+      !anchor.contains(candidate) && candidate.getClientRects().length > 0
+    ));
+    return candidates.find((candidate) => Boolean(anchor.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_FOLLOWING))
+      ?? [...candidates].reverse().find((candidate) => Boolean(anchor.compareDocumentPosition(candidate) & Node.DOCUMENT_POSITION_PRECEDING));
+  }
 
   function dismiss() {
     if (!visible) return;
+    const recoveryTarget = dismissButton?.matches(':focus-visible') ? adjacentFocusTarget() : undefined;
+    recoveryTarget?.focus();
     visible = false;
     ondismiss?.();
   }
@@ -40,7 +63,7 @@
       {@render children?.()}
     </div>
     {#if dismissible}
-      <button type="button" class="worn-alert-dismiss" onclick={dismiss} aria-label={accessibleDismissLabel}></button>
+      <button bind:this={dismissButton} type="button" class="worn-alert-dismiss" onclick={dismiss} aria-label={accessibleDismissLabel}></button>
     {/if}
   </div>
 {/if}
@@ -152,7 +175,7 @@
   .worn-alert-dismiss:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
 
   .worn-alert-dismiss:focus-visible {
-    outline: 2px dashed var(--cockpit-accent);
+    outline: 2px dashed var(--worn-alert-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
     outline-offset: 2px;
   }
 </style>

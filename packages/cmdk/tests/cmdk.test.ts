@@ -9,6 +9,8 @@ const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.me
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const readmeSource = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+const packageManifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 function fuzzyMatch(query: string, target: string): boolean {
   if (!query) return true;
@@ -114,10 +116,35 @@ describe('command palette chrome', () => {
 		expect(cmdkSource).toContain('@media (pointer: coarse) { .cmdk-item { min-height: 44px; } }');
 	});
 
+	test('limits close hover feedback to fine hover pointers', () => {
+		const closeHoverRules = cmdkSource.match(/\.cmdk-close:hover \{ background: var\(--cmdk-selected-bg, var\(--cockpit-hover-bg, #d7efe7\)\); \}/gu);
+		expect(closeHoverRules).toHaveLength(1);
+		expect(cmdkSource).toContain('@media (hover: hover) and (pointer: fine) {\n\t\t.cmdk-close:hover');
+	});
+
+	test('keeps pointer and keyboard navigation on one selected result', () => {
+		expect(cmdkSource).toContain('function selectPointerItem(index: number) { selected = index; }');
+		expect(cmdkSource).toContain('onpointerenter={() => selectPointerItem(i)}');
+		expect(cmdkSource).toContain('onpointerenter={() => selectPointerItem(idx)}');
+		expect(cmdkSource.match(/onpointerenter=\{\(\) => selectPointerItem\(/gu)).toHaveLength(2);
+		expect(cmdkSource).toContain('aria-activedescendant={displayedItems.length ? `cmdk-option-${selected}` : undefined}');
+	});
+
+	test('uses the component focus token with the shared high-contrast fallback', () => {
+		expect(cmdkSource).toContain('outline: 2px dashed var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));');
+	});
+
 	test('keeps the search input at an iOS-safe size without relying on pointer media detection', () => {
 		expect(cmdkSource).toContain('font-size: 16px; padding: 14px 8px 14px 16px;');
 		expect(cmdkSource).not.toContain('.cmdk-input { font-size: 16px; }');
 		expect(cmdkSource).toContain('width: 44px; height: 44px;');
+	});
+
+	test('keeps automatic search focus visible without changing input geometry', () => {
+		const inputRule = cmdkSource.match(/\.cmdk-input \{[\s\S]*?\}/u)?.[0] ?? '';
+		expect(inputRule).not.toContain('outline: none');
+		expect(cmdkSource).toContain('.cmdk-input:focus-visible { outline: 2px solid var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: -2px; }');
+		expect(readmeSource).toContain('The automatically focused search input has a contained, theme-safe visible outline');
 	});
 
 	test('keeps focus-time input geometry native-sized throughout the entrance animation', () => {
@@ -146,6 +173,10 @@ describe('command palette chrome', () => {
 });
 
 describe('package entrypoints', () => {
+	test('declares the visible-input-focus release', () => {
+		expect(packageManifest.version).toBe('0.1.11');
+	});
+
 	test('keeps the Svelte component separate from the custom-element wrapper', () => {
 		expect(cmdkSource).not.toContain('<svelte:options customElement');
 		expect(indexSource).toContain("export { default as Cmdk } from './Cmdk.svelte';");

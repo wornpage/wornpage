@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/segmented-control",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 segmented radio control with compact containment and isolated native groups",
   "type": "module",
   "wornpage": {

@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/select-card",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 card-based selection control with accessible pressed and disabled states",
   "type": "module",
   "wornpage": {

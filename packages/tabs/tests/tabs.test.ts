@@ -86,6 +86,15 @@ describe('keyboard and compact behavior', () => {
 		expect(source).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(source).toContain('transition: none;');
 	});
+
+	test('limits hover feedback to hover-capable fine pointers', () => {
+		expect(source).toMatch(/@media \(hover: hover\) and \(pointer: fine\) \{[\s\S]*\.worn-tabs-control:hover:not\(:disabled\)[\s\S]*\.worn-tab:hover[\s\S]*\}/u);
+	});
+
+	test('owns one state-aware focus token across tabs and overflow controls', () => {
+		expect(source).toMatch(/\.worn-tabs-control:focus-visible,\s*\.worn-tab:focus-visible \{\s*outline: 2px dashed var\(--worn-tabs-focus, currentColor\);\s*outline-offset: -2px;\s*\}/u);
+		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+	});
 });
 
 describe('overflow controls', () => {
@@ -132,6 +141,15 @@ describe('overflow controls', () => {
 		expect(source).toContain('overflowVisibilityFrame = requestAnimationFrame(() => {');
 		expect(source).toContain('ensureActiveTabVisible();');
 		expect(source).toContain('if (overflowVisibilityFrame !== undefined) cancelAnimationFrame(overflowVisibilityFrame);');
+	});
+
+	test('hands terminal overflow focus to the enabled opposite control', () => {
+		expect(source).toContain("onfocusout={(event) => recoverOverflowFocus(event, 'Scroll to next tabs')}");
+		expect(source).toContain("onfocusout={(event) => recoverOverflowFocus(event, 'Scroll to previous tabs')}");
+		expect(source).toContain('if (!(event.currentTarget instanceof HTMLButtonElement) || !event.currentTarget.disabled) return;');
+		expect(source).toContain('tabstrip?.querySelector<HTMLButtonElement>(`.worn-tabs-control[aria-label="${label}"]`)');
+		expect(source).toContain('queueMicrotask(() => {');
+		expect(source).toContain('Tabs overflow focus target is unavailable');
 	});
 });
 

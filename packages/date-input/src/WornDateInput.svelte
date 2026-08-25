@@ -70,7 +70,7 @@
 	}
 
 	.worn-date-input:focus {
-		outline: 2px dashed var(--cockpit-accent);
+		outline: 2px dashed var(--worn-date-input-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));
 		outline-offset: 2px;
 		border-color: var(--cockpit-accent);
 		box-shadow: 0 0 0 1px var(--cockpit-accent-50);

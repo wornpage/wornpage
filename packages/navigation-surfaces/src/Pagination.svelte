@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+
 	interface Props {
 		current?: number;
 		total?: number;
@@ -7,6 +9,8 @@
 	}
 
 	let { current = $bindable(1), total = 1, label = 'Pagination', onchange }: Props = $props();
+	let previousButton = $state<HTMLButtonElement>();
+	let nextButton = $state<HTMLButtonElement>();
 
 	let normalizedTotal = $derived(Number.isFinite(total) ? Math.max(1, Math.trunc(total)) : 1);
 	let normalizedCurrent = $derived(
@@ -17,10 +21,29 @@
 		if (current !== normalizedCurrent) current = normalizedCurrent;
 	});
 
-	function go(page: number) {
+	async function go(page: number, source: HTMLButtonElement) {
 		const target = Math.min(normalizedTotal, Math.max(1, Math.trunc(page)));
 		if (target === normalizedCurrent) return;
+		const crossedFirstBoundary = source === previousButton && target === 1;
+		const crossedLastBoundary = source === nextButton && target === normalizedTotal;
+		const recoveryTarget = crossedFirstBoundary
+			? nextButton
+			: crossedLastBoundary
+				? previousButton
+				: undefined;
+		if ((crossedFirstBoundary || crossedLastBoundary) && !recoveryTarget) {
+			throw new Error('Pagination boundary focus target is unavailable');
+		}
 		current = target;
+		if (recoveryTarget) {
+			await tick();
+			await new Promise<void>((resolve) => requestAnimationFrame(() => {
+				if (document.activeElement === document.body || document.activeElement === source) {
+					recoveryTarget.focus();
+				}
+				resolve();
+			}));
+		}
 		onchange?.(target);
 	}
 
@@ -45,10 +68,11 @@
 {#if normalizedTotal > 1}
 	<nav class="worn-pagination" aria-label={label}>
 		<button
+			bind:this={previousButton}
 			type="button"
 			class="worn-pagination-btn worn-pagination-edge worn-pagination-prev"
 			disabled={normalizedCurrent <= 1}
-			onclick={() => go(normalizedCurrent - 1)}
+			onclick={(event) => go(normalizedCurrent - 1, event.currentTarget)}
 			aria-label="Previous page"
 		></button>
 		<div class="worn-pagination-pages">
@@ -61,7 +85,7 @@
 						class="worn-pagination-btn"
 						aria-label={`Page ${page}`}
 						aria-current={page === normalizedCurrent ? 'page' : undefined}
-						onclick={() => go(page)}
+						onclick={(event) => go(page, event.currentTarget)}
 					>{page}</button>
 				{/if}
 			{/each}
@@ -74,10 +98,11 @@
 			aria-label={`Page ${normalizedCurrent} of ${normalizedTotal}`}
 		>{normalizedCurrent}/{normalizedTotal}</span>
 		<button
+			bind:this={nextButton}
 			type="button"
 			class="worn-pagination-btn worn-pagination-edge worn-pagination-next"
 			disabled={normalizedCurrent >= normalizedTotal}
-			onclick={() => go(normalizedCurrent + 1)}
+			onclick={(event) => go(normalizedCurrent + 1, event.currentTarget)}
 			aria-label="Next page"
 		></button>
 	</nav>
@@ -155,7 +180,7 @@
 	}
 
 	.worn-pagination-btn:focus-visible {
-		outline: 2px dashed var(--cockpit-accent, #287f73);
+		outline: 2px dashed var(--worn-navigation-focus, currentColor);
 		outline-offset: 2px;
 	}
 

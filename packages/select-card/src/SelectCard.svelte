@@ -67,11 +67,13 @@
 	.worn-select-card[aria-pressed='true'] span {
 		color: inherit;
 	}
-	.worn-select-card:hover:not([aria-pressed='true']):not(:disabled) {
-		border-color: var(--cockpit-border-strong);
+	@media (hover: hover) and (pointer: fine) {
+		.worn-select-card:hover:not([aria-pressed='true']):not(:disabled) {
+			border-color: var(--cockpit-border-strong);
+		}
 	}
 	.worn-select-card:focus-visible {
-		outline: 2px dashed var(--cockpit-accent);
+		outline: 2px dashed var(--worn-select-card-focus, currentColor);
 		outline-offset: 2px;
 	}
 	.worn-select-card:disabled {

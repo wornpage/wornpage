@@ -78,6 +78,15 @@
 		});
 	}
 
+	function recoverOverflowFocus(event: FocusEvent, label: 'Scroll to previous tabs' | 'Scroll to next tabs') {
+		if (!(event.currentTarget instanceof HTMLButtonElement) || !event.currentTarget.disabled) return;
+		const target = tabstrip?.querySelector<HTMLButtonElement>(`.worn-tabs-control[aria-label="${label}"]`);
+		queueMicrotask(() => {
+			if (!target?.isConnected || target.disabled) throw new Error('Tabs overflow focus target is unavailable');
+			target.focus();
+		});
+	}
+
 	function scrollByPage(direction: -1 | 1) {
 		if (!tablist) return;
 
@@ -155,6 +164,7 @@
 			aria-label="Scroll to previous tabs"
 			disabled={!canScrollBackward}
 			onclick={() => scrollByPage(-1)}
+			onfocusout={(event) => recoverOverflowFocus(event, 'Scroll to next tabs')}
 		><span aria-hidden="true">&lsaquo;</span></button>
 	{/if}
 	<div
@@ -187,6 +197,7 @@
 			aria-label="Scroll to next tabs"
 			disabled={!canScrollForward}
 			onclick={() => scrollByPage(1)}
+			onfocusout={(event) => recoverOverflowFocus(event, 'Scroll to previous tabs')}
 		><span aria-hidden="true">&rsaquo;</span></button>
 	{/if}
 </div>
@@ -234,10 +245,6 @@
 		transition: color 0.12s ease, background-color 0.12s ease;
 	}
 
-	.worn-tabs-control:hover:not(:disabled) {
-		color: var(--cockpit-text);
-	}
-
 	.worn-tabs-control:disabled {
 		color: var(--cockpit-text-muted);
 		cursor: default;
@@ -246,7 +253,11 @@
 
 	.worn-tabs-control:focus-visible {
 		position: relative;
-		outline: 2px dashed var(--cockpit-accent);
+	}
+
+	.worn-tabs-control:focus-visible,
+	.worn-tab:focus-visible {
+		outline: 2px dashed var(--worn-tabs-focus, currentColor);
 		outline-offset: -2px;
 	}
 
@@ -281,18 +292,19 @@
 		white-space: nowrap;
 	}
 
-	.worn-tab:hover {
-		color: var(--cockpit-text);
-	}
-
 	.worn-tab[aria-selected='true'] {
 		color: var(--cockpit-link);
 		border-block-end-color: var(--cockpit-accent);
 	}
 
-	.worn-tab:focus-visible {
-		outline: 2px dashed var(--cockpit-accent);
-		outline-offset: -2px;
+	@media (hover: hover) and (pointer: fine) {
+		.worn-tabs-control:hover:not(:disabled) {
+			color: var(--cockpit-text);
+		}
+
+		.worn-tab:hover {
+			color: var(--cockpit-text);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {

@@ -44,3 +44,7 @@ npm install @wornpage/date-input
 ## Interaction
 
 The component preserves the browser-native date picker. On touch-first devices it uses a 16px input font to avoid iOS zoom and a minimum 44px control height; desktop remains compact.
+
+## Styling
+
+`--worn-date-input-focus` customizes the keyboard focus outline. Its default falls through the shared `--cockpit-focus` and `--cockpit-text` tokens so the outline remains distinguishable from themed field surfaces. Border and shadow feedback continue to use the shared accent tokens.

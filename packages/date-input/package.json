@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/date-input",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Svelte 5 date input control with touch-safe styling and native date-picker semantics.",
   "type": "module",
   "wornpage": {

@@ -10,12 +10,42 @@ const foldIndicator = read('FoldIndicator');
 const foldedSurface = read('FoldedSurface');
 const panel = read('Panel');
 const resizable = read('Resizable');
+const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+
+function expectFinePointerHover(source: string, selector: string, expectedCount = 1) {
+	const occurrences = [...source.matchAll(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&'), 'gu'))];
+	expect(occurrences).toHaveLength(expectedCount);
+
+	for (const occurrence of occurrences) {
+		const index = occurrence.index ?? -1;
+		let mediaStart = source.lastIndexOf('@media (hover: hover) and (pointer: fine)', index);
+		let enclosed = false;
+
+		while (mediaStart >= 0 && !enclosed) {
+			const blockStart = source.indexOf('{', mediaStart);
+			let depth = 0;
+
+			for (let cursor = blockStart; cursor < source.length; cursor += 1) {
+				if (source[cursor] === '{') depth += 1;
+				if (source[cursor] === '}') depth -= 1;
+				if (depth === 0) {
+					enclosed = index > blockStart && index < cursor;
+					break;
+				}
+			}
+
+			mediaStart = source.lastIndexOf('@media (hover: hover) and (pointer: fine)', mediaStart - 1);
+		}
+
+		expect(enclosed).toBe(true);
+	}
+}
 
 describe('@wornpage/layout-surfaces', () => {
 	it('declares one source-delivered v2 package', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/layout-surfaces');
-		expect(pkg.version).toBe('0.2.0');
+		expect(pkg.version).toBe('0.2.3');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.main).toBe('./src/index.ts');
 		expect(pkg.files).not.toContain('dist');
@@ -53,6 +83,15 @@ describe('@wornpage/layout-surfaces', () => {
 		expect(foldIndicator).toContain('var(--worn-fold-background, var(--cockpit-bg, #f8f6f0))');
 		expect(foldIndicator).toContain('var(--worn-card-dog-ear-background, var(--cockpit-bg, #f8f6f0))');
 		expect(foldIndicator).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.worn-fold-indicator \{[\s\S]*?transition: none;/u);
+	});
+
+	it('limits hover-only fold reveals to fine pointers while retaining keyboard reveals', () => {
+		expect(foldIndicator).toContain(":global(.worn-folded-surface[data-fold-reveal='always']) > .worn-fold-indicator");
+		expect(foldIndicator).toContain(":global(.worn-folded-surface[data-fold-reveal='hover']:focus-visible) > .worn-fold-indicator");
+		expect(foldIndicator).toContain(":global(.worn-folded-surface[data-fold-reveal='hover']:focus-within) > .worn-fold-indicator");
+		expect(foldIndicator).toContain(':global(a.worn-card:focus-visible) > .worn-fold-indicator');
+		expectFinePointerHover(foldIndicator, ":global(.worn-folded-surface[data-fold-reveal='hover']:hover) > .worn-fold-indicator,");
+		expectFinePointerHover(foldIndicator, ':global(a.worn-card:hover) > .worn-fold-indicator {');
 	});
 
 	it('keeps static panels independent from optional fold behavior', () => {
@@ -103,10 +142,31 @@ describe('@wornpage/layout-surfaces', () => {
 		expect(card).not.toContain('right: 0;');
 	});
 
-	it('removes all card transitions for reduced-motion users', () => {
+	it('keeps linked-card focus and fine-pointer hover feedback geometrically stable', () => {
+		const focusRule = card.match(/a\.worn-card:focus-visible \{[\s\S]*?\}/u)?.[0] ?? '';
+		const hoverRule = card.match(/@media \(hover: hover\) and \(pointer: fine\) \{\s*a\.worn-card:hover \{[\s\S]*?\}\s*\}/u)?.[0] ?? '';
+		expectFinePointerHover(card, 'a.worn-card:hover {', 1);
+		for (const rule of [focusRule, hoverRule]) {
+			expect(rule).toContain('border-color: var(--worn-card-active-border');
+			expect(rule).toContain('box-shadow: var(--worn-card-active-shadow');
+			expect(rule).not.toContain('transform');
+		}
+		expect(card).toContain('transition: border-color 120ms ease, box-shadow 120ms ease;');
+		expect(card).not.toContain('translateY');
+		expect(readme).toContain('Stable border and shadow feedback does not move the linked Card');
+	});
+
+	it('removes card transitions for reduced-motion users without widening hover feedback', () => {
 		expect(card).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(card).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?a\.worn-card \{[\s\S]*?transition: none;/u);
-		expect(card).toMatch(/a\.worn-card:hover,\s*a\.worn-card:focus-visible \{\s*transform: none;/u);
+		expect(card).not.toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?a\.worn-card:(?:focus-visible|hover)/u);
+	});
+
+	it('gives linked cards a public theme-safe focus token', () => {
+		const focusRule = card.match(/a\.worn-card:focus-visible \{[\s\S]*?\}/gu)?.find((rule) => rule.includes('outline:')) ?? '';
+		expect(focusRule).toContain('outline: 2px solid var(--worn-card-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
+		expect(focusRule).not.toContain('--cockpit-accent');
+		expect(readme).toContain('`--worn-card-focus`');
 	});
 
 	it('exposes both divider forms as separators and contains long labels', () => {
@@ -142,5 +202,18 @@ describe('@wornpage/layout-surfaces', () => {
 		expect(resizable).toContain('var(--cockpit-accent, #0f766e)');
 		expect(resizable).toContain('inset-inline: -16px;');
 		expect(resizable).toContain('@media (prefers-reduced-motion: reduce)');
+	});
+
+	it('gives the splitter a public theme-safe focus token', () => {
+		const focusRule = resizable.match(/\.worn-resizable-handle:focus-visible \{[\s\S]*?\}/gu)?.find((rule) => rule.includes('outline:')) ?? '';
+		expect(focusRule).toContain('outline: 2px dashed var(--worn-resizable-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
+		expect(focusRule).not.toContain('--cockpit-accent');
+		expect(readme).toContain('`--worn-resizable-focus`');
+	});
+
+	it('limits splitter hover feedback to fine pointers while retaining focus and drag feedback', () => {
+		expect(resizable).toContain('.worn-resizable-handle:focus-visible::after,');
+		expect(resizable).toContain('.worn-resizable-handle.is-dragging::after {');
+		expectFinePointerHover(resizable, '.worn-resizable-handle:hover::after {');
 	});
 });

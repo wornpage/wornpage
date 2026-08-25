@@ -111,7 +111,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.worn-spinner-dot { animation: none; opacity: 0.6; }
+		.worn-spinner-dot { animation: none; opacity: 1; }
 	}
 
 	.sr-only {

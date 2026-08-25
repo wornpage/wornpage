@@ -125,7 +125,9 @@
   }
 
   @media (pointer: coarse) {
-    .worn-input { font-size: 16px; }
+    .worn-input {
+      font-size: 16px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

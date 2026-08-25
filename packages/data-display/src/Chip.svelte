@@ -101,6 +101,7 @@
 		font-size: 13px;
 		font-weight: 560;
 		gap: 6px;
+		inline-size: max-content;
 		line-height: 1.2;
 		max-inline-size: 100%;
 		min-inline-size: 0;
@@ -110,9 +111,8 @@
 
 	.worn-chip-label {
 		min-inline-size: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		overflow-wrap: anywhere;
+		white-space: normal;
 	}
 
 	button.worn-chip,
@@ -137,10 +137,12 @@
 		padding: 2px 10px;
 	}
 
-	button.worn-chip:hover:not([aria-pressed='true']),
-	a.worn-chip:hover {
-		background: var(--cockpit-accent-50, #e1f3ee);
-		color: var(--cockpit-text, #21322b);
+	@media (hover: hover) and (pointer: fine) {
+		button.worn-chip:hover:not([aria-pressed='true']),
+		a.worn-chip:hover {
+			background: var(--cockpit-accent-50, #e1f3ee);
+			color: var(--cockpit-text, #21322b);
+		}
 	}
 
 	.worn-chip:focus-visible {

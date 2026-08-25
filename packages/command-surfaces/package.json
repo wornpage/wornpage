@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/command-surfaces",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 command toolbars and keyboard shortcut hints for compact application workflows",
   "type": "module",
   "wornpage": {

@@ -75,16 +75,24 @@ Pagination normalizes invalid totals and bound page values. It keeps native
 buttons and the full numeric range when space permits, then uses a compact
 previous, compact current/total status, and next layout based on its own container width.
 Consumers with multiple paginators should give each one a distinct `label`.
+When a keyboard-activated edge reaches the first or last page and becomes
+disabled, focus moves to the still-enabled opposite edge instead of falling
+back to the document. `onchange` runs after that default recovery, so a
+consumer may deliberately hand focus to newly rendered content without being
+overwritten.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `current` | `number` | `1` | Bindable current page, clamped to the available range |
 | `total` | `number` | `1` | Total pages, normalized to an integer of at least one |
 | `label` | `string` | `Pagination` | Accessible navigation landmark name |
-| `onchange` | `(page: number) => void` | none | Called after a user chooses a different valid page |
+| `onchange` | `(page: number) => void` | none | Called after a valid page change and any terminal-edge default focus recovery |
 
 ## Theme tokens
 
 All components consume the existing `--cockpit-*` and `--font-typewriter`
 tokens with complete light fallbacks. They do not impose outer page spacing;
 the pagination control only owns its 16px leading separation from results.
+Keyboard focus uses `--worn-navigation-focus` when supplied and otherwise
+follows each rendered control's `currentColor`, including the selected
+Pagination state.

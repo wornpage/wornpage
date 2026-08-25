@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 const source = readFileSync(new URL('../src/SelectCard.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const elementSource = readFileSync(new URL('../src/SelectCardElement.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 describe('selection semantics', () => {
 	test('uses one native controlled button with selected and disabled state', () => {
@@ -34,6 +36,25 @@ describe('responsive interaction contract', () => {
 		expect(source).toContain('.worn-select-card:focus-visible');
 		expect(source).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(source).toContain('transition: none;');
+	});
+
+	test('owns one theme-safe focus token for selected and unselected cards', () => {
+		expect(source).toContain(
+			'outline: 2px dashed var(--worn-select-card-focus, currentColor);'
+		);
+		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(readme).toContain('`--worn-select-card-focus`');
+		expect(packageJson.version).toBe('0.1.1');
+	});
+
+	test('limits hover feedback to fine hover-capable pointers', () => {
+		expect(source).toContain("@media (hover: hover) and (pointer: fine) {");
+		expect(source).toMatch(
+			/@media \(hover: hover\) and \(pointer: fine\) \{\s*\.worn-select-card:hover:not\(\[aria-pressed='true'\]\):not\(:disabled\) \{\s*border-color: var\(--cockpit-border-strong\);/u
+		);
+		expect(source).toContain(".worn-select-card[aria-pressed='true'] {");
+		expect(source).toContain('.worn-select-card:focus-visible');
+		expect(source).toContain('.worn-select-card:disabled {');
 	});
 });
 

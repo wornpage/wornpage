@@ -45,7 +45,6 @@
 		min-inline-size: 0;
 	}
 
-	.worn-toolbar:hover,
 	.worn-toolbar:focus-within {
 		border-color: var(--worn-toolbar-active-border, var(--cockpit-accent, #287f73));
 		box-shadow: var(--worn-toolbar-active-shadow, 0 0 0 1px var(--cockpit-accent, #287f73));

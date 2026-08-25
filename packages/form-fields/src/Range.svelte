@@ -18,10 +18,9 @@
 
   let percentage = $derived(
     max > min
-      ? Math.min(100, Math.max(0, Math.round(((value - min) / (max - min)) * 100)))
+      ? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))
       : 0
   );
-  let bucket = $derived(Math.round(percentage / 5) * 5);
   let visibleValue = $derived(valueText || `${value}${suffix}`);
 </script>
 
@@ -47,15 +46,16 @@
       aria-valuetext={valueText || undefined}
       {...rest}
     />
-    <div class="worn-range-track">
-      <div class="worn-range-fill worn-range-fill-{bucket}"></div>
-    </div>
+    <svg class="worn-range-track" aria-hidden="true" focusable="false">
+      <rect class="worn-range-fill" width={`${percentage}%`} height="100%"></rect>
+    </svg>
   </div>
   <span class="worn-range-value" aria-hidden="true" title={visibleValue}>{visibleValue}</span>
 </div>
 
 <style>
   .worn-range {
+    --_worn-range-default-fill: var(--cockpit-focus, var(--cockpit-text, #21322b));
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -96,7 +96,9 @@
 
   .worn-range-track {
     position: relative;
+    display: block;
     flex: 1 1 auto;
+    inline-size: 100%;
     min-inline-size: 44px;
     block-size: 8px;
     overflow: hidden;
@@ -110,12 +112,15 @@
   }
 
   .worn-range-fill {
-    block-size: 100%;
-    min-inline-size: 0;
-    border-radius: inherit;
-    background: var(--worn-range-fill, var(--cockpit-accent, #0f766e));
+    fill: var(--worn-range-fill, var(--_worn-range-default-fill));
     pointer-events: none;
     transition: width 0.15s ease;
+  }
+
+  @supports (color: color-mix(in srgb, black, white)) {
+    .worn-range {
+      --_worn-range-default-fill: color-mix(in srgb, var(--cockpit-accent, #0f766e) 55%, var(--cockpit-text, #21322b));
+    }
   }
 
   .worn-range-value {
@@ -139,34 +144,12 @@
   }
 
   .worn-range.is-disabled .worn-range-fill {
-    background: var(--cockpit-text-muted, #506058);
+    fill: var(--cockpit-text-muted, #506058);
   }
 
   .worn-range.is-disabled .worn-range-value {
     color: var(--cockpit-text-secondary, #394b43);
   }
-
-  .worn-range-fill-0 { width: 0%; }
-  .worn-range-fill-5 { width: 5%; }
-  .worn-range-fill-10 { width: 10%; }
-  .worn-range-fill-15 { width: 15%; }
-  .worn-range-fill-20 { width: 20%; }
-  .worn-range-fill-25 { width: 25%; }
-  .worn-range-fill-30 { width: 30%; }
-  .worn-range-fill-35 { width: 35%; }
-  .worn-range-fill-40 { width: 40%; }
-  .worn-range-fill-45 { width: 45%; }
-  .worn-range-fill-50 { width: 50%; }
-  .worn-range-fill-55 { width: 55%; }
-  .worn-range-fill-60 { width: 60%; }
-  .worn-range-fill-65 { width: 65%; }
-  .worn-range-fill-70 { width: 70%; }
-  .worn-range-fill-75 { width: 75%; }
-  .worn-range-fill-80 { width: 80%; }
-  .worn-range-fill-85 { width: 85%; }
-  .worn-range-fill-90 { width: 90%; }
-  .worn-range-fill-95 { width: 95%; }
-  .worn-range-fill-100 { width: 100%; }
 
   @media (pointer: coarse) {
     .worn-range-input { font-size: 16px; }

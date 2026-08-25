@@ -77,15 +77,17 @@
 		inline-size: 20px;
 	}
 	.worn-icon-btn.is-danger { color: var(--cockpit-danger-text); }
-	.worn-icon-btn:hover:not(:disabled) {
-		background: var(--cockpit-bg-secondary);
-		border-color: var(--cockpit-border);
-		color: var(--cockpit-text);
-	}
-	.worn-icon-btn.is-danger:hover:not(:disabled) {
-		background: var(--cockpit-danger-bg);
-		border-color: var(--cockpit-danger-border);
-		color: var(--cockpit-danger-text);
+	@media (hover: hover) and (pointer: fine) {
+		.worn-icon-btn:hover:not(:disabled) {
+			background: var(--cockpit-bg-secondary);
+			border-color: var(--cockpit-border);
+			color: var(--cockpit-text);
+		}
+		.worn-icon-btn.is-danger:hover:not(:disabled) {
+			background: var(--cockpit-danger-bg);
+			border-color: var(--cockpit-danger-border);
+			color: var(--cockpit-danger-text);
+		}
 	}
 	.worn-icon-btn:active:not(:disabled) {
 		filter: brightness(0.94);

@@ -200,7 +200,7 @@
 	.worn-drawer-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 	.worn-drawer-close:hover { background: var(--cockpit-hover-bg); }
 	.worn-drawer-close:focus-visible {
-		outline: 2px dashed var(--cockpit-accent);
+		outline: 2px dashed var(--worn-drawer-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
 		outline-offset: 2px;
 	}
 	.worn-drawer-body {

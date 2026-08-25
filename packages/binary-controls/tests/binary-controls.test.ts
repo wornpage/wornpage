@@ -52,6 +52,16 @@ describe('theme and compact behavior', () => {
       expect(source).toContain('transition: none;');
     }
   });
+
+  test('owns one state-aware focus token across checked and unchecked controls', () => {
+    for (const source of [checkbox, switchControl]) {
+      expect(source).toContain('outline: 2px dashed var(--worn-binary-focus, var(--worn-binary-state-focus, currentColor));');
+      expect(source).toContain('--worn-binary-state-focus: currentColor;');
+      expect(source).toContain('--worn-binary-state-focus: var(--cockpit-accent-text);');
+      expect(source.match(/--worn-binary-focus/gu)?.length).toBe(1);
+      expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+    }
+  });
 });
 
 describe('browser delivery', () => {

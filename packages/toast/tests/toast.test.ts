@@ -6,6 +6,8 @@ const toastSource = readFileSync(new URL('../src/Toast.svelte', import.meta.url)
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const readmeSource = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const packageManifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 function createToast(items: ToastItem[], item: Omit<ToastItem, 'id'>): ToastItem[] {
 	const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
@@ -75,6 +77,29 @@ describe('toast component', () => {
 		expect(toastSource).toContain('dismissing = true;');
 	});
 
+	test('completes reduced-motion dismissal without waiting for an absent animation', () => {
+		expect(toastSource).toContain("import { prefersReducedMotion } from 'svelte/motion';");
+		expect(toastSource).toContain('function completeDismissal()');
+		expect(toastSource).toMatch(/if \(prefersReducedMotion\.current\) \{\s*completeDismissal\(\);\s*return;\s*\}\s*setTimeout\(completeDismissal, EXIT_DURATION_MS\);/u);
+		expect(packageManifest.version).toBe('0.1.5');
+		expect(readmeSource).toContain('Reduced-motion dismissal completes immediately instead of waiting for an exit animation that is not rendered');
+	});
+
+	test('pauses and resumes timed dismissal while the toast is being used', () => {
+		expect(toastSource).toContain('function pauseAutoDismiss()');
+		expect(toastSource).toContain('function resumeAutoDismiss()');
+		expect(toastSource).toContain('onpointerenter={pauseAutoDismiss}');
+		expect(toastSource).toContain('onpointerleave={resumeAutoDismiss}');
+		expect(toastSource).toContain('onfocusin={pauseAutoDismiss}');
+		expect(toastSource).toContain('onfocusout={handleFocusOut}');
+		expect(toastSource).toContain('remainingDuration -= Date.now() - timerStartedAt;');
+		expect(toastSource).toContain('if (element.contains(event.relatedTarget as Node | null)) return;');
+	});
+
+	test('uses the theme focus token before the accent fallback', () => {
+		expect(toastSource).toContain('var(--cockpit-focus, var(--cockpit-accent, currentColor))');
+	});
+
 	test('uses stylesheet motion that remains compatible with a strict CSP', () => {
 		expect(toastSource).not.toContain("from 'svelte/transition'");
 		expect(toastSource).toContain('@keyframes wrn-toast-enter');
@@ -97,5 +122,9 @@ describe('browser demo', () => {
 		expect(demoSource).not.toContain('Click to show toasts');
 		expect(demoSource).not.toContain('setTimeout');
 		expect(demoSource).not.toContain('window.show');
+	});
+
+	test('documents interaction-safe automatic dismissal', () => {
+		expect(readmeSource).toContain('Automatic dismissal pauses while the notification is hovered or contains keyboard focus');
 	});
 });

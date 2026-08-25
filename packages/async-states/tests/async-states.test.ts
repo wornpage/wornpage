@@ -14,7 +14,7 @@ describe('@wornpage/async-states', () => {
 		expect(pkg.name).toBe('@wornpage/async-states');
 		expect(pkg.version).toBe('0.1.4');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
-		expect(pkg.dependencies['@wornpage/button']).toContain('6091bc96a929599382c0e106451a09b9b889cddb');
+		expect(pkg.dependencies['@wornpage/button']).toContain('1af321063c107e7435597a5332e9e9b7e790cd59');
 	});
 
 	it('exports all four stable component surfaces', async () => {
@@ -62,6 +62,7 @@ describe('@wornpage/async-states', () => {
 		expect(spinner).toContain("import { prefersReducedMotion } from 'svelte/motion';");
 		expect(spinner).toMatch(/\{#if !prefersReducedMotion\.current\}[\s\S]*?<animate/u);
 		expect(spinner).toContain('@media (prefers-reduced-motion: reduce)');
+		expect(spinner).toContain('.worn-spinner-dot { animation: none; opacity: 1; }');
 		expect(spinner).toContain('.worn-spinner.is-sm .worn-spinner-dots { gap: 4px; }');
 	});
 

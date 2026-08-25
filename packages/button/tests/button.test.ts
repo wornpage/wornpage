@@ -64,6 +64,7 @@ describe('public contract', () => {
 		expect(buttonSource).toContain('if (disabled) { e.preventDefault(); return; }');
 		expect(buttonSource).toContain('tabindex={disabled ? -1 : undefined}');
 		expect(buttonSource).toContain('{disabled}');
+		expect(buttonSource).toContain('@media (hover: hover) and (pointer: fine) {');
 		expect(buttonSource).toContain('.worn-btn.is-primary:hover:not(:disabled):not([aria-disabled=\'true\']) {');
 		expect(buttonSource).toContain('box-shadow: 0 2px 4px rgb(0 0 0 / 0.14);');
 		expect(buttonSource).toContain('.worn-btn.is-primary:active:not(:disabled):not([aria-disabled=\'true\']) {');
@@ -118,6 +119,12 @@ describe('disabled state', () => {
 		expect(buttonSource.indexOf("[aria-pressed='true']:not(:disabled):not([aria-disabled='true'])"))
 		.toBeLessThan(buttonSource.indexOf(".worn-btn.worn-btn[aria-disabled='true'] {"));
 	});
+
+	test('limits hover feedback to fine hover-capable pointers', () => {
+		const hoverMedia = buttonSource.match(/@media \(hover: hover\) and \(pointer: fine\) \{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		expect(hoverMedia).toContain('.worn-btn:hover:not(:disabled):not([aria-disabled=\'true\']) {');
+		expect(hoverMedia).toContain('.worn-btn.is-warning:hover:not(:disabled):not([aria-disabled=\'true\']) {');
+	});
 });
 
 describe('compact and touch interactions', () => {
@@ -164,6 +171,13 @@ describe('compact and touch interactions', () => {
 		expect(iconButtonSource).toContain('opacity: 1;');
 	});
 
+	test('limits icon hover feedback to fine hover-capable pointers', () => {
+		const hoverMedia = iconButtonSource.match(/@media \(hover: hover\) and \(pointer: fine\) \{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		expect(hoverMedia).toContain('.worn-icon-btn:hover:not(:disabled) {');
+		expect(hoverMedia).toContain('.worn-icon-btn.is-danger:hover:not(:disabled) {');
+		expect(iconButtonSource).not.toContain('\n\t.worn-icon-btn:hover:not(:disabled) {');
+	});
+
 	test('keeps reactions touch-safe, legible, and theme-aware', () => {
 		expect(reactionButtonSource).toContain('min-block-size: 44px;');
 		expect(reactionButtonSource).toContain('min-inline-size: 44px;');
@@ -175,6 +189,12 @@ describe('compact and touch interactions', () => {
 		expect(reactionButtonSource).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(reactionButtonSource).toContain('@media (forced-colors: active)');
 		expect(reactionButtonSource).toContain('opacity: 1;');
+	});
+
+	test('limits reaction hover feedback to fine hover-capable pointers', () => {
+		const hoverMedia = reactionButtonSource.match(/@media \(hover: hover\) and \(pointer: fine\) \{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		expect(hoverMedia).toContain('.worn-reaction-btn:hover:not(:disabled) {');
+		expect(reactionButtonSource).not.toContain('\n\t.worn-reaction-btn:hover:not(:disabled) {');
 	});
 });
 

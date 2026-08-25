@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/alert",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Svelte 5 inline alerts with live-region semantics, contextual dismissal, and compact containment",
   "type": "module",
   "wornpage": {

@@ -5,6 +5,8 @@ import { compile } from 'svelte/compiler';
 const source = readFileSync(new URL('../src/WornMultiSelect.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const typesSource = readFileSync(new URL('../src/types.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 describe('multi-select source', () => {
 	test('compiles as a Svelte 5 component', () => {
@@ -39,8 +41,9 @@ describe('multi-select source', () => {
 		expect(source).toContain('max-inline-size: 100%;');
 		expect(source).toContain('min-inline-size: 0;');
 		expect(source).toContain('touch-action: manipulation;');
-		expect(source).toContain('@media (pointer: coarse)');
-		expect(source).toContain('font-size: 16px;');
+		const coarsePointerOverride = source.match(/@media\s*\(pointer:\s*coarse\)\s*\{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		expect(coarsePointerOverride).toContain('.worn-multi-select {');
+		expect(coarsePointerOverride).toContain('font-size: 16px;');
 	});
 
 	test('uses the shared high-contrast field boundary and keyboard focus treatment', () => {
@@ -49,6 +52,17 @@ describe('multi-select source', () => {
 		expect(source).toContain('var(--cockpit-text-muted)');
 		expect(source).toContain('.worn-multi-select:focus-visible');
 		expect(source).not.toContain('.worn-multi-select:focus {');
+	});
+
+	test('owns a public theme-safe focus token', () => {
+		const focusRule = source.match(/\.worn-multi-select:focus-visible \{[\s\S]*?\}/u)?.[0] ?? '';
+		expect(focusRule).toContain('outline: 2px dashed var(--worn-multi-select-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
+		expect(focusRule.match(/outline:[^;]+;/u)?.[0] ?? '').not.toContain('--cockpit-accent');
+		expect(readme).toContain('`--worn-multi-select-focus`');
+	});
+
+	test('records the focus-owner release version', () => {
+		expect(packageJson.version).toBe('0.1.3');
 	});
 
 	test('keeps disabled rows legible without browser opacity', () => {

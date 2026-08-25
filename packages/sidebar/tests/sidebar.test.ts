@@ -5,6 +5,7 @@ import { nextNavFocusIndex } from '../src/keyboard.js';
 import { shouldInterceptNavigationClick } from '../src/navigation.js';
 import { visibleNavItems } from '../src/visibility.js';
 import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from '../src/shortcuts.js';
+import * as shortcutHelpers from '../src/shortcuts.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
 const itemSource = readFileSync(new URL('../src/SidebarItem.svelte', import.meta.url), 'utf8');
@@ -14,6 +15,17 @@ const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'u
 const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const readmeSource = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+const packageManifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+
+describe('package delivery', () => {
+	test('declares the next browser-bundle contract revision', () => {
+		expect(packageManifest.name).toBe('@wornpage/sidebar');
+		expect(packageManifest.version).toBe('0.1.6');
+		expect(packageManifest.wornpage).toEqual({ contractVersion: 2, delivery: 'browser-bundle' });
+		expect(packageManifest.main).toBe('./dist/worn-sidebar.js');
+		expect(packageManifest.svelte).toBe('./src/index.ts');
+	});
+});
 
 describe('current page placement', () => {
 	const shortcuts = [
@@ -58,7 +70,7 @@ describe('current page placement', () => {
 	});
 
 	test('uses the shared placement contract and keeps transient links inactive', () => {
-		expect(sidebarSource).toContain("import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';");
+		expect(sidebarSource).toContain("import { filterTransientNavItems, orderedFavoriteItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';");
 		expect(sidebarSource).toContain('const currentPage = $derived(selectCurrentPagePlacement(flatItems, activeHref, favorites));');
 		expect(sidebarSource).toContain("@render navLink(item, isCurrentPage(item, 'pinned'))");
 		expect(sidebarSource.match(/isCurrentPage\((?:child|item), 'canonical'\)/gu)?.length).toBe(2);
@@ -88,7 +100,7 @@ describe('filter control', () => {
 		expect(sidebarSource).not.toContain('type="search"');
 		expect(sidebarSource.match(/class="worn-filter-clear"/gu)?.length).toBe(1);
 		expect(sidebarSource).toContain('aria-label="Clear filter"');
-		expect(sidebarSource).toContain('favorites.has(i.id) && matchesNavItem(i, normalizedFilterText)');
+		expect(sidebarSource).toContain('orderedFavoriteItems(flatItems, favorites).filter(i => matchesNavItem(i, normalizedFilterText))');
 	});
 });
 
@@ -220,6 +232,29 @@ describe('keyboard navigation', () => {
 });
 
 describe('pinned reorder controls', () => {
+	test('renders persisted order and recovers the moved control', () => {
+		const orderedFavoriteItems = Reflect.get(shortcutHelpers, 'orderedFavoriteItems');
+		expect(typeof orderedFavoriteItems).toBe('function');
+		if (typeof orderedFavoriteItems === 'function') {
+			const items = [
+				{ id: 'review', href: '/review', label: 'Review' },
+				{ id: 'work', href: '/work', label: 'Work' },
+				{ id: 'next', href: '/next', label: 'Next' }
+			];
+			expect(orderedFavoriteItems(items, new Set(['work', 'missing', 'review'])).map((item: { id: string }) => item.id)).toEqual(['work', 'review']);
+		}
+		expect(sidebarSource).toContain("import { tick } from 'svelte';");
+		expect(sidebarSource).toContain("import { filterTransientNavItems, orderedFavoriteItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';");
+		expect(sidebarSource).toContain('orderedFavoriteItems(flatItems, favorites).filter(i => matchesNavItem(i, normalizedFilterText))');
+		expect(sidebarSource).toContain('async function moveFavorite(id: string, delta: number)');
+		expect(sidebarSource).toContain('await tick();');
+		expect(sidebarSource).toContain('data-reorder-delta="-1"');
+		expect(sidebarSource).toContain('data-reorder-delta="1"');
+		expect(sidebarSource).toContain("nextControl?.focus({ preventScroll: true });");
+		expect(readmeSource).toContain('Saved pin order drives rendering');
+		expect(readmeSource).not.toContain('Drag-to-reorder pinned items');
+	});
+
 	test('keeps buttons outside the navigation link', () => {
 		const start = sidebarSource.indexOf('{#snippet navLink');
 		const end = sidebarSource.indexOf('{/snippet}', start);
@@ -261,9 +296,12 @@ describe('keyboard focus', () => {
 	test('prevents filter focus zoom while keeping coarse-pointer targets touch-safe', () => {
 		const coarsePointerBlock = sidebarSource.match(/@media \(pointer: coarse\) \{([\s\S]*?)\n\t\}/u)?.[1];
 
+		expect(sidebarSource).toContain('font: inherit; font-size: 12px;');
 		expect(coarsePointerBlock).toMatch(/\.worn-filter-input \{\s*font-size: 16px;\s*\}/u);
 		expect(coarsePointerBlock).toMatch(/\.worn-filter-input,[\s\S]*?\.worn-filter-clear,[\s\S]*?\.worn-nav-item,[\s\S]*?\.worn-sidebar-restore,[\s\S]*?\.worn-reorder-btn,[\s\S]*?\.worn-context-menu button \{[\s\S]*?min-block-size: 44px;/u);
+		expect(coarsePointerBlock).toMatch(/\.worn-reorder-btn \{\s*min-inline-size: 44px;\s*\}/u);
 		expect(coarsePointerBlock).toMatch(/\.worn-nav-row\.has-reorder > \.worn-nav-item \{[\s\S]*?padding-inline-end: 104px;/u);
+		expect(readmeSource).toContain('44px square targets on coarse pointers while retaining 28px desktop controls');
 	});
 });
 
