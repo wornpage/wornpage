@@ -8,6 +8,7 @@ const accordionElement = read('../src/AccordionElement.svelte');
 const collapsibleElement = read('../src/CollapsibleElement.svelte');
 const index = read('../src/index.ts');
 const demo = read('../index.html');
+const readme = read('../README.md');
 const packageJson = JSON.parse(read('../package.json'));
 
 describe('semantic disclosure contract', () => {
@@ -32,6 +33,12 @@ describe('semantic disclosure contract', () => {
 });
 
 describe('compact and motion behavior', () => {
+  test('limits trigger hover feedback to fine hover-capable pointers', () => {
+    expect(collapsible).toContain('@media (hover: hover) and (pointer: fine)');
+    expect(collapsible).toContain('.worn-collapsible-trigger:hover {');
+    expect(collapsible).toContain('background: var(--cockpit-hover-bg);');
+  });
+
   test('contains hostile labels and owns the complete trigger target', () => {
     for (const source of [accordion, collapsible]) {
       expect(source).toContain('max-inline-size: 100%;');
@@ -41,6 +48,16 @@ describe('compact and motion behavior', () => {
       expect(source).toContain('touch-action: manipulation;');
       expect(source).toContain(':focus-visible');
     }
+  });
+
+  test('shares one theme-safe focus token across both disclosure triggers', () => {
+    const focusOutline = 'outline: 2px dashed var(--worn-disclosure-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));';
+    for (const source of [accordion, collapsible]) {
+      expect(source).toContain(focusOutline);
+      expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+    }
+    expect(readme).toContain('`--worn-disclosure-focus`');
+    expect(packageJson.version).toBe('0.1.1');
   });
 
   test('keeps only transitions that can execute and honors reduced motion', () => {

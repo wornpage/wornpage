@@ -55,9 +55,11 @@
 		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
 		-webkit-tap-highlight-color: transparent;
 	}
-	.worn-reaction-btn:hover:not(:disabled) {
-		background: var(--cockpit-hover-bg, #eef2ef);
-		border-color: var(--cockpit-border, #c8c2b9);
+	@media (hover: hover) and (pointer: fine) {
+		.worn-reaction-btn:hover:not(:disabled) {
+			background: var(--cockpit-hover-bg, #eef2ef);
+			border-color: var(--cockpit-border, #c8c2b9);
+		}
 	}
 	.worn-reaction-btn:active:not(:disabled) {
 		filter: brightness(0.94);

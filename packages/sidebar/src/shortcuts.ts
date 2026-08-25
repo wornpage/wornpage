@@ -5,6 +5,14 @@ export interface CurrentPagePlacement {
 	group: 'pinned' | 'canonical';
 }
 
+/** Resolve saved favorite ids in their persisted order and discard stale ids. */
+export function orderedFavoriteItems(items: NavItem[], favoriteIds: Set<string>): NavItem[] {
+	const itemsById = new Map(items.map((item) => [item.id, item]));
+	return [...favoriteIds]
+		.map((id) => itemsById.get(id))
+		.filter((item): item is NavItem => Boolean(item));
+}
+
 /** Select the sole durable navigation group responsible for the current page. */
 export function selectCurrentPagePlacement(
 	items: NavItem[],

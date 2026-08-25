@@ -186,7 +186,7 @@
 		opacity: 0.45;
 	}
 	.worn-dialog-close:focus-visible {
-		outline: 2px dashed var(--cockpit-accent);
+		outline: 2px dashed var(--worn-dialog-focus, var(--cockpit-focus, currentColor));
 		outline-offset: 2px;
 	}
 	.worn-dialog-body {

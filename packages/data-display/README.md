@@ -75,8 +75,9 @@ Badge labels wrap within their parent, including unbroken identifiers.
 
 With `href`, Chip renders a native 44px link. With `onclick`, it renders a native 44px button;
 supplying `pressed` adds toggle semantics, while omitting it keeps one-shot commands as ordinary
-buttons. Without either prop, Chip remains a compact display-only span. Long labels stay contained
-and transitions stop under reduced motion.
+buttons. Complete labels wrap within the Chip instead of being hidden behind an ellipsis. Without
+either prop, Chip remains a compact display-only span. Long labels stay contained and transitions
+stop under reduced motion.
 
 ## Avatar
 
@@ -104,8 +105,15 @@ contrast with white initials.
 | `size` | `sm \| md` | `md` | Track size |
 | `variant` | `default \| accent \| muted \| warn \| danger` | `default` | Fill tone |
 
-Progress normalizes invalid ranges, clamps visual and ARIA values together, contains hostile
-labels, uses CSP-safe width buckets, and disables width transitions under reduced motion.
+Progress normalizes invalid ranges, clamps visual and ARIA values together, and contains hostile
+labels. It paints the exact clamped fraction without an inline style, using a decorative CSP-safe
+SVG width attribute instead of rounded bucket classes. Default and accent fills retain their theme
+hue while maintaining at least 3:1 fill-to-track contrast across supported themes, and width
+transitions stop under reduced motion.
+
+Use `--worn-progress-track` and `--worn-progress-fill` to override the shared visual. The accent,
+muted, warning, and danger variants additionally accept `--worn-progress-accent-fill`,
+`--worn-progress-muted-fill`, `--worn-progress-warn-fill`, and `--worn-progress-danger-fill`.
 
 ## Metrics
 
@@ -140,13 +148,15 @@ contain hostile text without relying on consumer CSS.
 
 `TimelineEntry` requires `title`; `iter`, `date`, `description`, `href`, and `meta` are optional.
 Entries with `iter` retain the numbered release badge. Entries with `href` render as native linked
-cards with a 44px target and visible keyboard focus; entries without `href` remain articles. Set
-`--worn-timeline-max-inline-size` on a container when a product timeline should exceed the default
-readable width.
+cards with a 44px target and visible keyboard focus; entries without `href` remain articles. Use
+`--worn-timeline-focus` to override the linked-card focus color; it otherwise follows the host focus
+or text token. Set `--worn-timeline-max-inline-size` on a container when a product timeline should
+exceed the default readable width.
 
 Timeline exposes native ordered-list, list-item, article, heading, and time semantics. Decorative
 tracks stay out of the accessibility tree. Hostile labels and entries wrap inside the component,
-compact content stacks below its date and stops at three lines on narrow screens, theme tokens have standalone fallbacks, and entry motion
-and linked-card transitions are disabled under reduced motion. Use `titleContent` for structured
+compact content stacks below its date and stops at three lines on narrow screens, theme tokens have
+standalone fallbacks, and rows render in their final position without presentation-only entrance
+motion. Linked-card transitions are disabled under reduced motion. Use `titleContent` for structured
 inline content such as mention links; keep `entry.href` empty when that content is interactive so
 the component never creates nested links.

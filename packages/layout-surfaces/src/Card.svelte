@@ -48,18 +48,23 @@
 	}
 
 	a.worn-card {
-		transition: border-color 120ms ease, box-shadow 120ms ease, transform 100ms ease;
+		transition: border-color 120ms ease, box-shadow 120ms ease;
 	}
 
-	a.worn-card:hover,
 	a.worn-card:focus-visible {
 		border-color: var(--worn-card-active-border, var(--cockpit-border, #d6d3cc));
 		box-shadow: var(--worn-card-active-shadow, var(--cockpit-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08)));
-		transform: translateY(-1px);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		a.worn-card:hover {
+			border-color: var(--worn-card-active-border, var(--cockpit-border, #d6d3cc));
+			box-shadow: var(--worn-card-active-shadow, var(--cockpit-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08)));
+		}
 	}
 
 	a.worn-card:focus-visible {
-		outline: 2px solid var(--worn-card-focus, var(--cockpit-accent, #287f73));
+		outline: 2px solid var(--worn-card-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));
 		outline-offset: 2px;
 	}
 
@@ -70,11 +75,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		a.worn-card {
 			transition: none;
-		}
-
-		a.worn-card:hover,
-		a.worn-card:focus-visible {
-			transform: none;
 		}
 	}
 </style>

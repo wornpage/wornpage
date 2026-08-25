@@ -5,12 +5,13 @@ import { compile } from 'svelte/compiler';
 const read = (name: string) => readFileSync(new URL(`../src/${name}.svelte`, import.meta.url), 'utf8');
 const kbd = read('Kbd');
 const toolbar = read('Toolbar');
+const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 
 describe('@wornpage/command-surfaces', () => {
 	it('declares one source-delivered v2 package', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/command-surfaces');
-		expect(pkg.version).toBe('0.1.0');
+		expect(pkg.version).toBe('0.1.1');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.main).toBe('./src/index.ts');
 	});
@@ -42,6 +43,13 @@ describe('@wornpage/command-surfaces', () => {
 		expect(toolbar).toContain('role="group"');
 		expect(toolbar).toContain("aria-label={label?.trim() || 'Toolbar'}");
 		expect(toolbar).not.toContain('role="toolbar"');
+	});
+
+	it('reserves active group chrome for focus without a false hover affordance', () => {
+		expect(toolbar).not.toMatch(/\.worn-toolbar:hover/u);
+		expect(toolbar).toMatch(/\.worn-toolbar:focus-within \{[\s\S]*?border-color:[\s\S]*?box-shadow:/u);
+		expect(readme).toMatch(/The group itself does not advertise a click\s+action on hover/u);
+		expect(readme).toMatch(/focus moves within its\s+controls/u);
 	});
 
 	it('wraps both layouts without clipping controls or focus rings', () => {

@@ -59,7 +59,7 @@ The standard `aria-label` attribute is forwarded to the native input when no vis
 | `disabled` | boolean | `false` | Disables the native input without hiding its label. |
 | remaining attributes | input attributes | - | Forwarded to the native input, including `aria-label` and `data-*`. |
 
-The package expects the Wornpage `--cockpit-*` color and typography tokens. Override `--worn-binary-boundary` on a control only when a host theme has independently verified a 3:1 state boundary.
+The package expects the Wornpage `--cockpit-*` color and typography tokens. Override `--worn-binary-boundary` on a control only when a host theme has independently verified a 3:1 state boundary. Keyboard outlines use `--worn-binary-focus`; the default follows `currentColor` while unchecked and `--cockpit-accent-text` while checked.
 
 ## Verification
 

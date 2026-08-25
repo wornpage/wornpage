@@ -24,7 +24,7 @@ describe('@wornpage/data-display', () => {
 	it('declares one source-delivered v2 package', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/data-display');
-		expect(pkg.version).toBe('0.1.3');
+		expect(pkg.version).toBe('0.1.7');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.main).toBe('./src/index.ts');
 	});
@@ -86,7 +86,8 @@ describe('@wornpage/data-display', () => {
 		expect(chip).toContain('max-inline-size: 100%;');
 		expect(chip).toMatch(/button\.worn-chip,\s*a\.worn-chip \{[\s\S]*?min-height: 44px;/u);
 		expect(chip).toContain('a.worn-chip { text-decoration: none; }');
-		expect(chip).toMatch(/button\.worn-chip:hover:not\(\[aria-pressed='true'\]\),\s*a\.worn-chip:hover/u);
+		expect(chip).toMatch(/@media \(hover: hover\) and \(pointer: fine\) \{[\s\S]*?button\.worn-chip:hover:not\(\[aria-pressed='true'\]\),\s*a\.worn-chip:hover/u);
+		expect(chip).not.toContain("\n\tbutton.worn-chip:hover:not([aria-pressed='true']),");
 		expect(rootRule).not.toContain('min-height');
 		expect(chip).toContain('touch-action: manipulation;');
 		expect(chip).toContain('outline: 2px dashed var(--worn-chip-focus, var(--cockpit-text, #21322b));');
@@ -96,6 +97,18 @@ describe('@wornpage/data-display', () => {
 		expect(chip).toContain('box-shadow: 0 0 0 3px var(--worn-chip-drag-over-ring, #5eead4);');
 		expect(chip).toContain('outline: 2px solid var(--worn-chip-drag-over-outline, #0f766e);');
 		expect(chip).not.toMatch(/\.is-drag-over[\s\S]*?(?:transform|translate|scale|animation):/u);
+	});
+
+	it('keeps the complete chip label visible inside its bounded surface', () => {
+		const rootRule = chip.match(/\n\t\.worn-chip \{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		const labelRule = chip.match(/\.worn-chip-label \{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		expect(rootRule).toContain('inline-size: max-content;');
+		expect(labelRule).toContain('min-inline-size: 0;');
+		expect(labelRule).toContain('overflow-wrap: anywhere;');
+		expect(labelRule).toContain('white-space: normal;');
+		expect(labelRule).not.toContain('overflow: hidden;');
+		expect(labelRule).not.toContain('text-overflow: ellipsis;');
+		expect(readme).toContain('Complete labels wrap within the Chip instead of being hidden behind an ellipsis.');
 	});
 
 	it('owns standalone-safe badge and chip theme fallbacks', () => {
@@ -146,10 +159,24 @@ describe('@wornpage/data-display', () => {
 		expect(progress).toContain('const safeValue = $derived(Number.isFinite(value) ? Math.min(safeMax, Math.max(0, value)) : 0);');
 		expect(progress).toContain('aria-valuenow={safeValue}');
 		expect(progress).toContain('aria-valuemax={safeMax}');
-		expect(progress).toContain('const bucket = $derived(Math.round(pct / 5) * 5);');
 		expect(progress).toContain('aria-label={ariaLabel || label || `${Math.round(pct)}%`}');
 		expect(progress).toContain("variant?: 'default' | 'accent' | 'muted' | 'warn' | 'danger';");
-		expect(progress).toContain('.worn-progress.is-muted .worn-progress-fill { background: var(--cockpit-text-muted); }');
+	});
+
+	it('paints the exact safe percentage with a CSP-safe all-theme visual', () => {
+		expect(progress).toContain('<svg class="worn-progress-track" aria-hidden="true" focusable="false">');
+		expect(progress).toContain('<rect class="worn-progress-fill" width={`${pct}%`} height="100%"></rect>');
+		expect(progress).not.toContain('const bucket = $derived');
+		expect(progress).not.toMatch(/worn-progress-fill-\d/u);
+		expect(progress).not.toContain('style:width');
+		expect(progress).toContain('--_worn-progress-default-fill: var(--cockpit-focus, var(--cockpit-text, #21322b));');
+		expect(progress).toContain('fill: var(--_worn-progress-active-fill, var(--worn-progress-fill, var(--_worn-progress-default-fill)));');
+		expect(progress).toContain('color-mix(in srgb, var(--cockpit-accent, #0f766e) 55%, var(--cockpit-text, #21322b))');
+		expect(progress).toContain('.worn-progress.is-muted { --_worn-progress-active-fill: var(--worn-progress-muted-fill, var(--cockpit-text-muted, #506058)); }');
+		expect(progress).toContain('.worn-progress.is-warn { --_worn-progress-active-fill: var(--worn-progress-warn-fill, var(--cockpit-warning-text, #a85200)); }');
+		expect(progress).toContain('.worn-progress.is-danger { --_worn-progress-active-fill: var(--worn-progress-danger-fill, var(--cockpit-danger-text, #991b1b)); }');
+		expect(readme).toContain('exact clamped fraction without an inline style');
+		expect(readme).toContain('`--worn-progress-fill`');
 	});
 
 	it('contains progress labels and stops width motion when requested', () => {
@@ -181,11 +208,18 @@ describe('@wornpage/data-display', () => {
 		expect(timeline).toContain('{#if iteration}<Badge variant="accent" label={`${badgePrefix}${iteration}`} />{/if}');
 		expect(timeline).toContain('{#if meta}<span class="worn-timeline-entry-meta">{meta}</span>{/if}');
 		expect(timeline).toMatch(/\.worn-timeline-card-link \{[\s\S]*?min-block-size: 44px;[\s\S]*?touch-action: manipulation;/u);
-		expect(timeline).toMatch(/\.worn-timeline-card-link:focus-visible \{[\s\S]*?outline: 2px solid var\(--cockpit-accent, #23796d\);/u);
+		expect(timeline).toMatch(/\.worn-timeline-card-link:focus-visible \{[\s\S]*?outline-offset: 2px;/u);
 		expect(timeline).toMatch(/@media \(max-width: 420px\) \{[\s\S]*?\.worn-timeline\.is-compact \.worn-timeline-title,[\s\S]*?\.worn-timeline-desc \{[\s\S]*?-webkit-line-clamp: 3;[\s\S]*?line-clamp: 3;/u);
 		expect(timeline).toMatch(/@media \(max-width: 420px\) \{[\s\S]*?\.worn-timeline\.is-compact \.worn-timeline-title \{[\s\S]*?grid-column: 1 \/ -1;[\s\S]*?grid-row: 2;[\s\S]*?\.worn-timeline\.is-compact \.worn-timeline-desc \{ grid-row: 3; \}[\s\S]*?\.worn-timeline\.is-compact \.worn-timeline-entry-meta \{ grid-row: 4; \}/u);
 		expect(timeline).toMatch(/\.worn-timeline\.is-compact \.worn-timeline-entry \{[\s\S]*?min-block-size: 44px;/u);
 		expect(timeline).toMatch(/\.worn-timeline\.is-compact \.worn-timeline-card \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: auto minmax\(0, 1fr\);/u);
+	});
+
+	it('owns a theme-extensible focus ring for linked entries', () => {
+		const focusRule = timeline.match(/\.worn-timeline-card-link:focus-visible \{[\s\S]*?\}/u)?.[0] ?? '';
+		expect(focusRule).toContain('outline: 2px solid var(--worn-timeline-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
+		expect(focusRule).not.toContain('--cockpit-accent');
+		expect(readme).toContain('`--worn-timeline-focus`');
 	});
 
 	it('allows structured title content without changing the plain-title fallback', () => {
@@ -206,14 +240,14 @@ describe('@wornpage/data-display', () => {
 		expect(timeline).toContain('max-inline-size: var(--worn-timeline-max-inline-size, 40rem);');
 	});
 
-	it('owns date formatting, theme fallbacks, and motion preferences', async () => {
+	it('owns date formatting, theme fallbacks, and presentation-static rows', async () => {
 		const { formatTimelineDate } = await import('../src/timeline.ts');
 		expect(formatTimelineDate('2026-08-14')).toBe('Aug 14, 2026');
 		expect(formatTimelineDate('not-a-date')).toBe('not-a-date');
 		expect(formatTimelineDate('x'.repeat(80))).toHaveLength(40);
 		expect(timeline).toContain('var(--cockpit-text, #26352f)');
 		expect(timeline).toContain('var(--cockpit-border, #d4cec5)');
-		expect(timeline).toContain('.worn-timeline-entry { animation: none; }');
+		expect(timeline).not.toMatch(/\banimation(?:-delay)?:|@keyframes/u);
 		expect(timeline).toContain('.worn-timeline-card-link { transition: none; }');
 	});
 });

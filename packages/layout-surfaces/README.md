@@ -102,6 +102,12 @@ Card renders an anchor when `href` is present and a neutral `div` otherwise.
 Linked cards retain native link behavior and visible focus. Content wraps
 inside the card instead of being clipped.
 
+Stable border and shadow feedback does not move the linked Card on keyboard
+focus or fine-pointer hover. Reduced motion disables those transitions.
+
+Linked-card focus uses `--worn-card-focus`, then `--cockpit-focus`,
+`--cockpit-text`, and `currentColor` as progressively broader fallbacks.
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `href` | `string` | none | Render as a native link |
@@ -130,6 +136,9 @@ Sizes snap to 20-pixel increments in the supported 100-800 pixel range. Grid
 tracks can still shrink in a compact parent so neither pane widens the page.
 `side="end"` places the resizable pane at the visual end and reverses the arrow
 direction accordingly.
+
+Separator focus uses `--worn-resizable-focus`, then `--cockpit-focus`,
+`--cockpit-text`, and `currentColor` as progressively broader fallbacks.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|

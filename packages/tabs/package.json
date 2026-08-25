@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/tabs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Svelte 5 tablist with roving keyboard focus, stable panel relationships, and compact overflow",
   "type": "module",
   "wornpage": {

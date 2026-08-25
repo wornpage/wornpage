@@ -33,6 +33,11 @@ button dismisses the drawer. Focus remains inside the drawer while open and retu
 previously focused element after close. Long unbroken content wraps or scrolls inside the
 drawer body instead of widening the panel or page.
 
+The close button's keyboard-focus outline uses `--worn-drawer-focus` when supplied. Its
+default fallback prefers the host's shared `--cockpit-focus` token, then
+`--cockpit-accent`, then the current text color, so applications can keep a high-contrast
+focus indicator across light and dark surfaces without overriding component selectors.
+
 ## Browser bundle
 
 ```html

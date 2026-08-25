@@ -103,7 +103,9 @@
   }
 
   @media (pointer: coarse) {
-    .worn-textarea { font-size: 16px; }
+    .worn-textarea {
+      font-size: 16px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

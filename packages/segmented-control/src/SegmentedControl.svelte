@@ -86,7 +86,7 @@
 	}
 
 	.worn-segment input:focus-visible + span {
-		outline: 2px dashed var(--cockpit-accent);
+		outline: 2px dashed var(--worn-segmented-focus, currentColor);
 		outline-offset: -3px;
 	}
 

@@ -68,7 +68,9 @@
   }
 
   @media (pointer: coarse) {
-    .worn-select { font-size: 16px; }
+    .worn-select {
+      font-size: 16px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

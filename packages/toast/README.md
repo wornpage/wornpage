@@ -56,7 +56,7 @@ bun add @wornpage/toast
 
 ## Interaction
 
-Toasts use stylesheet animations instead of inline transition styles, so they work with strict Content Security Policies. Reduced-motion users receive no animation. Messages wrap inside narrow hosts, and the dismiss control is 44px on coarse pointers while the desktop presentation remains compact. Supply a distinct `dismissLabel` when multiple toasts can be visible together.
+Toasts use stylesheet animations instead of inline transition styles, so they work with strict Content Security Policies. Reduced-motion users receive no animation. Reduced-motion dismissal completes immediately instead of waiting for an exit animation that is not rendered. Automatic dismissal pauses while the notification is hovered or contains keyboard focus, then resumes with the remaining time. Messages wrap inside narrow hosts, and the dismiss control is 44px on coarse pointers while the desktop presentation remains compact. Supply a distinct `dismissLabel` when multiple toasts can be visible together.
 
 ## Events (web component)
 
@@ -73,6 +73,7 @@ Toasts use stylesheet animations instead of inline transition styles, so they wo
   --wrn-toast-text: #21322b;
   --wrn-toast-error-border: #e74c3c;
   --wrn-toast-success-border: #27ae60;
+  --wrn-toast-focus: #21322b;
 }
 ```
 

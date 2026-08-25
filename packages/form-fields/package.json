@@ -1,6 +1,6 @@
 {
   "name": "@wornpage/form-fields",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Svelte 5 input, textarea, select, and range controls with native semantics and standalone responsive guarantees",
   "type": "module",
   "wornpage": {

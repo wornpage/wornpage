@@ -60,6 +60,11 @@ Additional button attributes such as `aria-label` and `data-*` are forwarded.
 The primary label is 15px by default; set `--worn-select-card-title-size` on a
 container only when a product surface needs a different established type size.
 
+## Theme tokens
+
+- `--worn-select-card-focus` — focus outline; falls back to the card's
+  state-aware `currentColor`
+
 ## Commands
 
 ```bash

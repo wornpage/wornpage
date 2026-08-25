@@ -66,7 +66,7 @@
   .worn-accordion-summary::-webkit-details-marker { display: none; }
 
   .worn-accordion-summary:focus-visible {
-    outline: 2px dashed var(--cockpit-accent);
+    outline: 2px dashed var(--worn-disclosure-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
     outline-offset: 2px;
   }
 

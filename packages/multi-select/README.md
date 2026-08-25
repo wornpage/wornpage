@@ -45,3 +45,5 @@ npm install @wornpage/multi-select
 | `size` | `number` | - | Visible row count |
 
 Give the control an accessible name with an associated `label`, `aria-label`, or `aria-labelledby`. Native listbox selection and keyboard behavior are preserved; `size` controls the visible row count above the component's 44px minimum target.
+
+Keyboard focus resolves through the public `--worn-multi-select-focus` token, then the shared `--cockpit-focus` and `--cockpit-text` tokens, before falling back to the current text color. The accent-colored border and shadow remain supplemental state cues rather than the focus outline's contrast owner.

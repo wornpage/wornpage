@@ -103,7 +103,7 @@
 	}
 
 	a:focus-visible {
-		outline: 2px dashed var(--cockpit-accent, #287f73);
+		outline: 2px dashed var(--worn-navigation-focus, currentColor);
 		outline-offset: -3px;
 		position: relative;
 		z-index: 1;

@@ -11,7 +11,7 @@ describe('@wornpage/navigation-surfaces', () => {
 	it('declares one source-delivered v2 package', () => {
 		const pkg = require('../package.json');
 		expect(pkg.name).toBe('@wornpage/navigation-surfaces');
-		expect(pkg.version).toBe('0.2.1');
+		expect(pkg.version).toBe('0.2.2');
 		expect(pkg.wornpage).toEqual({ contractVersion: 2, delivery: 'source' });
 		expect(pkg.main).toBe('./src/index.ts');
 		expect(pkg.files).not.toContain('dist');
@@ -46,7 +46,7 @@ describe('@wornpage/navigation-surfaces', () => {
 	});
 
 	it('owns focus, theme, selected, forced-color, and reduced-motion presentation', () => {
-		expect(navigationList).toContain('outline: 2px dashed var(--cockpit-accent, #287f73);');
+		expect(navigationList).toContain('outline: 2px dashed var(--worn-navigation-focus, currentColor);');
 		expect(navigationList).toContain("a[aria-current='page']");
 		expect(navigationList).toContain('var(--cockpit-selected-bg, var(--cockpit-accent-50, #e5f2ef))');
 		expect(navigationList).toContain('@media (forced-colors: active)');
@@ -106,5 +106,34 @@ describe('@wornpage/navigation-surfaces', () => {
 		expect(pagination).toContain('min-inline-size: 44px;');
 		expect(pagination).toContain('touch-action: manipulation;');
 		expect(pagination).toContain('@media (prefers-reduced-motion: reduce)');
+	});
+
+	it('uses one state-aware focus owner across every navigation surface', () => {
+		const focusRule = 'outline: 2px dashed var(--worn-navigation-focus, currentColor);';
+		for (const source of [breadcrumb, navigationList, pagination]) expect(source).toContain(focusRule);
+		expect([breadcrumb, navigationList, pagination].join('\n').match(/--worn-navigation-focus/gu)).toHaveLength(3);
+		for (const source of [breadcrumb, navigationList, pagination]) {
+			expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent, #287f73);');
+		}
+	});
+
+	it('hands terminal pagination focus to the enabled opposite edge without overriding consumer focus', () => {
+		expect(pagination).toContain("import { tick } from 'svelte';");
+		expect(pagination).toContain('onchange?: (page: number) => void;');
+		expect(pagination).toContain('let previousButton = $state<HTMLButtonElement>();');
+		expect(pagination).toContain('let nextButton = $state<HTMLButtonElement>();');
+		expect(pagination).toContain('async function go(page: number, source: HTMLButtonElement)');
+		expect(pagination).toContain('source === previousButton && target === 1');
+		expect(pagination).toContain('source === nextButton && target === normalizedTotal');
+		expect(pagination).toMatch(/current = target;[\s\S]*?if \(recoveryTarget\) \{[\s\S]*?await tick\(\);[\s\S]*?await new Promise<void>[\s\S]*?\}\s*onchange\?\.\(target\);/u);
+		expect(pagination).toContain('await tick();');
+		expect(pagination).toContain('await new Promise<void>((resolve) => requestAnimationFrame(() => {');
+		expect(pagination).toContain('if (document.activeElement === document.body || document.activeElement === source) {');
+		expect(pagination).toContain('recoveryTarget.focus();');
+		expect(pagination).toContain('resolve();');
+		expect(pagination).toContain("throw new Error('Pagination boundary focus target is unavailable');");
+		expect(pagination).toContain('bind:this={previousButton}');
+		expect(pagination).toContain('bind:this={nextButton}');
+		expect(pagination.match(/onclick=\{\(event\) => go\(/gu)).toHaveLength(3);
 	});
 });

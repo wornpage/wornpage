@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { prefersReducedMotion } from 'svelte/motion';
 	import type { ToastProps } from './types.js';
 
 	let { message, kind = 'info', dismissLabel = 'Dismiss notification', ondismiss, duration = 3000 }: ToastProps = $props();
@@ -6,20 +7,71 @@
 	let visible = $state(true);
 	let dismissing = $state(false);
 	const EXIT_DURATION_MS = 180;
+	let autoDismissTimer: ReturnType<typeof setTimeout> | undefined;
+	let remainingDuration = 0;
+	let timerStartedAt = 0;
+	let autoDismissHolds = 0;
+
+	function clearAutoDismissTimer() {
+		if (autoDismissTimer === undefined) return;
+		clearTimeout(autoDismissTimer);
+		autoDismissTimer = undefined;
+	}
+
+	function completeDismissal() {
+		visible = false;
+		ondismiss?.();
+	}
 
 	function dismiss() {
 		if (dismissing) return;
 		dismissing = true;
-		setTimeout(() => {
-			visible = false;
-			ondismiss?.();
-		}, EXIT_DURATION_MS);
+		clearAutoDismissTimer();
+		if (prefersReducedMotion.current) {
+			completeDismissal();
+			return;
+		}
+		setTimeout(completeDismissal, EXIT_DURATION_MS);
+	}
+
+	function startAutoDismissTimer() {
+		clearAutoDismissTimer();
+		if (duration <= 0 || autoDismissHolds > 0) return;
+		if (remainingDuration <= 0) {
+			dismiss();
+			return;
+		}
+		timerStartedAt = Date.now();
+		autoDismissTimer = setTimeout(() => {
+			autoDismissTimer = undefined;
+			remainingDuration = 0;
+			dismiss();
+		}, remainingDuration);
+	}
+
+	function pauseAutoDismiss() {
+		autoDismissHolds += 1;
+		if (autoDismissTimer === undefined) return;
+		clearAutoDismissTimer();
+		remainingDuration -= Date.now() - timerStartedAt;
+		remainingDuration = Math.max(0, remainingDuration);
+	}
+
+	function resumeAutoDismiss() {
+		autoDismissHolds = Math.max(0, autoDismissHolds - 1);
+		if (autoDismissHolds === 0 && !dismissing) startAutoDismissTimer();
+	}
+
+	function handleFocusOut(event: FocusEvent) {
+		const element = event.currentTarget as HTMLElement;
+		if (element.contains(event.relatedTarget as Node | null)) return;
+		resumeAutoDismiss();
 	}
 
 	$effect(() => {
-		if (duration <= 0) return;
-		const timer = setTimeout(() => dismiss(), duration);
-		return () => clearTimeout(timer);
+		remainingDuration = duration;
+		startAutoDismissTimer();
+		return clearAutoDismissTimer;
 	});
 </script>
 
@@ -28,6 +80,10 @@
 		role={kind === 'error' ? 'alert' : 'status'}
 		aria-live={kind === 'error' ? 'assertive' : 'polite'}
 		aria-atomic="true"
+		onpointerenter={pauseAutoDismiss}
+		onpointerleave={resumeAutoDismiss}
+		onfocusin={pauseAutoDismiss}
+		onfocusout={handleFocusOut}
 	>
 		<span class="wrn-toast-icon" aria-hidden="true">{kind === 'error' ? '✗' : kind === 'success' ? '✓' : '→'}</span>
 		<span class="wrn-toast-text">{message}</span>
@@ -77,7 +133,7 @@
 		font: inherit; font-size: 18px; line-height: 1;
 	}
 	.wrn-toast-dismiss:hover { background: var(--wrn-toast-dismiss-hover-bg, var(--cockpit-hover-bg, rgba(0,0,0,0.08))); }
-	.wrn-toast-dismiss:focus-visible { outline: 2px dashed var(--cockpit-accent, currentColor); outline-offset: 1px; }
+	.wrn-toast-dismiss:focus-visible { outline: 2px dashed var(--wrn-toast-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: 1px; }
 
 	@media (pointer: coarse) {
 		.wrn-toast { min-block-size: 52px; padding-block: 4px; }

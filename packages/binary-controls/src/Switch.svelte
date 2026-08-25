@@ -70,6 +70,7 @@
   }
 
   .worn-switch-track {
+    --worn-binary-state-focus: currentColor;
     position: relative;
     box-sizing: border-box;
     inline-size: 42px;
@@ -82,6 +83,7 @@
   }
 
   .worn-switch-input:checked + .worn-switch-track {
+    --worn-binary-state-focus: var(--cockpit-accent-text);
     border-color: var(--worn-binary-boundary);
     background: var(--cockpit-accent);
   }
@@ -113,7 +115,7 @@
   }
 
   .worn-switch-input:focus-visible + .worn-switch-track {
-    outline: 2px dashed var(--cockpit-accent);
+    outline: 2px dashed var(--worn-binary-focus, var(--worn-binary-state-focus, currentColor));
     outline-offset: 2px;
   }
 

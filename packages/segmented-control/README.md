@@ -40,6 +40,13 @@ Each component instance gives its radios a private native group name. A hidden
 input retains the supplied `name` and current value for form submission, so two
 controls can safely reuse a field name without changing each other's selection.
 
+## Styling
+
+Keyboard focus defaults to the rendered segment's `currentColor`, keeping the
+inset outline distinct in both selected and unselected states. Set
+`--worn-segmented-focus` on a component ancestor to supply a different focus
+color while retaining the native radio and focus-visible behavior.
+
 ## Web component
 
 ```html

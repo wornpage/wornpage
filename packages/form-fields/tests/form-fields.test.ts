@@ -14,6 +14,7 @@ const index = read('../src/index.ts');
 const demo = read('../index.html');
 const packageJson = JSON.parse(read('../package.json'));
 const types = read('../src/types.ts');
+const readme = read('../README.md');
 
 describe('native field contract', () => {
   test('preserves bindable values and forwards remaining native attributes', () => {
@@ -30,12 +31,18 @@ describe('native field contract', () => {
   });
 
   test('makes each producer own its touch target and responsive containment', () => {
-    for (const source of [input, textarea, select]) {
+    for (const [source, selector] of [
+      [input, '.worn-input'],
+      [textarea, '.worn-textarea'],
+      [select, '.worn-select'],
+    ] as const) {
       expect(source).toContain('max-inline-size: 100%;');
       expect(source).toContain('min-inline-size: 0;');
       expect(source).toContain('touch-action: manipulation;');
-      expect(source).toContain('@media (pointer: coarse)');
-      expect(source).toContain('font-size: 16px;');
+      expect(source).toMatch(/font-size: 14px;[\s\S]*@media \(pointer: coarse\)[\s\S]*font-size: 16px;/u);
+      expect(source).toMatch(
+        new RegExp(`@media \\(pointer: coarse\\) \\{\\s*${selector} \\{\\s*font-size: 16px;\\s*\\}\\s*\\}`, 'u'),
+      );
     }
     expect(input).toContain('min-block-size: 44px;');
     expect(textarea).toContain('min-block-size: 72px;');
@@ -56,6 +63,22 @@ describe('native field contract', () => {
     expect(range).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
+  test('paints the exact safe percentage without CSP-fragile styles or bucket classes', () => {
+    expect(packageJson.version).toBe('0.1.2');
+    expect(range).toContain('<svg class="worn-range-track" aria-hidden="true" focusable="false">');
+    expect(range).toContain('<rect class="worn-range-fill" width={`${percentage}%`} height="100%"></rect>');
+    expect(range).toContain('? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))');
+    expect(range).not.toContain('Math.round(((value - min) / (max - min)) * 100)');
+    expect(range).not.toContain('let bucket =');
+    expect(range).not.toMatch(/worn-range-fill-\d/u);
+    expect(range).not.toContain('style=');
+    expect(range).toContain('fill: var(--worn-range-fill, var(--_worn-range-default-fill));');
+    expect(range).toContain('--_worn-range-default-fill: color-mix(');
+    expect(range).toContain('@supports (color: color-mix(in srgb, black, white))');
+    expect(readme).toContain('exact CSP-safe percentage');
+    expect(readme).toContain('at least 3:1');
+  });
+
   test('lets mapped numeric values expose one formatted visible and accessible value', () => {
     expect(types).toContain('valueText?: string;');
     expect(range).toContain("valueText = ''");
@@ -63,7 +86,7 @@ describe('native field contract', () => {
     expect(range).toContain('aria-valuetext={valueText || undefined}');
     expect(rangeElement).toContain("valueText: { attribute: 'value-text', reflect: true, type: 'String' }");
     expect(rangeElement).toContain('{valueText}');
-    expect(read('../README.md')).toContain('`valueText`');
+    expect(readme).toContain('`valueText`');
   });
 });
 
@@ -74,8 +97,8 @@ describe('theme and state behavior', () => {
       expect(source).toContain(`outline: 2px dashed ${focusToken};`);
     }
     expect(range).toContain(`outline: 2px dashed var(--worn-range-focus, ${focusToken});`);
-    expect(read('../README.md')).toContain('`--worn-field-focus`');
-    expect(read('../README.md')).toContain('`--worn-range-focus`');
+    expect(readme).toContain('`--worn-field-focus`');
+    expect(readme).toContain('`--worn-range-focus`');
   });
 
   test('uses a theme-derived boundary and select arrow', () => {

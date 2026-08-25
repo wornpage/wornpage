@@ -24,7 +24,9 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
 
 Danger alerts use an assertive live region; info, success, and warning alerts use a polite status region. All tones own narrow containment, hostile-text wrapping, theme-safe icons, reduced-motion entry, and a 44 px dismiss target.
 
-When `dismissible` is true, `dismissLabel` overrides the accessible button name. Otherwise a titled alert uses `Dismiss {title}` and an untitled alert uses `Dismiss alert`.
+When `dismissible` is true, `dismissLabel` overrides the accessible button name. Otherwise a titled alert uses `Dismiss {title}` and an untitled alert uses `Dismiss alert`. Keyboard dismissal hands focus to the next surviving focusable control in document order, or the previous control when nothing follows; pointer dismissal does not force a focus change.
+
+The dismiss button's keyboard-focus outline uses `--worn-alert-focus` when supplied. Its default fallback prefers the host's shared `--cockpit-focus` token, then `--cockpit-accent`, then the current text color so every alert tone can retain a high-contrast focus indicator without consumer selector overrides.
 
 ## Browser bundle
 
@@ -50,6 +52,8 @@ The default slot contains the alert message.
 
 ## Theme tokens
 
+- `--worn-alert-focus`
+- `--cockpit-focus`
 - `--cockpit-accent-50`
 - `--cockpit-accent`
 - `--cockpit-text`

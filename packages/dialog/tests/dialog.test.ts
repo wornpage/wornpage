@@ -8,6 +8,7 @@ const element = readFileSync(new URL('../src/DialogElement.svelte', import.meta.
 const elementsEntry = readFileSync(new URL('../src/elements.ts', import.meta.url), 'utf8');
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 const demo = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 
 describe('hydration and interaction contract', () => {
   test('uses a hydration-stable component id without browser crypto', () => {
@@ -19,6 +20,16 @@ describe('hydration and interaction contract', () => {
     expect(source).toContain("if (e.key === 'Escape' && dismissible)");
     expect(source).toContain('if (dismissible && e.target === e.currentTarget)');
     expect(source).toContain('aria-label="Close"');
+  });
+
+  test('owns a state-aware public focus token for the close control', () => {
+    expect(source).toContain('outline: 2px dashed var(--worn-dialog-focus, var(--cockpit-focus, currentColor));');
+    expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+  });
+
+  test('documents the close-control focus token', () => {
+    expect(readme).toContain('`--worn-dialog-focus`');
+    expect(readme).toContain('keyboard focus');
   });
 
   test('locks every dismissal path while an action is in flight', () => {

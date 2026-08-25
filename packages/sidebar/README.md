@@ -19,7 +19,7 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
 - 🔍 Inline search/filter
 - 📌 Pin favorites (right-click or star icon)
 - 🕐 Recent items tracking
-- 🔄 Drag-to-reorder pinned items
+- 🔄 Reorder pinned items with named controls
 - 🎨 Animated active indicator pill
 - 📱 Responsive (rail → drawer on mobile)
 - 🌗 CSS custom properties for theming
@@ -54,6 +54,10 @@ npm add @wornpage/sidebar
 When `onnavigate` is present, plain primary clicks are delegated to it for
 client-side routing. Modified clicks, non-primary clicks, previously prevented
 events, and links without a handler retain the browser's native anchor behavior.
+
+Saved pin order drives rendering and survives reloads. After a keyboard move,
+focus follows the item to its next valid reorder control. Reorder controls use
+44px square targets on coarse pointers while retaining 28px desktop controls.
 
 ### Web component (any framework)
 

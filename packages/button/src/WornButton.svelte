@@ -92,9 +92,17 @@
 		border-color: var(--cockpit-accent);
 		color: var(--cockpit-accent-text);
 	}
-	.worn-btn.is-primary:hover:not(:disabled):not([aria-disabled='true']) {
-		filter: brightness(0.98);
-		box-shadow: 0 2px 4px rgb(0 0 0 / 0.14);
+	@media (hover: hover) and (pointer: fine) {
+		.worn-btn.is-primary:hover:not(:disabled):not([aria-disabled='true']) {
+			filter: brightness(0.98);
+			box-shadow: 0 2px 4px rgb(0 0 0 / 0.14);
+		}
+		.worn-btn.is-warning:hover:not(:disabled):not([aria-disabled='true']) {
+			background: var(--cockpit-warning-bg);
+		}
+		.worn-btn:hover:not(:disabled):not([aria-disabled='true']) {
+			filter: brightness(0.96);
+		}
 	}
 	.worn-btn.is-primary:active:not(:disabled):not([aria-disabled='true']) {
 		filter: brightness(0.94);
@@ -109,12 +117,6 @@
 		background: transparent;
 		border-color: var(--cockpit-warning-text);
 		color: var(--cockpit-warning-text);
-	}
-	.worn-btn.is-warning:hover:not(:disabled):not([aria-disabled='true']) {
-		background: var(--cockpit-warning-bg);
-	}
-	.worn-btn:hover:not(:disabled):not([aria-disabled='true']) {
-		filter: brightness(0.96);
 	}
 	.worn-btn:active:not(:disabled):not([aria-disabled='true']) {
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);

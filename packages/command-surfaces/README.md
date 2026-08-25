@@ -44,7 +44,9 @@ Toolbar groups related controls without replacing their native keyboard
 behavior. It uses `role="group"`, not `role="toolbar"`, so children remain in
 the normal Tab sequence. The default layout wraps controls; `variant="chips"`
 uses responsive grid tracks. Both variants contain their children without
-clipping focus rings or content.
+clipping focus rings or content. The group itself does not advertise a click
+action on hover; its active boundary appears only when focus moves within its
+controls.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
