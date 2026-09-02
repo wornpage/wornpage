@@ -20,10 +20,10 @@ bun test          # 100+ tests across all packages and tools
 
 ```bash
 # Import reviewed standalone commits (canonical source):
-bun add "https://codeload.github.com/wornpage/sidebar/tar.gz/4913ab63fc670bcc760d66424a7fc1d919007bac"
-bun add "https://codeload.github.com/wornpage/button/tar.gz/0fdf229650e77759ba75530a76af201c12cce4a7"
-bun add "https://codeload.github.com/wornpage/cmdk/tar.gz/55f974b0fd06412b6dc603c90dce27da062661b0"
-bun add "https://codeload.github.com/wornpage/toast/tar.gz/26c6924a046fcd2aecefdccbbe9a336286f26a4c"
+bun add "https://codeload.github.com/wornpage/sidebar/tar.gz/919dadb0f62b8fa6c7f35470279b5782ba2bc84d"
+bun add "https://codeload.github.com/wornpage/button/tar.gz/6da25ba40af71d3329abc2a4631d46047abd180b"
+bun add "https://codeload.github.com/wornpage/cmdk/tar.gz/2b81e02c079213c2da6f42385b87be418ef489d4"
+bun add "https://codeload.github.com/wornpage/toast/tar.gz/e58675ad9e945776e0715a0ccfdf7b3aaf6af0e1"
 ```
 
 ## What's inside

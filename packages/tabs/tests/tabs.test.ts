@@ -27,6 +27,26 @@ describe('tab semantics', () => {
 			tabId: 'catalog-tab-Web-components',
 			panelId: 'catalog-panel-Web-components',
 		});
+		expect(tabDomIds('catalog', '  --alpha!!!beta--  ')).toEqual({
+			tabId: 'catalog-tab-alpha-beta',
+			panelId: 'catalog-panel-alpha-beta',
+		});
+		expect(tabDomIds('catalog', 'alpha-!beta')).toEqual({
+			tabId: 'catalog-tab-alpha--beta',
+			panelId: 'catalog-panel-alpha--beta',
+		});
+		expect(tabDomIds('catalog', '???')).toEqual({
+			tabId: 'catalog-tab-tab',
+			panelId: 'catalog-panel-tab',
+		});
+	});
+
+	test('sanitizes adversarial repeated separators in one pass', () => {
+		const repeatedHyphens = '-'.repeat(250_000);
+		expect(tabDomIds('catalog', `${repeatedHyphens}safe${repeatedHyphens}`)).toEqual({
+			tabId: 'catalog-tab-safe',
+			panelId: 'catalog-panel-safe',
+		});
 	});
 });
 
