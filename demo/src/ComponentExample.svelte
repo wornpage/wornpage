@@ -157,7 +157,7 @@
         <p>Aggregate catalog coverage now follows the canonical repository list.</p>
       </Accordion>
       <Collapsible summary="Inspect install command" ariaLabel="Inspect disclosure install command" bind:open={sourceOpen}>
-        <code>bun add @wornpage/disclosure</code>
+        <code>bun add "https://codeload.github.com/wornpage/disclosure/tar.gz/29c3df1b3cee6ff23ba3a4f10d7a1f021f02a31e"</code>
       </Collapsible>
     </div>
 

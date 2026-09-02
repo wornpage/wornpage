@@ -124,4 +124,4 @@ owner should approve one explicit choice: **MIT**, **dual-license**,
 identify the covered version and files, preserve required third-party notices,
 and avoid suggesting that a license change is a technical safety fix. The
 decision should be recorded in the canonical standalone repository; this
-mirror follows it on its next synchronization.
+mirror adopts it only after the reviewed standalone commit pin is updated.
