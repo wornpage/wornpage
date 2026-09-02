@@ -14,11 +14,12 @@ Repository text is checked out as LF through `.gitattributes`, so generated outp
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
-## Install
+## Source use
 
-```sh
-bun add @wornpage/navigation-surfaces
-```
+This package is not published to npm. Check out this repository at a reviewed commit, install its
+dependencies from `bun.lock`, and consume `src/index.ts` through a local workspace alias. The
+`@wornpage/navigation-surfaces` imports below assume that local alias; they do not resolve from the
+public npm registry.
 
 ## Usage
 
@@ -50,6 +51,11 @@ Breadcrumb uses native anchors for linked ancestors and assigns
 `aria-current="page"` only to the final item. Intermediate unlinked items remain
 plain text. Separators align with the first line when a hostile label wraps.
 Empty item arrays render no empty navigation landmark.
+
+Breadcrumb and NavigationList destinations may be relative or use `https:`, `mailto:`, or `tel:`.
+Empty values, network-path references, backslashes, separator/control/format characters, plain
+HTTP, and every other scheme are rejected with a `TypeError`. Omit an optional Breadcrumb `href`
+to render plain text.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -90,7 +96,7 @@ overwritten.
 
 ## Theme tokens
 
-All components consume the existing `--cockpit-*` and `--font-typewriter`
+All components consume the existing `--worn-*` and `--font-typewriter`
 tokens with complete light fallbacks. They do not impose outer page spacing;
 the pagination control only owns its 16px leading separation from results.
 Keyboard focus uses `--worn-navigation-focus` when supplied and otherwise

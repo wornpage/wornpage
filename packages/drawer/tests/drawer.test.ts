@@ -23,8 +23,8 @@ describe('hydration and interaction contract', () => {
   });
 
   test('gives close focus a public token and a high-contrast shared fallback', () => {
-    expect(source).toContain('outline: 2px dashed var(--worn-drawer-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));');
-    expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+    expect(source).toContain('outline: 2px dashed var(--worn-drawer-focus, var(--worn-focus, var(--worn-accent, currentColor)));');
+    expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
   });
 
   test('owns mobile viewport, every edge, and reduced-motion behavior', () => {

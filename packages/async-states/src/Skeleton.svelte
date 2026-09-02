@@ -30,9 +30,9 @@
 
 <style>
 	.worn-skeleton {
-		background: var(--cockpit-surface);
-		border: 1px solid var(--cockpit-border);
-		border-radius: var(--cockpit-radius);
+		background: var(--worn-surface);
+		border: 1px solid var(--worn-border);
+		border-radius: var(--worn-radius);
 		box-sizing: border-box;
 		display: grid;
 		gap: 10px;
@@ -49,9 +49,9 @@
 		animation: worn-shimmer 1.6s ease-in-out infinite;
 		background-image: linear-gradient(
 			90deg,
-			var(--cockpit-border) 0%,
-			var(--cockpit-surface) 40%,
-			var(--cockpit-border) 80%
+			var(--worn-border) 0%,
+			var(--worn-surface) 40%,
+			var(--worn-border) 80%
 		);
 		background-size: 200% 100%;
 		border-radius: 4px;

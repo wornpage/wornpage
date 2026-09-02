@@ -6,44 +6,44 @@
   <title>Wornpage Form Fields</title>
   <style>
     :root {
-      --cockpit-bg: #f5f0e8;
-      --cockpit-bg-secondary: #ece6dd;
-      --cockpit-surface: #fdfbf7;
-      --cockpit-border: #e2ddd5;
-      --cockpit-border-strong: #d0cac1;
-      --cockpit-text: #21322b;
-      --cockpit-text-secondary: #394b43;
-      --cockpit-text-muted: #506058;
-      --cockpit-accent: #0f766e;
-      --cockpit-accent-50: rgb(15 118 110 / 0.18);
+      --worn-bg: #f5f0e8;
+      --worn-bg-secondary: #ece6dd;
+      --worn-surface: #fdfbf7;
+      --worn-border: #e2ddd5;
+      --worn-border-strong: #d0cac1;
+      --worn-text: #21322b;
+      --worn-text-secondary: #394b43;
+      --worn-text-muted: #506058;
+      --worn-accent: #0f766e;
+      --worn-accent-50: rgb(15 118 110 / 0.18);
       --font-typewriter: ui-monospace, SFMono-Regular, Consolas, monospace;
-      --cockpit-radius-sm: 6px;
+      --worn-radius-sm: 6px;
       color-scheme: light;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --cockpit-bg: #0f1714;
-        --cockpit-bg-secondary: #121c18;
-        --cockpit-surface: #18241f;
-        --cockpit-border: #3a4d45;
-        --cockpit-border-strong: #4d5c52;
-        --cockpit-text: #f7fffc;
-        --cockpit-text-secondary: #d9e5dd;
-        --cockpit-text-muted: #b0bcb4;
-        --cockpit-accent: #5cc8a9;
-        --cockpit-accent-50: rgb(92 200 169 / 0.18);
+        --worn-bg: #0f1714;
+        --worn-bg-secondary: #121c18;
+        --worn-surface: #18241f;
+        --worn-border: #3a4d45;
+        --worn-border-strong: #4d5c52;
+        --worn-text: #f7fffc;
+        --worn-text-secondary: #d9e5dd;
+        --worn-text-muted: #b0bcb4;
+        --worn-accent: #5cc8a9;
+        --worn-accent-50: rgb(92 200 169 / 0.18);
         color-scheme: dark;
       }
     }
     * { box-sizing: border-box; }
-    body { margin: 0; padding: 24px; background: var(--cockpit-bg); color: var(--cockpit-text); font-family: Georgia, serif; }
+    body { margin: 0; padding: 24px; background: var(--worn-bg); color: var(--worn-text); font-family: Georgia, serif; }
     main { max-width: 620px; margin: 0 auto; }
     h1 { margin: 0 0 8px; font-size: 28px; }
-    p { margin: 0 0 22px; color: var(--cockpit-text-muted); }
-    .surface { display: grid; gap: 14px; border-block: 1px solid var(--cockpit-border); padding-block: 16px; }
-    label { display: grid; gap: 5px; min-inline-size: 0; color: var(--cockpit-text-secondary); font: 700 11px/1.2 var(--font-typewriter); text-transform: uppercase; }
+    p { margin: 0 0 22px; color: var(--worn-text-muted); }
+    .surface { display: grid; gap: 14px; border-block: 1px solid var(--worn-border); padding-block: 16px; }
+    label { display: grid; gap: 5px; min-inline-size: 0; color: var(--worn-text-secondary); font: 700 11px/1.2 var(--font-typewriter); text-transform: uppercase; }
     .compact { max-inline-size: 280px; }
-    output { display: block; margin-top: 16px; min-height: 22px; font: 12px/1.5 var(--font-typewriter); color: var(--cockpit-text-muted); }
+    output { display: block; margin-top: 16px; min-height: 22px; font: 12px/1.5 var(--font-typewriter); color: var(--worn-text-muted); }
     @media (max-width: 380px) { body { padding: 14px; } }
   </style>
   <script type="module" src="./dist/worn-form-fields.js"></script>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { compile } from 'svelte/compiler';
+import { assertSafeHref } from '../src/safe-href';
 
 const read = (name: string) => readFileSync(new URL(`../src/${name}.svelte`, import.meta.url), 'utf8');
 const avatar = read('Avatar');
@@ -68,10 +69,10 @@ describe('@wornpage/data-display', () => {
 	});
 
 	it('keeps chip command and toggle semantics explicit', () => {
-		expect(chip).toContain('{#if href}');
+		expect(chip).toContain('{#if safeHref}');
 		expect(chip).toContain('{:else if onclick}');
 		expect(chip).toContain('<a');
-		expect(chip).toContain('{href}');
+		expect(chip).toContain('href={safeHref}');
 		expect(chip).toContain('\t\tpressed,');
 		expect(chip).not.toContain('pressed = false');
 		expect(chip).toContain('aria-pressed={pressed}');
@@ -90,7 +91,7 @@ describe('@wornpage/data-display', () => {
 		expect(chip).not.toContain("\n\tbutton.worn-chip:hover:not([aria-pressed='true']),");
 		expect(rootRule).not.toContain('min-height');
 		expect(chip).toContain('touch-action: manipulation;');
-		expect(chip).toContain('outline: 2px dashed var(--worn-chip-focus, var(--cockpit-text, #21322b));');
+		expect(chip).toContain('outline: 2px dashed var(--worn-chip-focus, var(--worn-text, #21322b));');
 		expect(chip).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(chip).toContain('.worn-chip { transition: none; }');
 		expect(chip).toContain('.worn-chip.is-drag-over {');
@@ -112,15 +113,18 @@ describe('@wornpage/data-display', () => {
 	});
 
 	it('owns standalone-safe badge and chip theme fallbacks', () => {
-		expect(badge).toContain('var(--cockpit-bg-secondary, #efede7)');
-		expect(badge).toContain('var(--cockpit-warning-text, #5f4300)');
-		expect(badge).toContain('var(--cockpit-accent-text, #fff)');
-		expect(chip).toContain('var(--cockpit-surface, #fdfbf7)');
-		expect(chip).toContain('var(--cockpit-text-muted, #506058)');
-		expect(chip).toContain('var(--cockpit-danger-text, #7a1a14)');
+		const mutedBadgeRule = badge.match(/\.worn-badge\.is-muted \{([\s\S]*?)\n\t\}/u)?.[1] ?? '';
+		expect(badge).toContain('var(--worn-bg-secondary, #efede7)');
+		expect(badge).toContain('var(--worn-warning-text, #5f4300)');
+		expect(badge).toContain('var(--worn-accent-text, #fff)');
+		expect(mutedBadgeRule).toContain('background: var(--worn-bg-secondary, #efede7);');
+		expect(mutedBadgeRule).not.toContain('var(--worn-border');
+		expect(chip).toContain('var(--worn-surface, #fdfbf7)');
+		expect(chip).toContain('var(--worn-text-muted, #506058)');
+		expect(chip).toContain('var(--worn-danger-text, #7a1a14)');
 		const pairs = [
 			['#21322b', '#efede7'],
-			['#506058', '#e2ddd5'],
+			['#506058', '#efede7'],
 			['#ffffff', '#0f766e'],
 			['#5f4300', '#fff7ed'],
 			['#506058', '#fdfbf7'],
@@ -131,6 +135,7 @@ describe('@wornpage/data-display', () => {
 			const dark = Math.min(relativeLuminance(foreground), relativeLuminance(background));
 			expect((light + 0.05) / (dark + 0.05)).toBeGreaterThanOrEqual(4.5);
 		}
+		expect(readme).toContain('Muted badges pair `--worn-text-muted` with `--worn-bg-secondary`; override them together with colors that preserve small-text contrast.');
 	});
 
 	it('falls back from broken avatar images before or after hydration without a duplicate accessible name', () => {
@@ -169,12 +174,12 @@ describe('@wornpage/data-display', () => {
 		expect(progress).not.toContain('const bucket = $derived');
 		expect(progress).not.toMatch(/worn-progress-fill-\d/u);
 		expect(progress).not.toContain('style:width');
-		expect(progress).toContain('--_worn-progress-default-fill: var(--cockpit-focus, var(--cockpit-text, #21322b));');
+		expect(progress).toContain('--_worn-progress-default-fill: var(--worn-focus, var(--worn-text, #21322b));');
 		expect(progress).toContain('fill: var(--_worn-progress-active-fill, var(--worn-progress-fill, var(--_worn-progress-default-fill)));');
-		expect(progress).toContain('color-mix(in srgb, var(--cockpit-accent, #0f766e) 55%, var(--cockpit-text, #21322b))');
-		expect(progress).toContain('.worn-progress.is-muted { --_worn-progress-active-fill: var(--worn-progress-muted-fill, var(--cockpit-text-muted, #506058)); }');
-		expect(progress).toContain('.worn-progress.is-warn { --_worn-progress-active-fill: var(--worn-progress-warn-fill, var(--cockpit-warning-text, #a85200)); }');
-		expect(progress).toContain('.worn-progress.is-danger { --_worn-progress-active-fill: var(--worn-progress-danger-fill, var(--cockpit-danger-text, #991b1b)); }');
+		expect(progress).toContain('color-mix(in srgb, var(--worn-accent, #0f766e) 55%, var(--worn-text, #21322b))');
+		expect(progress).toContain('.worn-progress.is-muted { --_worn-progress-active-fill: var(--worn-progress-muted-fill, var(--worn-text-muted, #506058)); }');
+		expect(progress).toContain('.worn-progress.is-warn { --_worn-progress-active-fill: var(--worn-progress-warn-fill, var(--worn-warning-text, #a85200)); }');
+		expect(progress).toContain('.worn-progress.is-danger { --_worn-progress-active-fill: var(--worn-progress-danger-fill, var(--worn-danger-text, #991b1b)); }');
 		expect(readme).toContain('exact clamped fraction without an inline style');
 		expect(readme).toContain('`--worn-progress-fill`');
 	});
@@ -191,7 +196,7 @@ describe('@wornpage/data-display', () => {
 		expect(timeline).toContain('<ol class="worn-timeline {extraClass}" class:is-compact={density === \'compact\'} aria-label={ariaLabel} {...rest}>');
 		expect(timeline).toContain('<li class="worn-timeline-entry">');
 		expect(timeline).toContain("this={href ? 'a' : 'article'}");
-		expect(timeline).toContain('href={href || undefined}');
+		expect(timeline).toContain('href={href}');
 		expect(timeline).toContain('<time datetime={date} class="worn-timeline-date">');
 		expect(timeline).toContain('<svelte:element this={headingTag} class="worn-timeline-title">');
 		expect(timeline).toContain('class="worn-timeline-marker" aria-hidden="true"');
@@ -217,8 +222,8 @@ describe('@wornpage/data-display', () => {
 
 	it('owns a theme-extensible focus ring for linked entries', () => {
 		const focusRule = timeline.match(/\.worn-timeline-card-link:focus-visible \{[\s\S]*?\}/u)?.[0] ?? '';
-		expect(focusRule).toContain('outline: 2px solid var(--worn-timeline-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
-		expect(focusRule).not.toContain('--cockpit-accent');
+		expect(focusRule).toContain('outline: 2px solid var(--worn-timeline-focus, var(--worn-focus, var(--worn-text, currentColor)));');
+		expect(focusRule).not.toContain('--worn-accent');
 		expect(readme).toContain('`--worn-timeline-focus`');
 	});
 
@@ -245,9 +250,34 @@ describe('@wornpage/data-display', () => {
 		expect(formatTimelineDate('2026-08-14')).toBe('Aug 14, 2026');
 		expect(formatTimelineDate('not-a-date')).toBe('not-a-date');
 		expect(formatTimelineDate('x'.repeat(80))).toHaveLength(40);
-		expect(timeline).toContain('var(--cockpit-text, #26352f)');
-		expect(timeline).toContain('var(--cockpit-border, #d4cec5)');
+		expect(timeline).toContain('var(--worn-text, #26352f)');
+		expect(timeline).toContain('var(--worn-border, #d4cec5)');
 		expect(timeline).not.toMatch(/\banimation(?:-delay)?:|@keyframes/u);
 		expect(timeline).toContain('.worn-timeline-card-link { transition: none; }');
+	});
+
+	it('accepts only relative and explicitly supported link destinations', () => {
+		for (const href of [
+			'/projects', './settings', '../home', 'projects/42', '?filter=open', '#details',
+			'https://example.com/path',
+			'mailto:security@example.com', 'tel:+15551234567'
+		]) {
+			expect(assertSafeHref(href)).toBe(href);
+		}
+		expect(chip).toContain('href === undefined ? undefined : assertSafeHref(href)');
+		expect(timeline).toContain('entry?.href === undefined ? undefined : assertSafeHref(entry.href)');
+		expect(timeline).not.toContain('function cleanHref');
+	});
+
+	it('rejects executable, ambiguous, and control-obfuscated link destinations', () => {
+		for (const href of [
+			'', ' javascript:alert(1)', 'javascript:alert(1)', 'JAVASCRIPT:alert(1)',
+			'java\nscript:alert(1)', 'data:text/html,boom', 'vbscript:msgbox(1)',
+			'http://localhost:3000', 'ftp://example.com/file', '//example.com/path',
+			'\\\\example.com\\path', 'https://example.com/a b',
+			'java\u200bscript:alert(1)', 'https://example.com/\u0000path'
+		]) {
+			expect(() => assertSafeHref(href)).toThrow(TypeError);
+		}
 	});
 });

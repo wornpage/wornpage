@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ButtonProps } from './types';
+	import { assertSafeHref } from './safe-href';
 
 	let {
 		variant = 'default',
@@ -12,11 +13,13 @@
 		children,
 		...rest
 	}: ButtonProps = $props();
+
+	const safeHref = $derived(href === undefined ? undefined : assertSafeHref(href));
 </script>
 
-{#if href}
+{#if safeHref}
 	<a
-		{href}
+		href={safeHref}
 		{...rest}
 		class={className ? `worn-btn ${className}` : 'worn-btn'}
 		class:is-primary={variant === 'primary'}
@@ -66,10 +69,10 @@
 		min-height: 36px;
 		overflow-wrap: anywhere;
 		padding: 8px 16px;
-		border: 1px solid var(--cockpit-border);
-		border-radius: var(--cockpit-radius);
-		background: var(--cockpit-surface);
-		color: var(--cockpit-text);
+		border: 1px solid var(--worn-border);
+		border-radius: var(--worn-radius);
+		background: var(--worn-surface);
+		color: var(--worn-text);
 		cursor: pointer;
 		text-align: center;
 		text-decoration: none;
@@ -88,9 +91,9 @@
 		padding: 4px 10px;
 	}
 	.worn-btn.is-primary {
-		background: var(--cockpit-accent);
-		border-color: var(--cockpit-accent);
-		color: var(--cockpit-accent-text);
+		background: var(--worn-accent);
+		border-color: var(--worn-accent);
+		color: var(--worn-accent-text);
 	}
 	@media (hover: hover) and (pointer: fine) {
 		.worn-btn.is-primary:hover:not(:disabled):not([aria-disabled='true']) {
@@ -98,7 +101,7 @@
 			box-shadow: 0 2px 4px rgb(0 0 0 / 0.14);
 		}
 		.worn-btn.is-warning:hover:not(:disabled):not([aria-disabled='true']) {
-			background: var(--cockpit-warning-bg);
+			background: var(--worn-warning-bg);
 		}
 		.worn-btn:hover:not(:disabled):not([aria-disabled='true']) {
 			filter: brightness(0.96);
@@ -109,27 +112,27 @@
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.16);
 	}
 	.worn-btn.is-danger {
-		background: var(--cockpit-danger-bg);
-		border-color: var(--cockpit-danger-border);
-		color: var(--cockpit-danger-text);
+		background: var(--worn-danger-bg);
+		border-color: var(--worn-danger-border);
+		color: var(--worn-danger-text);
 	}
 	.worn-btn.is-warning {
 		background: transparent;
-		border-color: var(--cockpit-warning-text);
-		color: var(--cockpit-warning-text);
+		border-color: var(--worn-warning-text);
+		color: var(--worn-warning-text);
 	}
 	.worn-btn:active:not(:disabled):not([aria-disabled='true']) {
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
 	}
 	.worn-btn[aria-pressed='true']:not(:disabled):not([aria-disabled='true']) {
-		background: var(--cockpit-accent);
-		border-color: var(--cockpit-accent);
-		color: var(--cockpit-accent-text);
+		background: var(--worn-accent);
+		border-color: var(--worn-accent);
+		color: var(--worn-accent-text);
 		filter: brightness(0.98);
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.14);
 	}
 	.worn-btn:focus-visible {
-		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
+		outline: 2px dashed var(--worn-button-focus, var(--worn-focus, var(--worn-text, #21322b)));
 		outline-offset: 2px;
 	}
 	@media (pointer: coarse) {
@@ -146,16 +149,16 @@
 		}
 	}
 	.worn-btn:global(.is-active) {
-		background: var(--cockpit-accent);
-		border-color: var(--cockpit-accent);
-		color: var(--cockpit-accent-text);
+		background: var(--worn-accent);
+		border-color: var(--worn-accent);
+		color: var(--worn-accent-text);
 		animation: energy-pulse 0.2s ease-out;
 	}
 	.worn-btn.worn-btn:disabled,
 	.worn-btn.worn-btn[aria-disabled='true'] {
-		background: var(--cockpit-bg-secondary);
-		border-color: var(--cockpit-border);
-		color: var(--cockpit-text-muted);
+		background: var(--worn-bg-secondary);
+		border-color: var(--worn-border);
+		color: var(--worn-text-muted);
 		cursor: not-allowed;
 		filter: none;
 		opacity: 1;

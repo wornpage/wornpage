@@ -33,7 +33,7 @@
 
 <style>
   .worn-checkbox {
-    --worn-binary-boundary: color-mix(in srgb, var(--cockpit-border-strong) 30%, var(--cockpit-text-muted));
+    --worn-binary-boundary: color-mix(in srgb, var(--worn-border-strong) 30%, var(--worn-text-muted));
     position: relative;
     display: inline-flex;
     box-sizing: border-box;
@@ -80,25 +80,25 @@
     justify-content: center;
     border: 2px solid var(--worn-binary-boundary);
     border-radius: 3px;
-    background: var(--cockpit-surface);
+    background: var(--worn-surface);
     transition: border-color 0.12s ease, background 0.12s ease;
   }
 
   .worn-checkbox-input:checked + .worn-checkbox-mark {
-    --worn-binary-state-focus: var(--cockpit-accent-text);
+    --worn-binary-state-focus: var(--worn-accent-text);
     border-color: var(--worn-binary-boundary);
-    background: var(--cockpit-accent);
+    background: var(--worn-accent);
   }
 
   .worn-checkbox.is-disabled .worn-checkbox-mark {
-    border-color: var(--cockpit-border-strong);
-    background: var(--cockpit-bg-secondary);
+    border-color: var(--worn-border-strong);
+    background: var(--worn-bg-secondary);
   }
 
   .worn-checkbox-tick {
     inline-size: 10px;
     block-size: 8px;
-    color: var(--cockpit-accent-text);
+    color: var(--worn-accent-text);
     opacity: 0;
     transform: scale(0.6);
     transition: opacity 0.12s ease, transform 0.12s ease;
@@ -119,11 +119,11 @@
     overflow-wrap: anywhere;
     font-family: var(--font-typewriter);
     font-size: 13px;
-    color: var(--cockpit-text);
+    color: var(--worn-text);
   }
 
   .worn-checkbox.is-disabled .worn-checkbox-label {
-    color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
   }
 
   @media (prefers-reduced-motion: reduce) {

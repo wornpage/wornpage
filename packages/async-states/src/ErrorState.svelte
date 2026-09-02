@@ -38,11 +38,11 @@
 
 <style>
 	.worn-error {
-		background: var(--cockpit-danger-bg);
-		border: 1px solid var(--cockpit-danger-border);
-		border-radius: var(--cockpit-radius);
+		background: var(--worn-danger-bg);
+		border: 1px solid var(--worn-danger-border);
+		border-radius: var(--worn-radius);
 		box-sizing: border-box;
-		color: var(--cockpit-danger-text);
+		color: var(--worn-danger-text);
 		display: grid;
 		font-family: var(--font-typewriter);
 		gap: 8px;
@@ -58,12 +58,12 @@
 	}
 
 	.worn-error strong {
-		color: var(--cockpit-danger-text);
+		color: var(--worn-danger-text);
 		display: block;
 	}
 
 	.worn-error span {
-		color: var(--cockpit-text-secondary);
+		color: var(--worn-text-secondary);
 		display: block;
 		font-size: 13px;
 	}

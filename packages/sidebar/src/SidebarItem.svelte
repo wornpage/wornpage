@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { shouldInterceptNavigationClick } from './navigation.js';
+	import NavIconView from './NavIcon.svelte';
+	import { assertSafeNavigationHref, shouldInterceptNavigationClick } from './navigation.js';
+	import type { NavIcon } from './types.js';
 
 	interface Props {
 		href?: string;
 		label: string;
-		icon?: string;
+		icon?: NavIcon;
 		badge?: number;
 		badgeVariant?: 'default' | 'danger';
 		active?: boolean;
@@ -12,6 +14,7 @@
 		children?: any;
 	}
 	let { href = '#', label, icon, badge, badgeVariant = 'default', active = false, onclick, children }: Props = $props();
+	const validatedHref = $derived(assertSafeNavigationHref(href, 'SidebarItem href'));
 
 	function handleClick(event: MouseEvent) {
 		if (!shouldInterceptNavigationClick(event, Boolean(onclick))) return;
@@ -20,9 +23,9 @@
 	}
 </script>
 
-<a {href} class="worn-nav-item" class:active onclick={handleClick}>
+<a href={validatedHref} class="worn-nav-item" class:active onclick={handleClick}>
 	{#if icon}
-		<span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html icon}</svg></span>
+		<NavIconView {icon}/>
 	{/if}
 	<span class="worn-nav-label">{label}</span>
 	{#if badge !== undefined && badge > 0}

@@ -37,7 +37,7 @@ describe('native control contract', () => {
 describe('theme and compact behavior', () => {
   test('uses one explicit state boundary for checked and unchecked controls', () => {
     for (const source of [checkbox, switchControl]) {
-      expect(source).toContain('--worn-binary-boundary: color-mix(in srgb, var(--cockpit-border-strong) 30%, var(--cockpit-text-muted));');
+      expect(source).toContain('--worn-binary-boundary: color-mix(in srgb, var(--worn-border-strong) 30%, var(--worn-text-muted));');
       expect(source).toContain('border-color: var(--worn-binary-boundary);');
       expect(source).toContain(':focus-visible +');
     }
@@ -57,9 +57,9 @@ describe('theme and compact behavior', () => {
     for (const source of [checkbox, switchControl]) {
       expect(source).toContain('outline: 2px dashed var(--worn-binary-focus, var(--worn-binary-state-focus, currentColor));');
       expect(source).toContain('--worn-binary-state-focus: currentColor;');
-      expect(source).toContain('--worn-binary-state-focus: var(--cockpit-accent-text);');
+      expect(source).toContain('--worn-binary-state-focus: var(--worn-accent-text);');
       expect(source.match(/--worn-binary-focus/gu)?.length).toBe(1);
-      expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+      expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
     }
   });
 });

@@ -19,10 +19,10 @@
 
 <style>
 	.worn-empty {
-		border: 1px dashed var(--cockpit-border);
-		border-radius: var(--cockpit-radius);
+		border: 1px dashed var(--worn-border);
+		border-radius: var(--worn-radius);
 		box-sizing: border-box;
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		display: grid;
 		font-family: var(--font-typewriter);
 		gap: 6px;
@@ -38,12 +38,12 @@
 	}
 
 	.worn-empty strong {
-		color: var(--cockpit-text);
+		color: var(--worn-text);
 		display: block;
 	}
 
 	.worn-empty span {
-		color: var(--cockpit-text-secondary);
+		color: var(--worn-text-secondary);
 		display: block;
 	}
 

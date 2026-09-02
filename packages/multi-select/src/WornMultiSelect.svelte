@@ -34,8 +34,8 @@
 	.worn-multi-select {
 		--worn-multi-select-boundary: color-mix(
 			in srgb,
-			var(--cockpit-border-strong) 30%,
-			var(--cockpit-text-muted)
+			var(--worn-border-strong) 30%,
+			var(--worn-text-muted)
 		);
 		box-sizing: border-box;
 		inline-size: 100%;
@@ -47,24 +47,24 @@
 		line-height: 1.4;
 		padding: 9px 12px;
 		border: 1px solid var(--worn-multi-select-boundary);
-		border-radius: var(--cockpit-radius-sm);
-		background: var(--cockpit-surface);
-		color: var(--cockpit-text);
+		border-radius: var(--worn-radius-sm);
+		background: var(--worn-surface);
+		color: var(--worn-text);
 		touch-action: manipulation;
 	}
 
 	.worn-multi-select:focus-visible {
-		outline: 2px dashed var(--worn-multi-select-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));
+		outline: 2px dashed var(--worn-multi-select-focus, var(--worn-focus, var(--worn-text, currentColor)));
 		outline-offset: 2px;
-		border-color: var(--cockpit-accent);
-		box-shadow: 0 0 0 1px var(--cockpit-accent-50);
+		border-color: var(--worn-accent);
+		box-shadow: 0 0 0 1px var(--worn-accent-50);
 	}
 
 	.worn-multi-select:disabled {
-		background-color: var(--cockpit-bg-secondary);
+		background-color: var(--worn-bg-secondary);
 		border-color: var(--worn-multi-select-boundary);
-		color: var(--cockpit-text-muted);
-		-webkit-text-fill-color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
+		-webkit-text-fill-color: var(--worn-text-muted);
 		cursor: not-allowed;
 		opacity: 1;
 	}

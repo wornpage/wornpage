@@ -23,8 +23,8 @@ describe('hydration and interaction contract', () => {
   });
 
   test('owns a state-aware public focus token for the close control', () => {
-    expect(source).toContain('outline: 2px dashed var(--worn-dialog-focus, var(--cockpit-focus, currentColor));');
-    expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+    expect(source).toContain('outline: 2px dashed var(--worn-dialog-focus, var(--worn-focus, currentColor));');
+    expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
   });
 
   test('documents the close-control focus token', () => {

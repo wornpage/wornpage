@@ -135,10 +135,10 @@
 		min-block-size: 44px;
 		min-inline-size: 44px;
 		padding: 6px 12px;
-		border: 1px solid var(--cockpit-border, #cfd5d1);
-		border-radius: var(--cockpit-radius-sm, 6px);
-		background: var(--cockpit-surface, #ffffff);
-		color: var(--cockpit-text-muted, #506058);
+		border: 1px solid var(--worn-border, #cfd5d1);
+		border-radius: var(--worn-radius-sm, 6px);
+		background: var(--worn-surface, #ffffff);
+		color: var(--worn-text-muted, #506058);
 		font-family: var(--font-typewriter, ui-monospace, SFMono-Regular, Consolas, monospace);
 		font-size: 13px;
 		font-weight: 560;
@@ -175,8 +175,8 @@
 	}
 
 	.worn-pagination-btn:hover:not(:disabled) {
-		background: var(--cockpit-accent-50, #e5f2ef);
-		color: var(--cockpit-text, #1f2f28);
+		background: var(--worn-accent-50, #e5f2ef);
+		color: var(--worn-text, #1f2f28);
 	}
 
 	.worn-pagination-btn:focus-visible {
@@ -185,22 +185,22 @@
 	}
 
 	.worn-pagination-btn[aria-current='page'] {
-		border-color: var(--cockpit-accent, #287f73);
-		background: var(--cockpit-accent, #287f73);
-		color: var(--cockpit-accent-text, #ffffff);
+		border-color: var(--worn-accent, #287f73);
+		background: var(--worn-accent, #287f73);
+		color: var(--worn-accent-text, #ffffff);
 	}
 
 	.worn-pagination-btn:disabled {
-		border-color: var(--cockpit-border, #cfd5d1);
-		background: var(--cockpit-bg-secondary, #f3f5f4);
-		color: var(--cockpit-text-muted, #506058);
+		border-color: var(--worn-border, #cfd5d1);
+		background: var(--worn-bg-secondary, #f3f5f4);
+		color: var(--worn-text-muted, #506058);
 		cursor: not-allowed;
 	}
 
 	.worn-pagination-ellipsis,
 	.worn-pagination-status {
 		box-sizing: border-box;
-		color: var(--cockpit-text-muted, #506058);
+		color: var(--worn-text-muted, #506058);
 		font-family: var(--font-typewriter, ui-monospace, SFMono-Regular, Consolas, monospace);
 		font-size: 13px;
 		font-weight: 560;

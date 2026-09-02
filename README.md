@@ -2,7 +2,8 @@
 
 > Component library + dev toolkit. **The tools are framework-agnostic.**
 > **This monorepo is a mirror.** Individual packages have their own repos.
-> Import them directly: `bun add @wornpage/sidebar`
+> Install standalone packages from reviewed Git commits; the `@wornpage` npm
+> scope is not a supported distribution path.
 
 ## Quick start — browsing
 
@@ -18,11 +19,11 @@ bun test          # 100+ tests across all packages and tools
 ## Quick start — using in your app
 
 ```bash
-# Import from standalone repos (canonical source):
-bun add @wornpage/sidebar    # or: github:wornpage/sidebar
-bun add @wornpage/button
-bun add @wornpage/cmdk
-bun add @wornpage/toast
+# Import reviewed standalone commits (canonical source):
+bun add "https://codeload.github.com/wornpage/sidebar/tar.gz/919dadb0f62b8fa6c7f35470279b5782ba2bc84d"
+bun add "https://codeload.github.com/wornpage/button/tar.gz/6da25ba40af71d3329abc2a4631d46047abd180b"
+bun add "https://codeload.github.com/wornpage/cmdk/tar.gz/2b81e02c079213c2da6f42385b87be418ef489d4"
+bun add "https://codeload.github.com/wornpage/toast/tar.gz/e58675ad9e945776e0715a0ccfdf7b3aaf6af0e1"
 ```
 
 ## What's inside
@@ -70,15 +71,16 @@ bun add @wornpage/toast
 ## Architecture
 
 - **Standalone repos are canonical.** Each `@wornpage/*` package lives in its own repo.
-- **This monorepo mirrors them.** `bun run sync` pulls the latest from each standalone repo.
+- **This monorepo mirrors them.** `bun run sync` fetches only the exact reviewed
+  commits in `scripts/component-repositories.ts`.
 - **`packages/` is generated — never hand-edit it.** A change made here reaches
   nobody, because nothing installs from this repo. `bun run sync` overwrites it.
 - **The demo consumes only mirrored workspaces.** Every internal dependency uses
   `workspace:*`; sibling `file:` paths and floating internal versions are
   rejected by `bun run check:workspace` before CI installs the frozen lockfile.
-- **`bun run sync --check` reports drift** without changing anything, and exits
-  non-zero when the mirror no longer matches canonical. CI runs it on repository
-  changes and daily, so drift is visible even when this mirror is untouched.
+- **`bun run sync --check` reports drift** without changing anything or executing
+  fetched package code, and exits non-zero when the mirror no longer matches the
+  pinned manifest. CI runs it on repository changes and daily.
 - **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
 - **Tests run across everything.** `bun test` validates all packages and tools together.
 - **Delivery is checked as a fleet.** `bun run check:components` inspects every
@@ -93,7 +95,7 @@ bun add @wornpage/toast
 1. Find the package you want to change in the table above
 2. Clone its standalone repo
 3. Make your changes, run `bun test`, submit a PR there
-4. The monorepo will pick up your changes on the next sync
+4. After review, update the standalone commit pin and regenerate the mirror
 
 ## License
 

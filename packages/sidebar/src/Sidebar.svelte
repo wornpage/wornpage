@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import NavIcon from './NavIcon.svelte';
 	import type { NavItem } from './types.js';
 	import { sectionForActiveHref, activeSectionToForceOpen, initialOpenSections } from './sections.js';
 	import { filterNavChildren, filterNavItems, hasNavFilterResults, matchesNavItem, shouldClearNavFilter, shouldOpenNavSection } from './filter.js';
 	import { nextNavFocusIndex } from './keyboard.js';
-	import { shouldInterceptNavigationClick } from './navigation.js';
+	import { shouldInterceptNavigationClick, validateNavItems } from './navigation.js';
 	import { filterTransientNavItems, orderedFavoriteItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from './shortcuts.js';
 	import { visibleNavItems } from './visibility.js';
 
@@ -30,6 +31,7 @@
 	let filterInput: HTMLInputElement | undefined = $state();
 	let navEl: HTMLElement | undefined = $state();
 	const normalizedFilterText = $derived(filterText.trim());
+	const validatedItems = $derived(validateNavItems(items));
 
 	// Sections default open; persisted per-section state (wornpage-sidebar-
 	// open-sections) is honored, with any NEW section defaulting open; the
@@ -40,9 +42,9 @@
 		try {
 			const raw = localStorage.getItem('wornpage-sidebar-open-sections');
 			const stored = raw ? (JSON.parse(raw) as string[]) : null;
-			openSections = initialOpenSections(items, stored);
+			openSections = initialOpenSections(validatedItems, stored);
 		} catch {
-			openSections = new Set(items.filter((i) => i.children).map((i) => i.id));
+			openSections = new Set(validatedItems.filter((i) => i.children).map((i) => i.id));
 		}
 	});
 	$effect(() => {
@@ -51,7 +53,7 @@
 		// effect depend on its own write (new Set !== old Set → re-run → write
 		// again), which looped until Svelte threw effect_update_depth_exceeded
 		// and the whole sidebar (and every WornReveal on the page) crashed.
-		const parent = activeSectionToForceOpen(items, activeHref, openSections);
+		const parent = activeSectionToForceOpen(validatedItems, activeHref, openSections);
 		if (parent) {
 			openSections = new Set(openSections).add(parent.id);
 		}
@@ -167,7 +169,7 @@
 		return result;
 	}
 
-	const visibleItems = $derived(visibleNavItems(items, hiddenItems));
+	const visibleItems = $derived(visibleNavItems(validatedItems, hiddenItems));
 	const flatItems = $derived(flatten(visibleItems));
 
 	const topLevel = $derived(filterNavItems(visibleItems, normalizedFilterText));
@@ -237,7 +239,7 @@
 
 {#snippet navLink(item: NavItem, isCurrentPage = false)}
 	<div class="worn-nav-row" class:has-reorder={favorites.has(item.id) && favItems.length > 1}>
-		<a href={item.href || '#'} class="worn-nav-item" class:active={isCurrentPage} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
+		<a href={item.href ?? '#'} class="worn-nav-item" class:active={isCurrentPage} class:is-context-anchor={contextMenu === item.id} data-nav-id={item.id}
 			aria-current={isCurrentPage ? 'page' : undefined}
 			title={collapsed ? item.label : undefined}
 			onclick={(e) => handleNav(e, item.href)}
@@ -245,7 +247,7 @@
 			oncontextmenu={(e) => showContextMenu(e, item.id)}
 		>
 			{#if item.icon}
-				<span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html item.icon}</svg></span>
+				<NavIcon icon={item.icon}/>
 			{/if}
 			<span class="worn-nav-label">{item.label}</span>
 			{#if item.badge !== undefined && item.badge > 0}
@@ -308,7 +310,7 @@
 	{#each topLevel.filter(i => shouldRenderCanonicalNavItem(i, attentionIds, normalizedFilterText, favorites)) as item (item.id)}
 		{#if item.children}
 			<details class="worn-nav-group" open={shouldOpenNavSection(item, normalizedFilterText, openSections)} ontoggle={(e) => toggleSection(item.id, (e.currentTarget as HTMLDetailsElement).open)}>
-				<summary class="worn-nav-item worn-nav-summary" class:active={sectionForActiveHref(items, activeHref)?.id === item.id}><span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span><span class="worn-nav-label">{item.label}</span></summary>
+				<summary class="worn-nav-item worn-nav-summary" class:active={sectionForActiveHref(validatedItems, activeHref)?.id === item.id}><span class="worn-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></span><span class="worn-nav-label">{item.label}</span></summary>
 				{#each filterNavChildren(item, normalizedFilterText).filter(c => shouldRenderCanonicalNavItem(c, attentionIds, normalizedFilterText, favorites)) as child (child.id)}
 					{@render navLink(child, isCurrentPage(child, 'canonical'))}
 				{/each}
@@ -386,7 +388,7 @@
 	.worn-sidebar.is-collapsed .worn-nav-group > .worn-nav-row > .worn-nav-item {
 		padding-inline: 6px;
 	}
-	.worn-sidebar.is-collapsed .worn-nav-icon { margin: 0; }
+	.worn-sidebar.is-collapsed :global(.worn-nav-icon) { margin: 0; }
 	.worn-sidebar.is-collapsed .worn-sidebar-restore {
 		inline-size: var(--worn-sidebar-collapsed-item-size, 44px);
 		justify-content: center;
@@ -409,23 +411,23 @@
 	.worn-sidebar-filter { position: relative; margin: 4px 8px 8px; }
 	.worn-filter-input {
 		width: 100%; padding: 6px 28px 6px 10px;
-		border: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd));
+		border: 1px solid var(--worn-sidebar-border, var(--worn-border, #ddd));
 		border-radius: 6px;
-		background: var(--worn-sidebar-bg, var(--cockpit-bg, #f5f5f5));
-		color: var(--worn-sidebar-text, var(--cockpit-text, #000));
+		background: var(--worn-sidebar-bg, var(--worn-bg, #f5f5f5));
+		color: var(--worn-sidebar-text, var(--worn-text, #000));
 		font: inherit; font-size: 12px;
 		box-sizing: border-box;
 	}
-	.worn-filter-input:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: -2px; }
+	.worn-filter-input:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--worn-focus, var(--worn-text, #21322b))); outline-offset: -2px; }
 	.worn-filter-clear {
 		position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
 		background: none; border: 0;
-		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));
 		cursor: pointer; font-size: 16px; padding: 2px 6px; line-height: 1;
 	}
 	.worn-filter-empty {
 		padding: 12px;
-		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));
 		font-size: 12px;
 		text-align: center;
 	}
@@ -435,7 +437,7 @@
 		display: flex; align-items: center; gap: 8px;
 		padding: 6px 12px;
 		border-radius: var(--worn-nav-radius, 8px);
-		color: var(--worn-sidebar-text, var(--cockpit-text, #000));
+		color: var(--worn-sidebar-text, var(--worn-text, #000));
 		text-decoration: none;
 		font-size: 13px;
 		position: relative;
@@ -448,11 +450,11 @@
 		inline-size: auto;
 	}
 	.worn-nav-row.has-reorder > .worn-nav-item { padding-inline-end: 72px; }
-	.worn-nav-item:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
-	.worn-nav-item:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: 2px; }
+	.worn-nav-item:hover { background: var(--worn-sidebar-hover, var(--worn-hover-bg, rgba(0,0,0,0.05))); }
+	.worn-nav-item:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--worn-focus, var(--worn-text, #21322b))); outline-offset: 2px; }
 	.worn-nav-item.active {
-		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
-		color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff));
+		background: var(--worn-sidebar-accent, var(--worn-accent, #0d9488));
+		color: var(--worn-sidebar-accent-text, var(--worn-accent-text, #fff));
 		anchor-name: --worn-active-item;
 	}
 	.worn-nav-item.is-context-anchor { anchor-name: --worn-ctx; }
@@ -468,24 +470,24 @@
 		display: inline-flex; align-items: center; justify-content: center;
 		min-width: 16px; height: 16px; padding: 0 5px;
 		border-radius: 8px;
-		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
-		color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff));
+		background: var(--worn-sidebar-accent, var(--worn-accent, #0d9488));
+		color: var(--worn-sidebar-accent-text, var(--worn-accent-text, #fff));
 		font-size: 9px; font-weight: 700; line-height: 16px;
 		text-align: center;
 	}
 	.worn-nav-badge.is-danger {
-		background: var(--worn-sidebar-danger, var(--cockpit-danger-badge-bg, #e74c3c));
-		color: var(--worn-sidebar-danger-text, var(--cockpit-danger-badge-text, #fff));
+		background: var(--worn-sidebar-danger, var(--worn-danger-badge-bg, #e74c3c));
+		color: var(--worn-sidebar-danger-text, var(--worn-danger-badge-text, #fff));
 	}
-	.worn-nav-badge.is-warning { background: var(--worn-sidebar-warning, var(--cockpit-warning-text, #d97706)); color: #fff; }
+	.worn-nav-badge.is-warning { background: var(--worn-sidebar-warning, var(--worn-warning-text, #d97706)); color: #fff; }
 
 	.worn-section-label {
 		font-size: 9px; font-weight: 600; text-transform: uppercase;
 		letter-spacing: 0.05em;
-		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));
 		padding: 4px 12px 2px;
 	}
-	.worn-section-divider { height: 1px; background: var(--worn-sidebar-border, var(--cockpit-border, #ddd)); margin: 4px 8px; }
+	.worn-section-divider { height: 1px; background: var(--worn-sidebar-border, var(--worn-border, #ddd)); margin: 4px 8px; }
 
 	.worn-nav-summary {
 		font-weight: 600;
@@ -496,24 +498,24 @@
 		   as the rows inside them.) */
 		padding-left: 12px;
 	}
-	.worn-nav-group { border-top: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd)); margin-top: 4px; padding-top: 4px; }
+	.worn-nav-group { border-top: 1px solid var(--worn-sidebar-border, var(--worn-border, #ddd)); margin-top: 4px; padding-top: 4px; }
 	.worn-nav-group > .worn-nav-row > .worn-nav-item { padding-left: 24px; }
 
 	/* Section title selected state: the summary highlights when the group is
 	   open (the arrow row the user clicked) or holds the active page. The
 	   chevron rotates to point at the expanded children. */
 	.worn-nav-group > .worn-nav-summary.active {
-		background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05)));
-		color: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
+		background: var(--worn-sidebar-hover, var(--worn-hover-bg, rgba(0,0,0,0.05)));
+		color: var(--worn-sidebar-accent, var(--worn-accent, #0d9488));
 	}
 	.worn-nav-group > .worn-nav-summary .worn-nav-icon { transition: transform 0.18s var(--worn-ease, ease); }
 	.worn-nav-group[open] > .worn-nav-summary .worn-nav-icon { transform: rotate(90deg); }
 	.worn-sidebar-restore {
 		align-items: center;
 		background: transparent;
-		border: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd));
+		border: 1px solid var(--worn-sidebar-border, var(--worn-border, #ddd));
 		border-radius: var(--worn-nav-radius, 8px);
-		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));
 		cursor: pointer;
 		display: flex;
 		font: inherit;
@@ -525,15 +527,15 @@
 		text-align: left;
 		width: calc(100% - 16px);
 	}
-	.worn-sidebar-restore:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--cockpit-text, #000)); }
-	.worn-sidebar-restore:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: 2px; }
+	.worn-sidebar-restore:hover { background: var(--worn-sidebar-hover, var(--worn-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--worn-text, #000)); }
+	.worn-sidebar-restore:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--worn-focus, var(--worn-text, #21322b))); outline-offset: 2px; }
 
 	.worn-active-indicator {
 		position: absolute; left: 2px; width: calc(100% - 4px);
 		position-anchor: --worn-active-item;
 		top: anchor(--worn-active-item top);
 		height: anchor(--worn-active-item height);
-		background: var(--worn-sidebar-accent, var(--cockpit-accent, #0d9488));
+		background: var(--worn-sidebar-accent, var(--worn-accent, #0d9488));
 		border-radius: 999px;
 		transition: opacity 0.15s ease;
 		pointer-events: none; z-index: 0; opacity: 0;
@@ -556,7 +558,7 @@
 		background: transparent;
 		border: 0;
 		border-radius: 4px;
-		color: var(--worn-sidebar-text-muted, var(--cockpit-text-muted, #666));
+		color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));
 		cursor: pointer;
 		display: inline-flex;
 		height: 28px;
@@ -564,10 +566,10 @@
 		padding: 0;
 		width: 28px;
 	}
-	.worn-reorder-btn:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--cockpit-text, #000)); }
-	.worn-reorder-btn:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))); outline-offset: 1px; }
+	.worn-reorder-btn:hover { background: var(--worn-sidebar-hover, var(--worn-hover-bg, rgba(0,0,0,0.05))); color: var(--worn-sidebar-text, var(--worn-text, #000)); }
+	.worn-reorder-btn:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--worn-focus, var(--worn-text, #21322b))); outline-offset: 1px; }
 	.worn-reorder-btn svg { fill: none; height: 14px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 14px; }
-	.worn-nav-row:has(.worn-nav-item.active) .worn-reorder-btn { color: var(--worn-sidebar-accent-text, var(--cockpit-accent-text, #fff)); }
+	.worn-nav-row:has(.worn-nav-item.active) .worn-reorder-btn { color: var(--worn-sidebar-accent-text, var(--worn-accent-text, #fff)); }
 
 	.worn-menu-backdrop {
 		position: fixed;
@@ -582,8 +584,8 @@
 		position-anchor: --worn-ctx;
 		left: anchor(right);
 		top: anchor(bottom);
-		background: var(--worn-sidebar-surface, var(--cockpit-surface, #fff));
-		border: 1px solid var(--worn-sidebar-border, var(--cockpit-border, #ddd));
+		background: var(--worn-sidebar-surface, var(--worn-surface, #fff));
+		border: 1px solid var(--worn-sidebar-border, var(--worn-border, #ddd));
 		border-radius: 6px;
 		box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 		min-width: 140px; overflow: hidden;
@@ -593,12 +595,12 @@
 		display: flex; align-items: center; gap: 8px;
 		width: 100%; padding: 8px 12px;
 		border: 0; background: transparent;
-		color: var(--worn-sidebar-text, var(--cockpit-text, #000));
+		color: var(--worn-sidebar-text, var(--worn-text, #000));
 		font: inherit; font-size: 12px;
 		cursor: pointer; text-align: left; min-height: 36px;
 	}
 	.worn-context-menu-icon { fill: none; flex: 0 0 auto; height: 16px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 16px; }
-	.worn-context-menu button:hover { background: var(--worn-sidebar-hover, var(--cockpit-hover-bg, rgba(0,0,0,0.05))); }
+	.worn-context-menu button:hover { background: var(--worn-sidebar-hover, var(--worn-hover-bg, rgba(0,0,0,0.05))); }
 
 	@media (pointer: coarse) {
 		.worn-filter-input {

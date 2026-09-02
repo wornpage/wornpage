@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { compile } from 'svelte/compiler';
+import { assertSafeHref } from '../src/safe-href';
 
 const read = (name: string) => readFileSync(new URL(`../src/${name}.svelte`, import.meta.url), 'utf8');
 const breadcrumb = read('Breadcrumb');
@@ -32,7 +33,7 @@ describe('@wornpage/navigation-surfaces', () => {
 		expect(navigationList).toContain('{#if items.length > 0}');
 		expect(navigationList).toContain('aria-label={label}');
 		expect(navigationList).toContain('<ul>');
-		expect(navigationList).toContain('<a href={item.href} aria-current={item.current ? \'page\' : undefined}>');
+		expect(navigationList).toContain('<a href={href} aria-current={item.current ? \'page\' : undefined}>');
 		expect(navigationList).toContain('data-worn-navigation-list');
 	});
 
@@ -48,7 +49,7 @@ describe('@wornpage/navigation-surfaces', () => {
 	it('owns focus, theme, selected, forced-color, and reduced-motion presentation', () => {
 		expect(navigationList).toContain('outline: 2px dashed var(--worn-navigation-focus, currentColor);');
 		expect(navigationList).toContain("a[aria-current='page']");
-		expect(navigationList).toContain('var(--cockpit-selected-bg, var(--cockpit-accent-50, #e5f2ef))');
+		expect(navigationList).toContain('var(--worn-selected-bg, var(--worn-accent-50, #e5f2ef))');
 		expect(navigationList).toContain('@media (forced-colors: active)');
 		expect(navigationList).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?a \{[\s\S]*?transition: none;/u);
 	});
@@ -59,6 +60,30 @@ describe('@wornpage/navigation-surfaces', () => {
 		expect(breadcrumb).toContain("{:else if i === items.length - 1}");
 		expect(breadcrumb.match(/aria-current="page"/gu)).toHaveLength(1);
 		expect(breadcrumb).toContain('class="worn-breadcrumb-text"');
+	});
+
+	it('accepts only relative and explicitly supported navigation destinations', () => {
+		for (const href of [
+			'/projects', './settings', '../home', 'projects/42', '?filter=open', '#details',
+			'https://example.com/path',
+			'mailto:security@example.com', 'tel:+15551234567'
+		]) {
+			expect(assertSafeHref(href)).toBe(href);
+		}
+		expect(breadcrumb).toContain('item.href === undefined ? undefined : assertSafeHref(item.href)');
+		expect(navigationList).toContain('const href = assertSafeHref(item.href)');
+	});
+
+	it('rejects executable, ambiguous, and control-obfuscated navigation destinations', () => {
+		for (const href of [
+			'', ' javascript:alert(1)', 'javascript:alert(1)', 'JAVASCRIPT:alert(1)',
+			'java\nscript:alert(1)', 'data:text/html,boom', 'vbscript:msgbox(1)',
+			'http://localhost:3000', 'ftp://example.com/file', '//example.com/path',
+			'\\\\example.com\\path', 'https://example.com/a b',
+			'java\u200bscript:alert(1)', 'https://example.com/\u0000path'
+		]) {
+			expect(() => assertSafeHref(href)).toThrow(TypeError);
+		}
 	});
 
 	it('contains hostile breadcrumb labels and gives links complete touch targets', () => {
@@ -99,9 +124,9 @@ describe('@wornpage/navigation-surfaces', () => {
 	});
 
 	it('owns standalone fallbacks, 44px controls, and reduced motion', () => {
-		expect(pagination).toContain('var(--cockpit-surface, #ffffff)');
-		expect(pagination).toContain('var(--cockpit-text-muted, #506058)');
-		expect(pagination).toContain('var(--cockpit-accent, #287f73)');
+		expect(pagination).toContain('var(--worn-surface, #ffffff)');
+		expect(pagination).toContain('var(--worn-text-muted, #506058)');
+		expect(pagination).toContain('var(--worn-accent, #287f73)');
 		expect(pagination).toContain('min-block-size: 44px;');
 		expect(pagination).toContain('min-inline-size: 44px;');
 		expect(pagination).toContain('touch-action: manipulation;');
@@ -113,7 +138,7 @@ describe('@wornpage/navigation-surfaces', () => {
 		for (const source of [breadcrumb, navigationList, pagination]) expect(source).toContain(focusRule);
 		expect([breadcrumb, navigationList, pagination].join('\n').match(/--worn-navigation-focus/gu)).toHaveLength(3);
 		for (const source of [breadcrumb, navigationList, pagination]) {
-			expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent, #287f73);');
+			expect(source).not.toContain('outline: 2px dashed var(--worn-accent, #287f73);');
 		}
 	});
 

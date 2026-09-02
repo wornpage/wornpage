@@ -46,8 +46,8 @@ describe('standalone behavior', () => {
   });
 
   test('gives dismiss focus a public token and a high-contrast shared fallback', () => {
-    expect(alert).toContain('outline: 2px dashed var(--worn-alert-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));');
-    expect(alert).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+    expect(alert).toContain('outline: 2px dashed var(--worn-alert-focus, var(--worn-focus, var(--worn-accent, currentColor)));');
+    expect(alert).not.toContain('outline: 2px dashed var(--worn-accent);');
   });
 
   test('uses theme-safe mask icons and reduced-motion entry', () => {

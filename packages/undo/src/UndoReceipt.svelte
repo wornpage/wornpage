@@ -48,11 +48,11 @@
 		--wrn-undo-boundary: var(
 			--wrn-undo-border,
 			var(
-				--cockpit-border-strong,
+				--worn-border-strong,
 				color-mix(
 					in srgb,
-					var(--cockpit-border, #c8c2b9) 60%,
-					var(--cockpit-text, #21322b)
+					var(--worn-border, #c8c2b9) 60%,
+					var(--worn-text, #21322b)
 				)
 			)
 		);
@@ -66,13 +66,13 @@
 		min-width: 0;
 		padding: 10px 14px;
 		overflow: hidden;
-		background: var(--wrn-undo-bg, var(--cockpit-surface, #fdfbf7));
+		background: var(--wrn-undo-bg, var(--worn-surface, #fdfbf7));
 		border: 1px solid var(--wrn-undo-boundary);
 		border-radius: var(--wrn-undo-radius, 6px);
 		font-family: var(--wrn-undo-font, inherit);
 		font-size: 13px;
 		letter-spacing: 0;
-		color: var(--wrn-undo-text, var(--cockpit-text, #21322b));
+		color: var(--wrn-undo-text, var(--worn-text, #21322b));
 		box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
 	}
 
@@ -101,7 +101,7 @@
 
 	.wrn-undo-body small {
 		font-size: 11px;
-		color: var(--wrn-undo-muted, var(--cockpit-muted, #596a61));
+		color: var(--wrn-undo-muted, var(--worn-muted, #596a61));
 	}
 
 	.wrn-undo-actions {
@@ -118,7 +118,7 @@
 		border: 1px solid var(--wrn-undo-boundary);
 		border-radius: 4px;
 		background: transparent;
-		color: var(--wrn-undo-text, var(--cockpit-text, #21322b));
+		color: var(--wrn-undo-text, var(--worn-text, #21322b));
 		font: inherit;
 		font-size: 12px;
 		letter-spacing: 0;
@@ -127,11 +127,11 @@
 	}
 
 	.wrn-undo-btn:hover {
-		background: var(--wrn-undo-hover, var(--cockpit-subtle, #eaf4f0));
+		background: var(--wrn-undo-hover, var(--worn-subtle, #eaf4f0));
 	}
 
 	.wrn-undo-btn:focus-visible {
-		outline: 2px solid var(--wrn-undo-focus, var(--cockpit-accent, #0f766e));
+		outline: 2px solid var(--wrn-undo-focus, var(--worn-accent, #0f766e));
 		outline-offset: 2px;
 	}
 

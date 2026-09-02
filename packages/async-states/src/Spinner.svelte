@@ -40,7 +40,7 @@
 		</div>
 	{:else}
 		<svg class="worn-spinner-ring" viewBox="0 0 24 24" fill="none">
-			<circle cx="12" cy="12" r="10" stroke="var(--cockpit-border)" stroke-width="3" />
+			<circle cx="12" cy="12" r="10" stroke="var(--worn-border)" stroke-width="3" />
 			<path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round">
 				{#if !prefersReducedMotion.current}
 					<animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/>
@@ -54,12 +54,12 @@
 <style>
 	.worn-spinner {
 		align-items: center;
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		display: inline-flex;
 		justify-content: center;
 	}
 
-	.worn-spinner.is-accent { color: var(--cockpit-link); }
+	.worn-spinner.is-accent { color: var(--worn-link); }
 
 	.worn-spinner-ring {
 		height: 28px;

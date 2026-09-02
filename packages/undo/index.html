@@ -6,43 +6,43 @@
   <title>@wornpage/undo demo</title>
   <style>
     :root {
-      --cockpit-bg: #f5f3ef;
-      --cockpit-surface: #fff;
-      --cockpit-border: #d5d0c8;
-      --cockpit-text: #21322b;
-      --cockpit-muted: #596a61;
-      --cockpit-subtle: #eaf4f0;
-      --cockpit-accent: #0d9488;
-      --cockpit-accent-text: #fff;
+      --worn-bg: #f5f3ef;
+      --worn-surface: #fff;
+      --worn-border: #d5d0c8;
+      --worn-text: #21322b;
+      --worn-muted: #596a61;
+      --worn-subtle: #eaf4f0;
+      --worn-accent: #0d9488;
+      --worn-accent-text: #fff;
     }
     * { box-sizing: border-box; }
     body {
       min-width: 0;
       margin: 0;
       padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-      background: var(--cockpit-bg);
-      color: var(--cockpit-text);
+      background: var(--worn-bg);
+      color: var(--worn-text);
       font-family: system-ui, sans-serif;
     }
     main { width: min(100%, 480px); min-width: 0; margin: 0 auto; }
     h1 { margin: 0 0 22px; font-size: 22px; }
-    .state { margin-bottom: 12px; padding: 14px; border: 1px solid var(--cockpit-border); border-radius: 6px; background: var(--cockpit-surface); }
+    .state { margin-bottom: 12px; padding: 14px; border: 1px solid var(--worn-border); border-radius: 6px; background: var(--worn-surface); }
     .controls { display: flex; gap: 8px; margin-bottom: 18px; }
-    .controls button { min-width: 44px; min-height: 44px; border: 1px solid var(--cockpit-border); border-radius: 6px; background: var(--cockpit-surface); color: inherit; cursor: pointer; font-size: 16px; touch-action: manipulation; }
-    .controls button:first-child { border-color: var(--cockpit-accent); background: var(--cockpit-accent); color: var(--cockpit-accent-text); }
+    .controls button { min-width: 44px; min-height: 44px; border: 1px solid var(--worn-border); border-radius: 6px; background: var(--worn-surface); color: inherit; cursor: pointer; font-size: 16px; touch-action: manipulation; }
+    .controls button:first-child { border-color: var(--worn-accent); background: var(--worn-accent); color: var(--worn-accent-text); }
     worn-undo { display: block; }
     worn-undo[hidden] { display: none; }
     @media (prefers-color-scheme: dark) {
       :root {
         color-scheme: dark;
-        --cockpit-bg: #151a18;
-        --cockpit-surface: #202825;
-        --cockpit-border: #68746f;
-        --cockpit-text: #f2f5f3;
-        --cockpit-muted: #bdc8c2;
-        --cockpit-subtle: #33413c;
-        --cockpit-accent: #5eead4;
-        --cockpit-accent-text: #10211c;
+        --worn-bg: #151a18;
+        --worn-surface: #202825;
+        --worn-border: #68746f;
+        --worn-text: #f2f5f3;
+        --worn-muted: #bdc8c2;
+        --worn-subtle: #33413c;
+        --worn-accent: #5eead4;
+        --worn-accent-text: #10211c;
       }
     }
   </style>

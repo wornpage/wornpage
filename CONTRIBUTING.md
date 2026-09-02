@@ -8,11 +8,12 @@ Thanks for your interest! Here's how things work.
 wornpage (this monorepo — mirror/showcase)
 ├── packages/          ← mirrored from standalone repos
 ├── tools/             ← monorepo-native dev tools
-└── scripts/sync.ts    ← pulls latest from standalone repos
+└── scripts/sync.ts    ← fetches reviewed commits from the manifest
 ```
 
 **Standalone repos are canonical.** Each `@wornpage/*` package has its own repo.
-This monorepo mirrors them so you can browse, test, and refactor across packages.
+This monorepo mirrors reviewed commits so you can browse, test, and refactor
+across packages without trusting mutable default branches.
 
 ## Finding where to contribute
 
@@ -29,7 +30,10 @@ This monorepo mirrors them so you can browse, test, and refactor across packages
 1. Clone the package's repo: `git clone https://github.com/wornpage/<name>.git`
 2. Make changes, run tests: `bun test`
 3. Submit PR to that repo
-4. After merge, the monorepo picks it up on next sync
+4. After merge, review the standalone commit and update its exact revision in
+   `scripts/component-repositories.ts`
+5. Run `bun run sync`, review the generated mirror diff, then install and test
+   in separate commands
 
 ### For monorepo-native changes (tools, scripts, docs)
 1. Clone the monorepo: `git clone https://github.com/wornpage/wornpage.git`
@@ -44,9 +48,9 @@ This monorepo mirrors them so you can browse, test, and refactor across packages
 - The generated Delivery section and deterministic `.gitattributes`
 - The shared release-contract workflow from `@wornpage/cli`
 
-The [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md)
-defines source-only and generated browser-bundle packages. Run
-`wornpage verify --frozen-dist` in the standalone repository before shipping.
+The [component delivery contract](https://github.com/wornpage/cli/blob/d65813ff4f5668e8ab96fef8f744e47dbfeb7e3c/docs/component-delivery.md)
+defines source-only and generated browser-bundle packages. Use a pinned CLI
+checkout to verify a standalone repository before shipping.
 
 ### Every tool must have:
 - `src/index.ts` — library export

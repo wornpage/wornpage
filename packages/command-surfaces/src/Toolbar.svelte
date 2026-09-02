@@ -28,9 +28,9 @@
 		padding: var(--worn-toolbar-padding, 10px);
 		position: relative;
 		overflow: visible;
-		border: 1px solid var(--worn-toolbar-border, var(--cockpit-border, #c8ceca));
-		border-radius: var(--worn-toolbar-radius, var(--cockpit-radius, 6px));
-		background: var(--worn-toolbar-background, var(--cockpit-surface, transparent));
+		border: 1px solid var(--worn-toolbar-border, var(--worn-border, #c8ceca));
+		border-radius: var(--worn-toolbar-radius, var(--worn-radius, 6px));
+		background: var(--worn-toolbar-background, var(--worn-surface, transparent));
 		box-shadow: var(--worn-toolbar-shadow, none);
 		transition: border-color 120ms ease, box-shadow 120ms ease;
 	}
@@ -46,8 +46,8 @@
 	}
 
 	.worn-toolbar:focus-within {
-		border-color: var(--worn-toolbar-active-border, var(--cockpit-accent, #287f73));
-		box-shadow: var(--worn-toolbar-active-shadow, 0 0 0 1px var(--cockpit-accent, #287f73));
+		border-color: var(--worn-toolbar-active-border, var(--worn-accent, #287f73));
+		box-shadow: var(--worn-toolbar-active-shadow, 0 0 0 1px var(--worn-accent, #287f73));
 	}
 
 	@media (max-width: 500px) {

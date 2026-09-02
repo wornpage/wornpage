@@ -12,11 +12,12 @@ Repository text is checked out as LF through `.gitattributes`, so generated outp
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
-## Install
+## Source use
 
-```bash
-npm install @wornpage/date-input
-```
+This package is not published to npm. Check out this repository at a reviewed commit, install its
+dependencies from `bun.lock`, and consume `src/index.ts` through a local workspace alias. The
+`@wornpage/date-input` imports below assume that local alias; they do not resolve from the public
+npm registry.
 
 ## Usage
 
@@ -47,4 +48,4 @@ The component preserves the browser-native date picker. On touch-first devices i
 
 ## Styling
 
-`--worn-date-input-focus` customizes the keyboard focus outline. Its default falls through the shared `--cockpit-focus` and `--cockpit-text` tokens so the outline remains distinguishable from themed field surfaces. Border and shadow feedback continue to use the shared accent tokens.
+`--worn-date-input-focus` customizes the keyboard focus outline. Its default falls through the shared `--worn-focus` and `--worn-text` tokens so the outline remains distinguishable from themed field surfaces. Border and shadow feedback continue to use the shared accent tokens.

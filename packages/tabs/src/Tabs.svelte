@@ -216,7 +216,7 @@
 		max-inline-size: 100%;
 		min-inline-size: 0;
 		gap: 0;
-		border-block-end: 2px solid var(--cockpit-border);
+		border-block-end: 2px solid var(--worn-border);
 		overflow-x: auto;
 		overscroll-behavior-inline: contain;
 		scroll-padding-inline: 8px;
@@ -234,19 +234,19 @@
 		min-block-size: 44px;
 		padding: 0;
 		border: 0;
-		border-block-end: 2px solid var(--cockpit-border);
+		border-block-end: 2px solid var(--worn-border);
 		font-family: var(--font-typewriter);
 		font-size: 28px;
 		line-height: 1;
-		background: var(--cockpit-surface, transparent);
-		color: var(--cockpit-link);
+		background: var(--worn-surface, transparent);
+		color: var(--worn-link);
 		cursor: pointer;
 		touch-action: manipulation;
 		transition: color 0.12s ease, background-color 0.12s ease;
 	}
 
 	.worn-tabs-control:disabled {
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		cursor: default;
 		opacity: 0.55;
 	}
@@ -279,7 +279,7 @@
 		font-weight: 560;
 		white-space: nowrap;
 		background: transparent;
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		cursor: pointer;
 		touch-action: manipulation;
 		transition: color 0.12s ease, border-color 0.12s ease;
@@ -293,17 +293,17 @@
 	}
 
 	.worn-tab[aria-selected='true'] {
-		color: var(--cockpit-link);
-		border-block-end-color: var(--cockpit-accent);
+		color: var(--worn-link);
+		border-block-end-color: var(--worn-accent);
 	}
 
 	@media (hover: hover) and (pointer: fine) {
 		.worn-tabs-control:hover:not(:disabled) {
-			color: var(--cockpit-text);
+			color: var(--worn-text);
 		}
 
 		.worn-tab:hover {
-			color: var(--cockpit-text);
+			color: var(--worn-text);
 		}
 	}
 

@@ -2,13 +2,15 @@ import { describe, test, expect } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { filterNavChildren, filterNavItems, filterNavLinks, hasNavFilterResults, shouldClearNavFilter, shouldOpenNavSection } from '../src/filter.js';
 import { nextNavFocusIndex } from '../src/keyboard.js';
-import { shouldInterceptNavigationClick } from '../src/navigation.js';
+import { assertSafeNavigationHref, isSafeNavigationHref, shouldInterceptNavigationClick, validateNavItems } from '../src/navigation.js';
+import { assertNavIcon } from '../src/nav-icon.js';
 import { visibleNavItems } from '../src/visibility.js';
 import { filterTransientNavItems, selectCurrentPagePlacement, shouldRenderCanonicalNavItem } from '../src/shortcuts.js';
 import * as shortcutHelpers from '../src/shortcuts.js';
 
 const sidebarSource = readFileSync(new URL('../src/Sidebar.svelte', import.meta.url), 'utf8');
 const itemSource = readFileSync(new URL('../src/SidebarItem.svelte', import.meta.url), 'utf8');
+const navIconSource = readFileSync(new URL('../src/NavIcon.svelte', import.meta.url), 'utf8');
 const elementSource = readFileSync(new URL('../src/SidebarElement.svelte', import.meta.url), 'utf8');
 const elementsEntrySource = readFileSync(new URL('../src/elements.ts', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const indexSource = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8');
@@ -16,6 +18,7 @@ const viteSource = readFileSync(new URL('../vite.config.ts', import.meta.url), '
 const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const readmeSource = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
 const packageManifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const rawHtmlDirective = `{${'@'}html`;
 
 describe('package delivery', () => {
 	test('declares the next browser-bundle contract revision', () => {
@@ -24,6 +27,12 @@ describe('package delivery', () => {
 		expect(packageManifest.wornpage).toEqual({ contractVersion: 2, delivery: 'browser-bundle' });
 		expect(packageManifest.main).toBe('./dist/worn-sidebar.js');
 		expect(packageManifest.svelte).toBe('./src/index.ts');
+	});
+
+	test('describes the current source-only delivery truthfully', () => {
+		expect(readmeSource).toContain('This package is not published to npm.');
+		expect(readmeSource).not.toContain('bun add @wornpage/sidebar');
+		expect(readmeSource).not.toContain('npm add @wornpage/sidebar');
 	});
 });
 
@@ -106,8 +115,8 @@ describe('filter control', () => {
 
 describe('danger badge theming', () => {
 	test('uses independent semantic background and foreground fallback chains', () => {
-		expect(sidebarSource).toContain('background: var(--worn-sidebar-danger, var(--cockpit-danger-badge-bg, #e74c3c));');
-		expect(sidebarSource).toContain('color: var(--worn-sidebar-danger-text, var(--cockpit-danger-badge-text, #fff));');
+		expect(sidebarSource).toContain('background: var(--worn-sidebar-danger, var(--worn-danger-badge-bg, #e74c3c));');
+		expect(sidebarSource).toContain('color: var(--worn-sidebar-danger-text, var(--worn-danger-badge-text, #fff));');
 		expect(readmeSource).toContain('--worn-sidebar-danger: #e74c3c;');
 		expect(readmeSource).toContain('--worn-sidebar-danger-text: #fff;');
 	});
@@ -204,6 +213,106 @@ describe('native link interactions', () => {
 	});
 });
 
+describe('navigation target security', () => {
+	test('accepts relative links and the explicitly supported absolute schemes', () => {
+		for (const href of [
+			'#review',
+			'/review?tab=summary',
+			'./review',
+			'../review',
+			'review',
+			'?tab=summary',
+			'https://example.com/review',
+			'mailto:team@example.com',
+			'tel:+15551234567',
+		]) {
+			expect(isSafeNavigationHref(href)).toBe(true);
+			expect(assertSafeNavigationHref(href)).toBe(href);
+		}
+	});
+
+	test('rejects active-content, downgrade, network-path, and obfuscated targets', () => {
+		for (const href of [
+			'javascript:alert(1)',
+			'JaVaScRiPt:alert(1)',
+			'data:text/html,<script>alert(1)</script>',
+			'vbscript:msgbox(1)',
+			'http://example.com',
+			'file:///etc/passwd',
+			'//example.com/review',
+			'\\\\example.com\\review',
+			' javascript:alert(1)',
+			'java\tscript:alert(1)',
+			'java\nscript:alert(1)',
+			'java\u200bscript:alert(1)',
+		]) {
+			expect(isSafeNavigationHref(href)).toBe(false);
+			expect(() => assertSafeNavigationHref(href)).toThrow();
+		}
+	});
+
+	test('validates every nested item before Sidebar rendering', () => {
+		const items = [{
+			id: 'tools',
+			label: 'Tools',
+			children: [{ id: 'unsafe', label: 'Unsafe', href: 'javascript:alert(1)' }],
+		}];
+
+		expect(() => validateNavItems(items)).toThrow('items[0].children[0].href');
+		expect(sidebarSource).toContain('const validatedItems = $derived(validateNavItems(items));');
+		expect(sidebarSource).toContain('visibleNavItems(validatedItems, hiddenItems)');
+		expect(itemSource).toContain("assertSafeNavigationHref(href, 'SidebarItem href')");
+		expect(elementSource).toContain('<Sidebar');
+	});
+});
+
+describe('structured icon security', () => {
+	test('accepts only the supported SVG primitive model', () => {
+		const icon = {
+			viewBox: '0 0 24 24',
+			shapes: [
+				{ type: 'path', d: 'M3 9l9-7 9 7' },
+				{ type: 'circle', cx: 12, cy: 12, r: 3 },
+				{ type: 'line', x1: 1, y1: 2, x2: 3, y2: 4 },
+				{ type: 'polyline', points: '9 18 15 12 9 6' },
+				{ type: 'polygon', points: '12 2 22 21 2 21' },
+				{ type: 'rect', x: 2, y: 3, width: 10, height: 8, rx: 2 },
+			],
+		};
+
+		expect(assertNavIcon(icon)).toBe(icon);
+		expect(validateNavItems([{ id: 'home', label: 'Home', icon }])[0]?.icon).toBe(icon);
+	});
+
+	test('rejects legacy raw markup and unsupported fields or elements', () => {
+		expect(() => validateNavItems([{ id: 'home', label: 'Home', icon: '<path onload="alert(1)" />' }])).toThrow('structured icon object');
+		expect(() => assertNavIcon({ shapes: [{ type: 'image', href: 'https://example.com/icon.svg' }] })).toThrow('supported SVG primitive');
+		expect(() => assertNavIcon({ shapes: [{ type: 'foreignObject' }] })).toThrow('supported SVG primitive');
+		expect(() => assertNavIcon({ shapes: [{ type: 'path', d: 'M0 0', onload: 'alert(1)' }] })).toThrow('onload is not a supported icon field');
+		expect(() => assertNavIcon({ shapes: [{ type: 'path', d: 'M0 0', href: 'javascript:alert(1)' }] })).toThrow('href is not a supported icon field');
+		expect(() => assertNavIcon({ shapes: [{ type: 'path', d: 'M0 0', 'xlink:href': 'data:text/html,unsafe' }] })).toThrow('xlink:href is not a supported icon field');
+		expect(() => assertNavIcon({ shapes: [{ type: 'path', d: 'M0 0', style: 'background:url(https://example.com/track)' }] })).toThrow('style is not a supported icon field');
+		expect(() => assertNavIcon({ shapes: [{ type: 'path', d: 'M0 0', fill: 'url(https://example.com/track)' }] })).toThrow('fill is not a supported icon field');
+		expect(() => assertNavIcon({ shapes: [{ type: '__proto__' }] })).toThrow('supported SVG primitive');
+	});
+
+	test('renders attributes through Svelte without a raw HTML path', () => {
+		for (const source of [sidebarSource, itemSource, navIconSource]) {
+			expect(source).not.toContain(rawHtmlDirective);
+		}
+		expect(navIconSource).toContain("{#if shape.type === 'path'}");
+		expect(navIconSource).toContain('<path d={shape.d}/>');
+		expect(navIconSource).not.toContain('{...shape}');
+		expect(navIconSource).not.toContain('href={');
+		expect(navIconSource).not.toContain('style={');
+		expect(navIconSource).not.toContain('fill={');
+		expect(sidebarSource).toContain('<NavIcon icon={item.icon}/>');
+		expect(itemSource).toContain('<NavIconView {icon}/>');
+		expect(demoSource).not.toMatch(/icon:\s*['"]</u);
+		expect(readmeSource).toContain('raw SVG/HTML strings are rejected');
+	});
+});
+
 describe('keyboard navigation', () => {
 	test('moves through bounded rendered-link indexes', () => {
 		expect(nextNavFocusIndex('ArrowDown', -1, 4)).toBe(0);
@@ -283,7 +392,7 @@ describe('pinned reorder controls', () => {
 
 describe('keyboard focus', () => {
 	test('owns one high-contrast focus token across every sidebar control', () => {
-		const focusToken = 'var(--worn-sidebar-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)))';
+		const focusToken = 'var(--worn-sidebar-focus, var(--worn-focus, var(--worn-text, #21322b)))';
 		expect(sidebarSource.match(new RegExp(`outline: 2px dashed ${focusToken.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g'))).toHaveLength(4);
 		expect(sidebarSource).toContain('.worn-filter-input:focus-visible');
 		expect(sidebarSource).not.toContain('.worn-filter-input:focus {');

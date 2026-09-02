@@ -104,14 +104,14 @@
 
 	.wrn-toast {
 		display: flex; align-items: center; gap: 8px;
-		background: var(--wrn-toast-bg, var(--cockpit-surface, #fdfbf7));
-		border: 1px solid var(--wrn-toast-border, var(--cockpit-border, #e2ddd5));
+		background: var(--wrn-toast-bg, var(--worn-surface, #fdfbf7));
+		border: 1px solid var(--wrn-toast-border, var(--worn-border, #e2ddd5));
 		border-radius: var(--wrn-toast-radius, 6px);
 		min-block-size: 44px;
 		padding: 6px 8px 6px 14px;
 		font-family: var(--wrn-toast-font, inherit);
 		font-size: 13px; font-weight: 600;
-		color: var(--wrn-toast-text, var(--cockpit-text, #21322b));
+		color: var(--wrn-toast-text, var(--worn-text, #21322b));
 		text-align: start; width: 100%; max-inline-size: 100%; min-inline-size: 0;
 		box-sizing: border-box;
 		box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
@@ -119,11 +119,11 @@
 		animation: wrn-toast-enter 220ms ease-out;
 	}
 	.wrn-toast.is-dismissing { animation: wrn-toast-exit 180ms ease-in forwards; pointer-events: none; }
-	.wrn-toast.is-error { border-color: var(--wrn-toast-error-border, var(--cockpit-danger-border, #e74c3c)); background: var(--wrn-toast-error-bg, var(--cockpit-danger-bg, #fdf0ef)); }
-	.wrn-toast.is-success { border-color: var(--wrn-toast-success-border, var(--cockpit-success-border, #27ae60)); background: var(--wrn-toast-success-bg, var(--cockpit-success-bg, #edf9f0)); }
+	.wrn-toast.is-error { border-color: var(--wrn-toast-error-border, var(--worn-danger-border, #e74c3c)); background: var(--wrn-toast-error-bg, var(--worn-danger-bg, #fdf0ef)); }
+	.wrn-toast.is-success { border-color: var(--wrn-toast-success-border, var(--worn-success-border, #27ae60)); background: var(--wrn-toast-success-bg, var(--worn-success-bg, #edf9f0)); }
 	.wrn-toast-icon { font-size: 14px; line-height: 1; flex-shrink: 0; }
-	.wrn-toast.is-error .wrn-toast-icon { color: var(--wrn-toast-error-text, var(--cockpit-danger-text, #e74c3c)); }
-	.wrn-toast.is-success .wrn-toast-icon { color: var(--wrn-toast-success-text, var(--cockpit-success-text, #27ae60)); }
+	.wrn-toast.is-error .wrn-toast-icon { color: var(--wrn-toast-error-text, var(--worn-danger-text, #e74c3c)); }
+	.wrn-toast.is-success .wrn-toast-icon { color: var(--wrn-toast-success-text, var(--worn-success-text, #27ae60)); }
 	.wrn-toast-text { flex: 1; max-inline-size: 100%; min-width: 0; line-height: 1.3; overflow-wrap: anywhere; }
 	.wrn-toast-dismiss {
 		display: inline-grid; place-items: center; flex: 0 0 auto;
@@ -132,8 +132,8 @@
 		background: transparent; color: inherit; cursor: pointer;
 		font: inherit; font-size: 18px; line-height: 1;
 	}
-	.wrn-toast-dismiss:hover { background: var(--wrn-toast-dismiss-hover-bg, var(--cockpit-hover-bg, rgba(0,0,0,0.08))); }
-	.wrn-toast-dismiss:focus-visible { outline: 2px dashed var(--wrn-toast-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: 1px; }
+	.wrn-toast-dismiss:hover { background: var(--wrn-toast-dismiss-hover-bg, var(--worn-hover-bg, rgba(0,0,0,0.08))); }
+	.wrn-toast-dismiss:focus-visible { outline: 2px dashed var(--wrn-toast-focus, var(--worn-focus, var(--worn-accent, currentColor))); outline-offset: 1px; }
 
 	@media (pointer: coarse) {
 		.wrn-toast { min-block-size: 52px; padding-block: 4px; }

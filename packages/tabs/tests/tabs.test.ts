@@ -27,6 +27,26 @@ describe('tab semantics', () => {
 			tabId: 'catalog-tab-Web-components',
 			panelId: 'catalog-panel-Web-components',
 		});
+		expect(tabDomIds('catalog', '  --alpha!!!beta--  ')).toEqual({
+			tabId: 'catalog-tab-alpha-beta',
+			panelId: 'catalog-panel-alpha-beta',
+		});
+		expect(tabDomIds('catalog', 'alpha-!beta')).toEqual({
+			tabId: 'catalog-tab-alpha--beta',
+			panelId: 'catalog-panel-alpha--beta',
+		});
+		expect(tabDomIds('catalog', '???')).toEqual({
+			tabId: 'catalog-tab-tab',
+			panelId: 'catalog-panel-tab',
+		});
+	});
+
+	test('sanitizes adversarial repeated separators in one pass', () => {
+		const repeatedHyphens = '-'.repeat(250_000);
+		expect(tabDomIds('catalog', `${repeatedHyphens}safe${repeatedHyphens}`)).toEqual({
+			tabId: 'catalog-tab-safe',
+			panelId: 'catalog-panel-safe',
+		});
 	});
 });
 
@@ -93,7 +113,7 @@ describe('keyboard and compact behavior', () => {
 
 	test('owns one state-aware focus token across tabs and overflow controls', () => {
 		expect(source).toMatch(/\.worn-tabs-control:focus-visible,\s*\.worn-tab:focus-visible \{\s*outline: 2px dashed var\(--worn-tabs-focus, currentColor\);\s*outline-offset: -2px;\s*\}/u);
-		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
 	});
 });
 

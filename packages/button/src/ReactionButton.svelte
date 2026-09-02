@@ -39,7 +39,7 @@
 		border: 1px solid transparent;
 		border-radius: 999px;
 		box-sizing: border-box;
-		color: var(--cockpit-text, #21322b);
+		color: var(--worn-text, #21322b);
 		cursor: pointer;
 		display: inline-flex;
 		font: inherit;
@@ -57,8 +57,8 @@
 	}
 	@media (hover: hover) and (pointer: fine) {
 		.worn-reaction-btn:hover:not(:disabled) {
-			background: var(--cockpit-hover-bg, #eef2ef);
-			border-color: var(--cockpit-border, #c8c2b9);
+			background: var(--worn-hover-bg, #eef2ef);
+			border-color: var(--worn-border, #c8c2b9);
 		}
 	}
 	.worn-reaction-btn:active:not(:disabled) {
@@ -66,18 +66,18 @@
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
 	}
 	.worn-reaction-btn:focus-visible {
-		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
+		outline: 2px dashed var(--worn-button-focus, var(--worn-focus, var(--worn-text, #21322b)));
 		outline-offset: 2px;
 	}
 	.worn-reaction-btn.is-pressed {
-		background: var(--cockpit-accent-50, #dff4ef);
-		border-color: var(--cockpit-accent, #0f766e);
-		color: var(--cockpit-text, #21322b);
+		background: var(--worn-accent-50, #dff4ef);
+		border-color: var(--worn-accent, #0f766e);
+		color: var(--worn-text, #21322b);
 	}
 	.worn-reaction-btn:disabled {
-		background: var(--cockpit-bg-secondary, #f0eee8);
-		border-color: var(--cockpit-border, #c8c2b9);
-		color: var(--cockpit-text-muted, #596a61);
+		background: var(--worn-bg-secondary, #f0eee8);
+		border-color: var(--worn-border, #c8c2b9);
+		color: var(--worn-text-muted, #596a61);
 		cursor: not-allowed;
 		opacity: 1;
 		box-shadow: none;
@@ -87,7 +87,7 @@
 		font-size: 15px;
 	}
 	.worn-reaction-count {
-		color: var(--cockpit-text-muted, #596a61);
+		color: var(--worn-text-muted, #596a61);
 		font-size: 11px;
 		font-weight: 600;
 		min-inline-size: 0;

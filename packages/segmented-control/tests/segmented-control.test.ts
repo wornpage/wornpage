@@ -46,7 +46,7 @@ describe('compact interaction contract', () => {
 	test('derives focus contrast from the rendered segment state', () => {
 		expect(source).toContain('outline: 2px dashed var(--worn-segmented-focus, currentColor);');
 		expect(source.match(/--worn-segmented-focus/gu)?.length).toBe(1);
-		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
 	});
 
 	test('honors reduced-motion preferences', () => {

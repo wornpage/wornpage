@@ -38,7 +38,7 @@
 		border: 1px solid transparent;
 		border-radius: 50%;
 		box-sizing: border-box;
-		color: var(--cockpit-text);
+		color: var(--worn-text);
 		cursor: pointer;
 		display: inline-flex;
 		flex: 0 0 44px;
@@ -76,17 +76,17 @@
 		block-size: 20px;
 		inline-size: 20px;
 	}
-	.worn-icon-btn.is-danger { color: var(--cockpit-danger-text); }
+	.worn-icon-btn.is-danger { color: var(--worn-danger-text); }
 	@media (hover: hover) and (pointer: fine) {
 		.worn-icon-btn:hover:not(:disabled) {
-			background: var(--cockpit-bg-secondary);
-			border-color: var(--cockpit-border);
-			color: var(--cockpit-text);
+			background: var(--worn-bg-secondary);
+			border-color: var(--worn-border);
+			color: var(--worn-text);
 		}
 		.worn-icon-btn.is-danger:hover:not(:disabled) {
-			background: var(--cockpit-danger-bg);
-			border-color: var(--cockpit-danger-border);
-			color: var(--cockpit-danger-text);
+			background: var(--worn-danger-bg);
+			border-color: var(--worn-danger-border);
+			color: var(--worn-danger-text);
 		}
 	}
 	.worn-icon-btn:active:not(:disabled) {
@@ -94,13 +94,13 @@
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
 	}
 	.worn-icon-btn:focus-visible {
-		outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
+		outline: 2px dashed var(--worn-button-focus, var(--worn-focus, var(--worn-text, #21322b)));
 		outline-offset: 2px;
 	}
 	.worn-icon-btn:disabled {
-		background: var(--cockpit-bg-secondary);
-		border-color: var(--cockpit-border);
-		color: var(--cockpit-text-muted);
+		background: var(--worn-bg-secondary);
+		border-color: var(--worn-border);
+		color: var(--worn-text-muted);
 		cursor: not-allowed;
 		opacity: 1;
 		box-shadow: none;

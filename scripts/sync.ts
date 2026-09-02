@@ -1,142 +1,201 @@
 #!/usr/bin/env bun
 //
-// Mirror the canonical standalone repos into packages/.
-//
-// The standalone repos are the source of truth (see CONTRIBUTING.md); this
-// monorepo exists so packages can be browsed, tested and refactored together.
-// That only holds if the mirror is GENERATED. Hand-editing packages/ produces
-// changes that are invisible to consumers, because nothing installs from here.
+// Mirror reviewed standalone repository commits into packages/.
 //
 // Usage:
-//   bun run sync                mirror every package, then run the test suite
-//   bun run sync --check        report drift and exit non-zero; changes nothing
-//   bun run sync --skip-tests   mirror without running tests
+//   bun run sync          replace drifted mirrors from the pinned manifest
+//   bun run sync --check  report drift and exit non-zero; change nothing
 //
-// --check is the one to wire into CI. A mirror nobody verifies drifts silently:
-// this script was previously concatenated onto itself (`const result = await `
-// followed by a second copy of the whole file), which is a syntax error — so
-// `bun run sync` failed instantly and every drift after that went unnoticed:
-// a missing package, six stale READMEs, and a stale test count in the README.
+// This command only fetches and copies reviewed source. It deliberately does
+// not install dependencies, build packages, or execute newly mirrored code.
 
 import { $ } from "bun";
-import { existsSync, rmSync, mkdirSync, cpSync, readdirSync, statSync, readFileSync } from "node:fs";
-import { join, relative } from "node:path";
-import { STANDALONE_REPOSITORIES } from "./component-repositories.ts";
+import {
+	cpSync,
+	existsSync,
+	lstatSync,
+	mkdirSync,
+	readFileSync,
+	readdirSync,
+	rmSync,
+} from "node:fs";
+import { isAbsolute, join, relative, resolve } from "node:path";
+import { STANDALONE_SOURCES, type StandaloneSource } from "./component-repositories.ts";
 
-// Monorepo-native code lives in tools/ and is deliberately absent from the
-// shared manifest because sync deletes and replaces every directory it mirrors.
+const CRUFT = new Set(["node_modules", "dist", ".wrangler", ".git", ".DS_Store"]);
+const DEFAULT_MONOREPO = resolve(import.meta.dir, "..");
 
-// Build output and local runtime state never belong in the mirror: they are
-// per-machine, and committing them makes every sync a noisy diff.
-const CRUFT = ["node_modules", "dist", ".wrangler", ".git", ".DS_Store"];
-
-const args = new Set(process.argv.slice(2));
-const checkOnly = args.has("--check");
-const skipTests = args.has("--skip-tests");
-
-const MONOREPO = join(import.meta.dir, "..");
-const TMP = join(MONOREPO, ".sync-tmp");
-
-/** Every file path under dir, relative to it, with cruft pruned. */
-function filesUnder(dir: string, base = dir): string[] {
-	if (!existsSync(dir)) return [];
-	const out: string[] = [];
-	for (const entry of readdirSync(dir)) {
-		if (CRUFT.includes(entry)) continue;
-		const full = join(dir, entry);
-		if (statSync(full).isDirectory()) out.push(...filesUnder(full, base));
-		else out.push(relative(base, full).replace(/\\/g, "/"));
+export function assertPathWithin(root: string, candidate: string): string {
+	const resolvedRoot = resolve(root);
+	const resolvedCandidate = resolve(candidate);
+	const fromRoot = relative(resolvedRoot, resolvedCandidate);
+	if (fromRoot.startsWith("..") || isAbsolute(fromRoot)) {
+		throw new Error(`Path escapes owned root ${resolvedRoot}: ${resolvedCandidate}`);
 	}
+	return resolvedCandidate;
+}
+
+function assertDirectory(path: string, label: string): void {
+	const stat = lstatSync(path);
+	if (stat.isSymbolicLink()) throw new Error(`${label} must not be a symbolic link: ${path}`);
+	if (!stat.isDirectory()) throw new Error(`${label} must be a directory: ${path}`);
+}
+
+function removeOwned(root: string, target: string): void {
+	const safeTarget = assertPathWithin(root, target);
+	if (safeTarget === resolve(root)) throw new Error(`Refusing to remove owned root: ${safeTarget}`);
+	if (!existsSync(safeTarget)) return;
+	const stat = lstatSync(safeTarget);
+	if (stat.isSymbolicLink()) throw new Error(`Refusing to remove symbolic link: ${safeTarget}`);
+	rmSync(safeTarget, { recursive: stat.isDirectory(), force: true });
+}
+
+/** Every safe file path under dir, relative to it, with local cruft pruned. */
+export function filesUnder(dir: string, base = dir): string[] {
+	if (!existsSync(dir)) return [];
+	const root = resolve(dir);
+	assertDirectory(root, "Mirror tree");
+	const out: string[] = [];
+
+	function visit(current: string): void {
+		for (const entry of readdirSync(current)) {
+			const full = assertPathWithin(root, join(current, entry));
+			const stat = lstatSync(full);
+			if (stat.isSymbolicLink()) throw new Error(`Symbolic links are forbidden in mirrored source: ${full}`);
+			if (CRUFT.has(entry)) continue;
+			if (stat.isDirectory()) visit(full);
+			else if (stat.isFile()) out.push(relative(base, full).replace(/\\/g, "/"));
+			else throw new Error(`Unsupported filesystem entry in mirrored source: ${full}`);
+		}
+	}
+
+	visit(root);
 	return out.sort();
 }
 
-/** Compare two trees by content. Returns human-readable differences. */
-function diffTrees(canonical: string, mirrored: string): string[] {
+/** Compare two safe trees by content. Returns human-readable differences. */
+export function diffTrees(canonical: string, mirrored: string): string[] {
 	const a = new Set(filesUnder(canonical));
 	const b = new Set(filesUnder(mirrored));
 	const diffs: string[] = [];
-	for (const f of a) if (!b.has(f)) diffs.push(`missing from mirror: ${f}`);
-	for (const f of b) if (!a.has(f)) diffs.push(`only in mirror: ${f}`);
-	for (const f of a) {
-		if (!b.has(f)) continue;
-		if (!readFileSync(join(canonical, f)).equals(readFileSync(join(mirrored, f)))) {
-			diffs.push(`differs: ${f}`);
+	for (const file of a) if (!b.has(file)) diffs.push(`missing from mirror: ${file}`);
+	for (const file of b) if (!a.has(file)) diffs.push(`only in mirror: ${file}`);
+	for (const file of a) {
+		if (!b.has(file)) continue;
+		const canonicalPath = assertPathWithin(canonical, join(canonical, file));
+		const mirroredPath = assertPathWithin(mirrored, join(mirrored, file));
+		if (!readFileSync(canonicalPath).equals(readFileSync(mirroredPath))) {
+			diffs.push(`differs: ${file}`);
 		}
 	}
 	return diffs;
 }
 
-if (existsSync(TMP)) rmSync(TMP, { recursive: true, force: true });
-mkdirSync(TMP, { recursive: true });
+export function parseSyncArgs(args: string[]): { checkOnly: boolean; help: boolean } {
+	const known = new Set(["--check", "--help", "-h"]);
+	const unknown = args.filter((arg) => !known.has(arg));
+	if (unknown.length > 0) throw new Error(`Unknown sync option(s): ${unknown.join(", ")}`);
+	return { checkOnly: args.includes("--check"), help: args.includes("--help") || args.includes("-h") };
+}
 
-const drifted: Record<string, string[]> = {};
-const failed: string[] = [];
+async function git(args: string[], cwd: string): Promise<string> {
+	const result = await $`git ${args}`.cwd(cwd).quiet().nothrow();
+	if (result.exitCode !== 0) {
+		const detail = [result.stdout.toString().trim(), result.stderr.toString().trim()].filter(Boolean).join("\n");
+		throw new Error(`git ${args.join(" ")} failed${detail ? `:\n${detail}` : "."}`);
+	}
+	return result.stdout.toString().trim();
+}
 
-for (const name of STANDALONE_REPOSITORIES) {
-	const repo = `https://github.com/wornpage/${name}.git`;
-	const cloneDir = join(TMP, name);
-	const targetDir = join(MONOREPO, "packages", name);
+async function fetchPinnedSource(source: StandaloneSource, temporaryRoot: string): Promise<string> {
+	if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u.test(source.name)) {
+		throw new Error(`Invalid standalone repository name: ${source.name}`);
+	}
+	if (!/^[0-9a-f]{40}$/u.test(source.revision)) {
+		throw new Error(`Invalid full commit for ${source.name}: ${source.revision}`);
+	}
+	const cloneDir = assertPathWithin(temporaryRoot, join(temporaryRoot, source.name));
+	mkdirSync(cloneDir);
+	await git(["init", "--quiet"], cloneDir);
+	await git(["remote", "add", "origin", `https://github.com/wornpage/${source.name}.git`], cloneDir);
+	await git(["fetch", "--depth", "1", "origin", source.revision], cloneDir);
+	const fetched = await git(["rev-parse", "FETCH_HEAD"], cloneDir);
+	if (fetched !== source.revision) {
+		throw new Error(`${source.name} resolved to ${fetched}, expected ${source.revision}`);
+	}
+	await git(["checkout", "--quiet", "--detach", source.revision], cloneDir);
 
+	// Validate the tracked tree before pruning metadata or ignored local output.
+	filesUnder(cloneDir);
+	for (const entry of CRUFT) removeOwned(cloneDir, join(cloneDir, entry));
+	return cloneDir;
+}
+
+export async function syncRepositories(options: { checkOnly: boolean; monorepo?: string }): Promise<void> {
+	const monorepo = resolve(options.monorepo ?? DEFAULT_MONOREPO);
+	const packagesRoot = assertPathWithin(monorepo, join(monorepo, "packages"));
+	const temporaryRoot = assertPathWithin(monorepo, join(monorepo, ".sync-tmp"));
+	assertDirectory(monorepo, "Monorepo");
+	assertDirectory(packagesRoot, "Packages root");
+	removeOwned(monorepo, temporaryRoot);
+	mkdirSync(temporaryRoot);
+
+	const fetched = new Map<string, string>();
+	const drifted = new Map<string, string[]>();
 	try {
-		await $`git clone --depth 1 ${repo} ${cloneDir}`.quiet();
-	} catch {
-		// One unreachable repo must not abort the whole mirror, or a transient
-		// network failure leaves packages/ half-updated.
-		failed.push(name);
-		console.error(`  ${name}: clone failed — left untouched`);
-		continue;
+		// Fetch and validate every input before touching a mirror target. A failed
+		// fetch therefore leaves the entire packages/ tree unchanged.
+		for (const source of STANDALONE_SOURCES) {
+			fetched.set(source.name, await fetchPinnedSource(source, temporaryRoot));
+		}
+
+		for (const source of STANDALONE_SOURCES) {
+			const cloneDir = fetched.get(source.name)!;
+			const targetDir = assertPathWithin(packagesRoot, join(packagesRoot, source.name));
+			const differences = diffTrees(cloneDir, targetDir);
+			if (differences.length > 0) drifted.set(source.name, differences);
+
+			console.log(`${differences.length ? "DRIFT" : "ok   "}  @wornpage/${source.name} @ ${source.revision.slice(0, 12)}${differences.length ? ` (${differences.length})` : ""}`);
+			for (const difference of differences.slice(0, 5)) console.log(`         ${difference}`);
+			if (differences.length > 5) console.log(`         …and ${differences.length - 5} more`);
+		}
+
+		if (options.checkOnly) {
+			if (drifted.size > 0) {
+				throw new Error(`${drifted.size} package(s) drifted from the pinned manifest: ${[...drifted.keys()].join(", ")}`);
+			}
+			console.log("\nMirror matches every pinned standalone commit.");
+			return;
+		}
+
+		for (const [name] of drifted) {
+			const cloneDir = fetched.get(name)!;
+			const targetDir = assertPathWithin(packagesRoot, join(packagesRoot, name));
+			removeOwned(packagesRoot, targetDir);
+			cpSync(cloneDir, targetDir, { recursive: true, errorOnExist: true });
+			console.log(`updated  @wornpage/${name}`);
+		}
+
+		console.log("\nMirror update complete. No fetched package code was installed or executed.");
+		console.log("Review the diff, then install and run checks as separate trusted steps.");
+	} finally {
+		removeOwned(monorepo, temporaryRoot);
 	}
-
-	for (const dir of CRUFT) {
-		const p = join(cloneDir, dir);
-		if (existsSync(p)) rmSync(p, { recursive: true, force: true });
-	}
-
-	const differences = diffTrees(cloneDir, targetDir);
-	if (differences.length) drifted[name] = differences;
-
-	if (checkOnly) {
-		console.log(`${differences.length ? "DRIFT" : "ok   "}  @wornpage/${name}${differences.length ? ` (${differences.length})` : ""}`);
-		for (const d of differences.slice(0, 5)) console.log(`         ${d}`);
-		if (differences.length > 5) console.log(`         …and ${differences.length - 5} more`);
-		continue;
-	}
-
-	if (existsSync(targetDir)) rmSync(targetDir, { recursive: true, force: true });
-	cpSync(cloneDir, targetDir, { recursive: true });
-	console.log(`${differences.length ? "updated" : "ok     "}  @wornpage/${name}`);
 }
 
-rmSync(TMP, { recursive: true, force: true });
-
-if (failed.length) {
-	console.error(`\n${failed.length} package(s) could not be fetched: ${failed.join(", ")}`);
-	process.exit(1);
-}
-
-if (checkOnly) {
-	const names = Object.keys(drifted);
-	if (names.length) {
-		console.error(`\n${names.length} package(s) drifted from canonical: ${names.join(", ")}`);
-		console.error("Run `bun run sync` to regenerate packages/ from the standalone repos.");
-		process.exit(1);
+async function main(): Promise<void> {
+	const options = parseSyncArgs(process.argv.slice(2));
+	if (options.help) {
+		console.log("Usage: bun run sync [--check]");
+		console.log("Fetch pinned commits and compare or replace the packages/ mirror without executing fetched code.");
+		return;
 	}
-	console.log("\nMirror matches every canonical repo.");
-	process.exit(0);
+	await syncRepositories({ checkOnly: options.checkOnly });
 }
 
-console.log("\nAll packages mirrored.");
-
-if (skipTests) process.exit(0);
-
-// Mirroring strips node_modules, so workspace dependencies must be reinstalled
-// before the suite can run. Without this, `bun run sync` ends on a failure that
-// looks like a broken package but is only a missing install — @wornpage/cli's
-// test failed exactly that way, unable to resolve `commander`.
-console.log("\nInstalling workspace dependencies...");
-const install = await $`bun install`.nothrow();
-if (install.exitCode !== 0) process.exit(install.exitCode);
-
-console.log("\nRunning tests...");
-const result = await $`bun test`.nothrow();
-process.exit(result.exitCode);
+if (import.meta.main) {
+	main().catch((error) => {
+		console.error(error instanceof Error ? error.message : String(error));
+		process.exitCode = 1;
+	});
+}

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync, readFileSync } from 'node:fs';
 import { compile } from 'svelte/compiler';
+import { assertSafeHref } from '../src/safe-href';
 
 const buttonSource = readFileSync(new URL('../src/WornButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const iconButtonSource = readFileSync(new URL('../src/WornIconButton.svelte', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
@@ -60,7 +61,7 @@ describe('public contract', () => {
 	test('uses restrained non-geometric primary hover and pressed states', () => {
 		expect(buttonSource).not.toContain('rotate(');
 		expect(buttonSource).not.toContain('transition: transform');
-		expect(buttonSource).toContain('{href}');
+		expect(buttonSource).toContain('href={safeHref}');
 		expect(buttonSource).toContain('if (disabled) { e.preventDefault(); return; }');
 		expect(buttonSource).toContain('tabindex={disabled ? -1 : undefined}');
 		expect(buttonSource).toContain('{disabled}');
@@ -103,8 +104,8 @@ describe('public contract', () => {
 describe('disabled state', () => {
 	test('is owned by the package for buttons and links', () => {
 		expect(buttonSource).toContain(".worn-btn.worn-btn:disabled,\n\t.worn-btn.worn-btn[aria-disabled='true'] {");
-		expect(buttonSource).toContain('background: var(--cockpit-bg-secondary);');
-		expect(buttonSource).toContain('color: var(--cockpit-text-muted);');
+		expect(buttonSource).toContain('background: var(--worn-bg-secondary);');
+		expect(buttonSource).toContain('color: var(--worn-text-muted);');
 		expect(buttonSource).toContain('cursor: not-allowed;');
 		expect(buttonSource).toContain('opacity: 1;');
 		expect(buttonSource).toContain('animation: none;');
@@ -140,7 +141,7 @@ describe('compact and touch interactions', () => {
 
 	test('suppresses browser gesture delay and decorative transitions when appropriate', () => {
 		expect(buttonSource).toContain('touch-action: manipulation;');
-		expect(buttonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
+		expect(buttonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--worn-focus, var(--worn-text, #21322b)));');
 		expect(buttonSource).toContain('@media (prefers-reduced-motion: reduce) {');
 		expect(buttonSource).toContain('transition: none;');
 	});
@@ -162,11 +163,11 @@ describe('compact and touch interactions', () => {
 	});
 
 	test('owns icon-button theme and focus states', () => {
-		expect(iconButtonSource).toContain('color: var(--cockpit-text);');
-		expect(iconButtonSource).toContain('background: var(--cockpit-bg-secondary);');
-		expect(iconButtonSource).toContain('color: var(--cockpit-danger-text);');
+		expect(iconButtonSource).toContain('color: var(--worn-text);');
+		expect(iconButtonSource).toContain('background: var(--worn-bg-secondary);');
+		expect(iconButtonSource).toContain('color: var(--worn-danger-text);');
 		expect(iconButtonSource).toContain('.worn-icon-btn:focus-visible {');
-		expect(iconButtonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
+		expect(iconButtonSource).toContain('outline: 2px dashed var(--worn-button-focus, var(--worn-focus, var(--worn-text, #21322b)));');
 		expect(iconButtonSource).toContain('.worn-icon-btn:disabled {');
 		expect(iconButtonSource).toContain('opacity: 1;');
 	});
@@ -184,7 +185,7 @@ describe('compact and touch interactions', () => {
 		expect(reactionButtonSource).toContain('touch-action: manipulation;');
 		expect(reactionButtonSource).toContain('overflow-wrap: anywhere;');
 		expect(reactionButtonSource).toContain('.worn-reaction-btn:focus-visible {');
-		expect(reactionButtonSource).toContain('var(--cockpit-focus, var(--cockpit-text, #21322b))');
+		expect(reactionButtonSource).toContain('var(--worn-focus, var(--worn-text, #21322b))');
 		expect(reactionButtonSource).toContain('.worn-reaction-btn.is-pressed {');
 		expect(reactionButtonSource).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(reactionButtonSource).toContain('@media (forced-colors: active)');
@@ -202,6 +203,33 @@ describe('browser wrapper', () => {
 	test('delegates its public attributes to the canonical Svelte button', () => {
 		expect(elementSource).toContain("tag: 'worn-button'");
 		expect(elementSource).toContain("disabled: { type: 'Boolean' }");
-		expect(elementSource).toContain('<Button {variant} {disabled} {size} {type} {href}>{label}</Button>');
+		expect(elementSource).toContain('href?: string | null;');
+		expect(elementSource).toContain('<Button {variant} {disabled} {size} {type} href={href ?? undefined}>{label}</Button>');
+	});
+});
+
+describe('link safety', () => {
+	test('accepts local destinations and explicitly supported schemes', () => {
+		for (const href of [
+			'/projects', './settings', '../home', 'projects/42', '?filter=open', '#details',
+			'https://example.com/path',
+			'mailto:security@example.com', 'tel:+15551234567'
+		]) {
+			expect(assertSafeHref(href)).toBe(href);
+		}
+		expect(buttonSource).toContain("import { assertSafeHref } from './safe-href';");
+		expect(buttonSource).toContain('href === undefined ? undefined : assertSafeHref(href)');
+	});
+
+	test('rejects executable, ambiguous, and control-obfuscated destinations', () => {
+		for (const href of [
+			'', ' javascript:alert(1)', 'javascript:alert(1)', 'JAVASCRIPT:alert(1)',
+			'java\nscript:alert(1)', 'data:text/html,boom', 'vbscript:msgbox(1)',
+			'http://localhost:3000', 'ftp://example.com/file', '//example.com/path',
+			'\\\\example.com\\path', 'https://example.com/a b',
+			'java\u200bscript:alert(1)', 'https://example.com/\u0000path'
+		]) {
+			expect(() => assertSafeHref(href)).toThrow(TypeError);
+		}
 	});
 });

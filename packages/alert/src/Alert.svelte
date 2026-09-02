@@ -81,7 +81,7 @@
     padding: 14px 16px;
     overflow-wrap: anywhere;
     border: 1px solid;
-    border-radius: var(--cockpit-radius);
+    border-radius: var(--worn-radius);
     font-family: var(--font-typewriter);
     font-size: 13px;
     line-height: 1.4;
@@ -89,30 +89,30 @@
 
   .worn-alert.is-info {
     --worn-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4'/%3E%3Cpath d='M12 8h.01'/%3E%3C/svg%3E");
-    background: var(--cockpit-accent-50);
-    border-color: var(--cockpit-accent);
-    color: var(--cockpit-text);
+    background: var(--worn-accent-50);
+    border-color: var(--worn-accent);
+    color: var(--worn-text);
   }
 
   .worn-alert.is-success {
     --worn-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
-    background: var(--cockpit-success-bg);
-    border-color: var(--cockpit-success-border);
-    color: var(--cockpit-success-text);
+    background: var(--worn-success-bg);
+    border-color: var(--worn-success-border);
+    color: var(--worn-success-text);
   }
 
   .worn-alert.is-warning {
     --worn-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3'/%3E%3Cpath d='M12 9v4'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
-    background: var(--cockpit-warning-bg);
-    border-color: var(--cockpit-warning-border);
-    color: var(--cockpit-warning-text);
+    background: var(--worn-warning-bg);
+    border-color: var(--worn-warning-border);
+    color: var(--worn-warning-text);
   }
 
   .worn-alert.is-danger {
     --worn-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m15 9-6 6'/%3E%3Cpath d='m9 9 6 6'/%3E%3C/svg%3E");
-    background: var(--cockpit-danger-bg);
-    border-color: var(--cockpit-danger-border);
-    color: var(--cockpit-danger-text);
+    background: var(--worn-danger-bg);
+    border-color: var(--worn-danger-border);
+    color: var(--worn-danger-text);
   }
 
   .worn-alert-icon {
@@ -175,7 +175,7 @@
   .worn-alert-dismiss:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
 
   .worn-alert-dismiss:focus-visible {
-    outline: 2px dashed var(--worn-alert-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
+    outline: 2px dashed var(--worn-alert-focus, var(--worn-focus, var(--worn-accent, currentColor)));
     outline-offset: 2px;
   }
 </style>

@@ -21,7 +21,7 @@
 
 <style>
   .worn-select {
-    --worn-field-boundary: color-mix(in srgb, var(--cockpit-border-strong) 30%, var(--cockpit-text-muted));
+    --worn-field-boundary: color-mix(in srgb, var(--worn-border-strong) 30%, var(--worn-text-muted));
     box-sizing: border-box;
     max-inline-size: 100%;
     min-block-size: 44px;
@@ -29,8 +29,8 @@
     padding: 9px 32px 9px 12px;
     overflow: hidden;
     border: 1px solid var(--worn-field-boundary);
-    border-radius: var(--cockpit-radius-sm);
-    background-color: var(--cockpit-surface);
+    border-radius: var(--worn-radius-sm);
+    background-color: var(--worn-surface);
     background-image:
       linear-gradient(45deg, transparent 50%, currentColor 50%),
       linear-gradient(135deg, currentColor 50%, transparent 50%);
@@ -39,7 +39,7 @@
       calc(100% - 9px) calc(50% + 1px);
     background-repeat: no-repeat;
     background-size: 5px 5px, 5px 5px;
-    color: var(--cockpit-text);
+    color: var(--worn-text);
     font-family: var(--font-typewriter);
     font-size: 14px;
     line-height: 1.4;
@@ -52,17 +52,17 @@
   }
 
   .worn-select:focus-visible {
-    outline: 2px dashed var(--worn-field-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
+    outline: 2px dashed var(--worn-field-focus, var(--worn-focus, var(--worn-text, #21322b)));
     outline-offset: 2px;
-    border-color: var(--cockpit-accent);
-    box-shadow: 0 0 0 1px var(--cockpit-accent-50);
+    border-color: var(--worn-accent);
+    box-shadow: 0 0 0 1px var(--worn-accent-50);
   }
 
   .worn-select:disabled {
-    background-color: var(--cockpit-bg-secondary);
+    background-color: var(--worn-bg-secondary);
     border-color: var(--worn-field-boundary);
-    color: var(--cockpit-text-muted);
-    -webkit-text-fill-color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
+    -webkit-text-fill-color: var(--worn-text-muted);
     cursor: not-allowed;
     opacity: 1;
   }

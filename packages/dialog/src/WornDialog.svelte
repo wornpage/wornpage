@@ -119,9 +119,9 @@
 	}
 	.worn-dialog {
 		box-sizing: border-box;
-		background: var(--cockpit-surface);
-		border: 1px solid var(--cockpit-border);
-		border-radius: var(--cockpit-radius);
+		background: var(--worn-surface);
+		border: 1px solid var(--worn-border);
+		border-radius: var(--worn-radius);
 		box-shadow: 0 16px 48px rgba(0,0,0,0.15);
 		width: 460px;
 		max-width: 100%;
@@ -145,7 +145,7 @@
 		font-family: var(--font-family-display);
 		font-size: 18px;
 		font-weight: 680;
-		color: var(--cockpit-text);
+		color: var(--worn-text);
 		margin: 0;
 		min-width: 0;
 		overflow-wrap: anywhere;
@@ -157,7 +157,7 @@
 		border-radius: 50%;
 		border: 0;
 		background: transparent;
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -179,14 +179,14 @@
 	.worn-dialog-close::before { transform: translate(-50%, -50%) rotate(45deg); }
 	.worn-dialog-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 	.worn-dialog-close:hover {
-		background: var(--cockpit-hover-bg);
+		background: var(--worn-hover-bg);
 	}
 	.worn-dialog-close:disabled {
 		cursor: not-allowed;
 		opacity: 0.45;
 	}
 	.worn-dialog-close:focus-visible {
-		outline: 2px dashed var(--worn-dialog-focus, var(--cockpit-focus, currentColor));
+		outline: 2px dashed var(--worn-dialog-focus, var(--worn-focus, currentColor));
 		outline-offset: 2px;
 	}
 	.worn-dialog-body {

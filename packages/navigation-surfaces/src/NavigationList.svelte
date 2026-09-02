@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { assertSafeHref } from './safe-href';
+
 	export interface NavigationListItem {
 		label: string;
 		href: string;
@@ -18,8 +20,9 @@
 	<nav class="worn-navigation-list" aria-label={label} data-worn-navigation-list>
 		<ul>
 			{#each items as item (item.href)}
+				{@const href = assertSafeHref(item.href)}
 				<li>
-					<a href={item.href} aria-current={item.current ? 'page' : undefined}>
+					<a href={href} aria-current={item.current ? 'page' : undefined}>
 						<span class="worn-navigation-list-label">{item.label}</span>
 						{#if item.description}
 							<span class="worn-navigation-list-description">{item.description}</span>
@@ -50,8 +53,8 @@
 		margin: 0;
 		padding: 1px;
 		list-style: none;
-		background: var(--worn-navigation-list-divider, var(--cockpit-border, #cfd5d1));
-		border-radius: var(--worn-navigation-list-radius, var(--cockpit-radius-sm, 6px));
+		background: var(--worn-navigation-list-divider, var(--worn-border, #cfd5d1));
+		border-radius: var(--worn-navigation-list-radius, var(--worn-radius-sm, 6px));
 	}
 
 	li {
@@ -71,8 +74,8 @@
 		min-block-size: 52px;
 		min-inline-size: 0;
 		padding: 8px 12px;
-		background: var(--worn-navigation-list-background, var(--cockpit-surface, #ffffff));
-		color: var(--cockpit-text, #1f2f28);
+		background: var(--worn-navigation-list-background, var(--worn-surface, #ffffff));
+		color: var(--worn-text, #1f2f28);
 		text-decoration: none;
 		touch-action: manipulation;
 		transition: background-color 0.12s ease, color 0.12s ease;
@@ -93,13 +96,13 @@
 	}
 
 	.worn-navigation-list-description {
-		color: var(--cockpit-text-muted, #506058);
+		color: var(--worn-text-muted, #506058);
 		font-size: 12px;
 		line-height: 1.4;
 	}
 
 	a:hover {
-		background: var(--worn-navigation-list-hover, var(--cockpit-accent-50, #e5f2ef));
+		background: var(--worn-navigation-list-hover, var(--worn-accent-50, #e5f2ef));
 	}
 
 	a:focus-visible {
@@ -110,8 +113,8 @@
 	}
 
 	a[aria-current='page'] {
-		background: var(--cockpit-selected-bg, var(--cockpit-accent-50, #e5f2ef));
-		color: var(--cockpit-selected-fg, var(--cockpit-text, #1f2f28));
+		background: var(--worn-selected-bg, var(--worn-accent-50, #e5f2ef));
+		color: var(--worn-selected-fg, var(--worn-text, #1f2f28));
 	}
 
 	@container (min-width: 520px) {

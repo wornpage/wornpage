@@ -36,7 +36,7 @@ describe('compact and motion behavior', () => {
   test('limits trigger hover feedback to fine hover-capable pointers', () => {
     expect(collapsible).toContain('@media (hover: hover) and (pointer: fine)');
     expect(collapsible).toContain('.worn-collapsible-trigger:hover {');
-    expect(collapsible).toContain('background: var(--cockpit-hover-bg);');
+    expect(collapsible).toContain('background: var(--worn-hover-bg);');
   });
 
   test('contains hostile labels and owns the complete trigger target', () => {
@@ -51,10 +51,10 @@ describe('compact and motion behavior', () => {
   });
 
   test('shares one theme-safe focus token across both disclosure triggers', () => {
-    const focusOutline = 'outline: 2px dashed var(--worn-disclosure-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));';
+    const focusOutline = 'outline: 2px dashed var(--worn-disclosure-focus, var(--worn-focus, var(--worn-accent, currentColor)));';
     for (const source of [accordion, collapsible]) {
       expect(source).toContain(focusOutline);
-      expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+      expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
     }
     expect(readme).toContain('`--worn-disclosure-focus`');
     expect(packageJson.version).toBe('0.1.1');

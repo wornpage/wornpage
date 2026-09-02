@@ -17,11 +17,11 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
 This README is the component-specific API and behavior contract; the CLI
 document linked above defines only the shared delivery checks.
 
-## Install
+## Source use
 
-```bash
-bun add @wornpage/undo
-```
+This package is not published to npm. Check out this repository at a reviewed commit and consume it
+from a local workspace after installing dependencies from `bun.lock`. The `@wornpage/undo` imports
+below assume that workspace mapping; they do not resolve from the public npm registry.
 
 ## The stack
 

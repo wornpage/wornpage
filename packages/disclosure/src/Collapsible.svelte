@@ -47,8 +47,8 @@
     min-block-size: 44px;
     min-inline-size: 0;
     overflow: hidden;
-    border: 1px solid var(--cockpit-border);
-    border-radius: var(--cockpit-radius-sm);
+    border: 1px solid var(--worn-border);
+    border-radius: var(--worn-radius-sm);
   }
 
   .worn-collapsible-trigger {
@@ -62,8 +62,8 @@
     min-inline-size: 0;
     padding: 10px 14px;
     border: 0;
-    background: var(--cockpit-surface);
-    color: var(--cockpit-text);
+    background: var(--worn-surface);
+    color: var(--worn-text);
     font: inherit;
     cursor: pointer;
     text-align: start;
@@ -72,12 +72,12 @@
 
   @media (hover: hover) and (pointer: fine) {
     .worn-collapsible-trigger:hover {
-      background: var(--cockpit-hover-bg);
+      background: var(--worn-hover-bg);
     }
   }
 
   .worn-collapsible-trigger:focus-visible {
-    outline: 2px dashed var(--worn-disclosure-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
+    outline: 2px dashed var(--worn-disclosure-focus, var(--worn-focus, var(--worn-accent, currentColor)));
     outline-offset: -2px;
   }
 
@@ -86,7 +86,7 @@
     inline-size: 16px;
     block-size: 16px;
     flex: 0 0 16px;
-    color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
   }
 
   .worn-collapsible-caret::before {
@@ -122,8 +122,8 @@
     min-inline-size: 0;
     padding: 12px 14px;
     overflow-wrap: anywhere;
-    border-top: 1px solid var(--cockpit-border);
-    background: var(--cockpit-bg);
+    border-top: 1px solid var(--worn-border);
+    background: var(--worn-bg);
   }
 
   @media (prefers-reduced-motion: reduce) {
