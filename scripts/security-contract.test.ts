@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
+import { STANDALONE_SOURCES } from "./component-repositories.ts";
 
 const workflow = readFileSync(new URL("../.github/workflows/mirror-check.yml", import.meta.url), "utf8");
 const publicInstructions = [
@@ -17,5 +18,21 @@ describe("repository security contract", () => {
 
 	it("does not advertise the unavailable registry as an installation path", () => {
 		expect(publicInstructions).not.toMatch(/\b(?:bun add|npm (?:add|install)|bunx) @wornpage\//u);
+	});
+
+	it("keeps public commit links aligned with the reviewed source manifest", () => {
+		const expectedRevisions = new Map(
+			STANDALONE_SOURCES.map(({ name, revision }) => [name, revision]),
+		);
+		const references = [
+			...publicInstructions.matchAll(
+				/https:\/\/(?:codeload\.)?github\.com\/wornpage\/([a-z][a-z0-9-]+)\/(?:tar\.gz|blob)\/([0-9a-f]{40})/gu,
+			),
+		];
+
+		expect(references.length).toBeGreaterThan(0);
+		for (const [, repository, revision] of references) {
+			expect(expectedRevisions.get(repository)).toBe(revision);
+		}
 	});
 });

@@ -48,7 +48,7 @@ across packages without trusting mutable default branches.
 - The generated Delivery section and deterministic `.gitattributes`
 - The shared release-contract workflow from `@wornpage/cli`
 
-The [component delivery contract](https://github.com/wornpage/cli/blob/9a6a0e085d137c436842096c106c5a50100cc7b2/docs/component-delivery.md)
+The [component delivery contract](https://github.com/wornpage/cli/blob/d65813ff4f5668e8ab96fef8f744e47dbfeb7e3c/docs/component-delivery.md)
 defines source-only and generated browser-bundle packages. Use a pinned CLI
 checkout to verify a standalone repository before shipping.
 
