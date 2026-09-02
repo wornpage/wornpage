@@ -33,7 +33,7 @@
 
 <style>
   .worn-switch {
-    --worn-binary-boundary: color-mix(in srgb, var(--cockpit-border-strong) 30%, var(--cockpit-text-muted));
+    --worn-binary-boundary: color-mix(in srgb, var(--worn-border-strong) 30%, var(--worn-text-muted));
     position: relative;
     display: inline-flex;
     box-sizing: border-box;
@@ -78,20 +78,20 @@
     flex: 0 0 42px;
     border: 2px solid var(--worn-binary-boundary);
     border-radius: 12px;
-    background: var(--cockpit-border-strong);
+    background: var(--worn-border-strong);
     transition: border-color 0.15s ease, background 0.15s ease;
   }
 
   .worn-switch-input:checked + .worn-switch-track {
-    --worn-binary-state-focus: var(--cockpit-accent-text);
+    --worn-binary-state-focus: var(--worn-accent-text);
     border-color: var(--worn-binary-boundary);
-    background: var(--cockpit-accent);
+    background: var(--worn-accent);
   }
 
   .worn-switch.is-disabled .worn-switch-track,
   .worn-switch.is-disabled .worn-switch-input:checked + .worn-switch-track {
-    border-color: var(--cockpit-border-strong);
-    background: var(--cockpit-border);
+    border-color: var(--worn-border-strong);
+    background: var(--worn-border);
   }
 
   .worn-switch-thumb {
@@ -101,7 +101,7 @@
     inline-size: 18px;
     block-size: 18px;
     border-radius: 50%;
-    background: var(--cockpit-accent-text);
+    background: var(--worn-accent-text);
     box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
     transition: transform 0.15s ease, opacity 0.15s ease;
   }
@@ -124,11 +124,11 @@
     overflow-wrap: anywhere;
     font-family: var(--font-typewriter);
     font-size: 13px;
-    color: var(--cockpit-text);
+    color: var(--worn-text);
   }
 
   .worn-switch.is-disabled .worn-switch-label {
-    color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
   }
 
   @media (prefers-reduced-motion: reduce) {

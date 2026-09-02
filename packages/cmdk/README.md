@@ -21,11 +21,12 @@ The shared [component delivery contract](https://github.com/wornpage/cli/blob/ma
 - 🎨 CSS custom properties for theming
 - 🪶 Zero dependencies (Svelte 5 peer only)
 
-## Install
+## Source use
 
-```bash
-bun add @wornpage/cmdk
-```
+This package is not published to npm. Check out this repository at a reviewed commit, install its
+dependencies from `bun.lock`, and consume `src/index.ts` through a local workspace alias. The
+`@wornpage/cmdk` imports below assume that local alias; they do not resolve from the public npm
+registry.
 
 ## Usage
 

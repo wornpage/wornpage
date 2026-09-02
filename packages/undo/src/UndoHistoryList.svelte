@@ -43,7 +43,7 @@
 
 <style>
 	.wrn-history-empty {
-		color: var(--cockpit-text-muted, #596a61);
+		color: var(--worn-text-muted, #596a61);
 		font-size: 13px;
 		margin: 0 0 12px;
 	}
@@ -59,9 +59,9 @@
 		appearance: none;
 		background: transparent;
 		border: 1px solid transparent;
-		border-radius: var(--worn-undo-radius, var(--cockpit-radius, 6px));
+		border-radius: var(--worn-undo-radius, var(--worn-radius, 6px));
 		box-sizing: border-box;
-		color: var(--cockpit-text, #21322b);
+		color: var(--worn-text, #21322b);
 		cursor: pointer;
 		display: flex;
 		font: inherit;
@@ -76,11 +76,11 @@
 		-webkit-tap-highlight-color: transparent;
 	}
 	.wrn-history-row:hover:not(:disabled) {
-		background: var(--cockpit-surface-raised, var(--cockpit-surface, #fdfbf7));
-		border-color: var(--cockpit-border, #c8c2b9);
+		background: var(--worn-surface-raised, var(--worn-surface, #fdfbf7));
+		border-color: var(--worn-border, #c8c2b9);
 	}
 	.wrn-history-row:focus-visible {
-		outline: 2px dashed var(--worn-undo-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));
+		outline: 2px dashed var(--worn-undo-focus, var(--worn-focus, var(--worn-text, #21322b)));
 		outline-offset: 2px;
 	}
 	.wrn-history-row:disabled {
@@ -88,17 +88,17 @@
 		opacity: 1;
 	}
 	.wrn-history-row.is-current {
-		background: var(--cockpit-surface-raised, var(--cockpit-surface, #fdfbf7));
-		border-color: var(--cockpit-border-strong, var(--cockpit-border, #c8c2b9));
+		background: var(--worn-surface-raised, var(--worn-surface, #fdfbf7));
+		border-color: var(--worn-border-strong, var(--worn-border, #c8c2b9));
 	}
 	.wrn-history-row.is-undone .wrn-history-label,
 	.wrn-history-row.is-undone .wrn-history-meta {
-		color: var(--cockpit-text-muted, #596a61);
+		color: var(--worn-text-muted, #596a61);
 		text-decoration: line-through;
 	}
 	.wrn-history-dot {
 		background: transparent;
-		border: 1px solid var(--cockpit-border-strong, var(--cockpit-border, #c8c2b9));
+		border: 1px solid var(--worn-border-strong, var(--worn-border, #c8c2b9));
 		border-radius: 50%;
 		block-size: 7px;
 		flex: none;
@@ -106,8 +106,8 @@
 		margin-block-start: 6px;
 	}
 	.wrn-history-row.is-current .wrn-history-dot {
-		background: var(--cockpit-link, #0f766e);
-		border-color: var(--cockpit-link, #0f766e);
+		background: var(--worn-link, #0f766e);
+		border-color: var(--worn-link, #0f766e);
 	}
 	.wrn-history-text {
 		display: grid;
@@ -119,7 +119,7 @@
 		overflow-wrap: anywhere;
 	}
 	.wrn-history-meta {
-		color: var(--cockpit-text-muted, #596a61);
+		color: var(--worn-text-muted, #596a61);
 		font-family: var(--font-typewriter, monospace);
 		font-size: 11px;
 		overflow-wrap: anywhere;

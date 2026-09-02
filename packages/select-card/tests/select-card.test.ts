@@ -40,9 +40,9 @@ describe('responsive interaction contract', () => {
 
 	test('owns one theme-safe focus token for selected and unselected cards', () => {
 		expect(source).toContain(
-			'outline: 2px dashed var(--worn-select-card-focus, currentColor);'
+			'outline: 2px dashed var(--worn-select-card-focus, var(--worn-focus, currentColor));'
 		);
-		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
 		expect(readme).toContain('`--worn-select-card-focus`');
 		expect(packageJson.version).toBe('0.1.1');
 	});
@@ -50,7 +50,7 @@ describe('responsive interaction contract', () => {
 	test('limits hover feedback to fine hover-capable pointers', () => {
 		expect(source).toContain("@media (hover: hover) and (pointer: fine) {");
 		expect(source).toMatch(
-			/@media \(hover: hover\) and \(pointer: fine\) \{\s*\.worn-select-card:hover:not\(\[aria-pressed='true'\]\):not\(:disabled\) \{\s*border-color: var\(--cockpit-border-strong\);/u
+			/@media \(hover: hover\) and \(pointer: fine\) \{\s*\.worn-select-card:hover:not\(\[aria-pressed='true'\]\):not\(:disabled\) \{\s*border-color: var\(--worn-border-strong\);/u
 		);
 		expect(source).toContain(".worn-select-card[aria-pressed='true'] {");
 		expect(source).toContain('.worn-select-card:focus-visible');
@@ -61,14 +61,14 @@ describe('responsive interaction contract', () => {
 describe('theme states', () => {
 	test('keeps pressed content on the selected foreground', () => {
 		expect(source).toContain(".worn-select-card[aria-pressed='true'] {");
-		expect(source).toContain('color: var(--cockpit-accent-text);');
+		expect(source).toContain('color: var(--worn-accent-text);');
 		expect(source).toContain(".worn-select-card[aria-pressed='true'] strong,");
 	});
 
 	test('keeps disabled state readable without opacity dimming', () => {
 		expect(source).toContain('.worn-select-card:disabled {');
-		expect(source).toContain('background: var(--cockpit-bg-secondary);');
-		expect(source).toContain('color: var(--cockpit-text-muted);');
+		expect(source).toContain('background: var(--worn-bg-secondary);');
+		expect(source).toContain('color: var(--worn-text-muted);');
 		expect(source).toContain('opacity: 1;');
 	});
 });

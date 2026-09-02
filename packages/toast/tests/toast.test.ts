@@ -52,10 +52,10 @@ describe('toast component', () => {
 	});
 
 	test('uses shared theme tokens with standalone fallbacks', () => {
-		expect(toastSource).toContain('var(--wrn-toast-bg, var(--cockpit-surface, #fdfbf7))');
-		expect(toastSource).toContain('var(--wrn-toast-text, var(--cockpit-text, #21322b))');
-		expect(toastSource).toContain('var(--wrn-toast-error-bg, var(--cockpit-danger-bg, #fdf0ef))');
-		expect(toastSource).toContain('var(--wrn-toast-success-bg, var(--cockpit-success-bg, #edf9f0))');
+		expect(toastSource).toContain('var(--wrn-toast-bg, var(--worn-surface, #fdfbf7))');
+		expect(toastSource).toContain('var(--wrn-toast-text, var(--worn-text, #21322b))');
+		expect(toastSource).toContain('var(--wrn-toast-error-bg, var(--worn-danger-bg, #fdf0ef))');
+		expect(toastSource).toContain('var(--wrn-toast-success-bg, var(--worn-success-bg, #edf9f0))');
 	});
 
 	test('announces messages and uses a dedicated dismiss control', () => {
@@ -97,7 +97,7 @@ describe('toast component', () => {
 	});
 
 	test('uses the theme focus token before the accent fallback', () => {
-		expect(toastSource).toContain('var(--cockpit-focus, var(--cockpit-accent, currentColor))');
+		expect(toastSource).toContain('var(--worn-focus, var(--worn-accent, currentColor))');
 	});
 
 	test('uses stylesheet motion that remains compatible with a strict CSP', () => {

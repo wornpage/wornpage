@@ -16,7 +16,7 @@ describe('date input source', () => {
 	});
 
 	test('keeps shared tokens and accessible native props', () => {
-		expect(source).toContain('var(--cockpit-border)');
+		expect(source).toContain('var(--worn-border)');
 		expect(source).toContain('{required}');
 		expect(source).toContain('{disabled}');
 		expect(source).toContain('autocomplete="off"');
@@ -31,10 +31,10 @@ describe('date input source', () => {
 
 	test('owns a standalone-safe focus token without changing themed field accents', () => {
 		expect(source).toContain('.worn-date-input:focus {');
-		expect(source).toContain('outline: 2px dashed var(--worn-date-input-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
-		expect(source).toContain('border-color: var(--cockpit-accent);');
-		expect(source).toContain('box-shadow: 0 0 0 1px var(--cockpit-accent-50);');
-		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(source).toContain('outline: 2px dashed var(--worn-date-input-focus, var(--worn-focus, var(--worn-text, currentColor)));');
+		expect(source).toContain('border-color: var(--worn-accent);');
+		expect(source).toContain('box-shadow: 0 0 0 1px var(--worn-accent-50);');
+		expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
 		expect(readme).toContain('`--worn-date-input-focus`');
 	});
 });

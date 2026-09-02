@@ -30,10 +30,10 @@
 		min-block-size: 44px;
 		min-inline-size: 0;
 		padding: 12px 16px;
-		border: 1px solid var(--cockpit-border);
-		border-radius: var(--cockpit-radius);
+		border: 1px solid var(--worn-border);
+		border-radius: var(--worn-radius);
 		background: transparent;
-		color: var(--cockpit-text-secondary);
+		color: var(--worn-text-secondary);
 		cursor: pointer;
 		font: inherit;
 		letter-spacing: 0;
@@ -54,14 +54,14 @@
 	}
 	.worn-select-card span {
 		margin-top: 2px;
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		font-size: 12px;
 		line-height: 1.4;
 	}
 	.worn-select-card[aria-pressed='true'] {
-		background: var(--cockpit-accent);
-		border-color: var(--cockpit-accent);
-		color: var(--cockpit-accent-text);
+		background: var(--worn-accent);
+		border-color: var(--worn-accent);
+		color: var(--worn-accent-text);
 	}
 	.worn-select-card[aria-pressed='true'] strong,
 	.worn-select-card[aria-pressed='true'] span {
@@ -69,17 +69,17 @@
 	}
 	@media (hover: hover) and (pointer: fine) {
 		.worn-select-card:hover:not([aria-pressed='true']):not(:disabled) {
-			border-color: var(--cockpit-border-strong);
+			border-color: var(--worn-border-strong);
 		}
 	}
 	.worn-select-card:focus-visible {
-		outline: 2px dashed var(--worn-select-card-focus, currentColor);
+		outline: 2px dashed var(--worn-select-card-focus, var(--worn-focus, currentColor));
 		outline-offset: 2px;
 	}
 	.worn-select-card:disabled {
-		background: var(--cockpit-bg-secondary);
-		border-color: var(--cockpit-border);
-		color: var(--cockpit-text-muted);
+		background: var(--worn-bg-secondary);
+		border-color: var(--worn-border);
+		color: var(--worn-text-muted);
 		cursor: not-allowed;
 		opacity: 1;
 	}
@@ -87,9 +87,9 @@
 		color: inherit;
 	}
 	.worn-select-card[aria-pressed='true']:disabled {
-		background: var(--cockpit-surface-raised);
-		border-color: var(--cockpit-border-strong);
-		color: var(--cockpit-text-secondary);
+		background: var(--worn-surface-raised);
+		border-color: var(--worn-border-strong);
+		color: var(--worn-text-secondary);
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.worn-select-card { transition: none; }

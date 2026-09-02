@@ -46,17 +46,17 @@
 		font-weight: 550;
 		line-height: 1.2;
 		padding: 3px 7px;
-		border: 1px solid var(--cockpit-border-strong, #8a948e);
+		border: 1px solid var(--worn-border-strong, #8a948e);
 		border-radius: 4px;
-		background: var(--cockpit-surface, #ffffff);
-		color: var(--cockpit-text-secondary, #3f4b45);
-		box-shadow: 0 1px 0 var(--cockpit-border, #c8ceca);
+		background: var(--worn-surface, #ffffff);
+		color: var(--worn-text-secondary, #3f4b45);
+		box-shadow: 0 1px 0 var(--worn-border, #c8ceca);
 		white-space: normal;
 	}
 
 	.worn-kbd-plus {
 		flex: 0 0 auto;
 		font-size: 11px;
-		color: var(--cockpit-text-muted, #64706a);
+		color: var(--worn-text-muted, #64706a);
 	}
 </style>

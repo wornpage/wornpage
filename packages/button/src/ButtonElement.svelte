@@ -27,8 +27,8 @@
 		disabled?: boolean;
 		size?: 'sm' | 'md';
 		type?: 'button' | 'submit';
-		href?: string;
+		href?: string | null;
 	} = $props();
 </script>
 
-<Button {variant} {disabled} {size} {type} {href}>{label}</Button>
+<Button {variant} {disabled} {size} {type} href={href ?? undefined}>{label}</Button>

@@ -93,7 +93,7 @@ describe('keyboard and compact behavior', () => {
 
 	test('owns one state-aware focus token across tabs and overflow controls', () => {
 		expect(source).toMatch(/\.worn-tabs-control:focus-visible,\s*\.worn-tab:focus-visible \{\s*outline: 2px dashed var\(--worn-tabs-focus, currentColor\);\s*outline-offset: -2px;\s*\}/u);
-		expect(source).not.toContain('outline: 2px dashed var(--cockpit-accent);');
+		expect(source).not.toContain('outline: 2px dashed var(--worn-accent);');
 	});
 });
 

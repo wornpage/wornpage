@@ -100,11 +100,11 @@ describe('command palette chrome', () => {
 	});
 
 	test('inherits shared theme tokens with standalone fallbacks', () => {
-		expect(cmdkSource).toContain('var(--cmdk-surface, var(--cockpit-surface, #fff))');
-		expect(cmdkSource).toContain('var(--cmdk-text, var(--cockpit-text, #21322b))');
-		expect(cmdkSource).toContain('var(--cmdk-border, var(--cockpit-border-strong, #d0cac1))');
-		expect(cmdkSource).toContain('var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7))');
-		expect(cmdkSource).toContain('var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a))');
+		expect(cmdkSource).toContain('var(--cmdk-surface, var(--worn-surface, #fff))');
+		expect(cmdkSource).toContain('var(--cmdk-text, var(--worn-text, #21322b))');
+		expect(cmdkSource).toContain('var(--cmdk-border, var(--worn-border-strong, #d0cac1))');
+		expect(cmdkSource).toContain('var(--cmdk-selected-bg, var(--worn-hover-bg, #d7efe7))');
+		expect(cmdkSource).toContain('var(--cmdk-text-muted, var(--worn-text-muted, #63746a))');
 		expect(cmdkSource).toContain('.cmdk-input::placeholder');
 	});
 
@@ -117,7 +117,7 @@ describe('command palette chrome', () => {
 	});
 
 	test('limits close hover feedback to fine hover pointers', () => {
-		const closeHoverRules = cmdkSource.match(/\.cmdk-close:hover \{ background: var\(--cmdk-selected-bg, var\(--cockpit-hover-bg, #d7efe7\)\); \}/gu);
+		const closeHoverRules = cmdkSource.match(/\.cmdk-close:hover \{ background: var\(--cmdk-selected-bg, var\(--worn-hover-bg, #d7efe7\)\); \}/gu);
 		expect(closeHoverRules).toHaveLength(1);
 		expect(cmdkSource).toContain('@media (hover: hover) and (pointer: fine) {\n\t\t.cmdk-close:hover');
 	});
@@ -131,7 +131,7 @@ describe('command palette chrome', () => {
 	});
 
 	test('uses the component focus token with the shared high-contrast fallback', () => {
-		expect(cmdkSource).toContain('outline: 2px dashed var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));');
+		expect(cmdkSource).toContain('outline: 2px dashed var(--cmdk-focus, var(--worn-focus, var(--worn-accent, currentColor)));');
 	});
 
 	test('keeps the search input at an iOS-safe size without relying on pointer media detection', () => {
@@ -143,7 +143,7 @@ describe('command palette chrome', () => {
 	test('keeps automatic search focus visible without changing input geometry', () => {
 		const inputRule = cmdkSource.match(/\.cmdk-input \{[\s\S]*?\}/u)?.[0] ?? '';
 		expect(inputRule).not.toContain('outline: none');
-		expect(cmdkSource).toContain('.cmdk-input:focus-visible { outline: 2px solid var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: -2px; }');
+		expect(cmdkSource).toContain('.cmdk-input:focus-visible { outline: 2px solid var(--cmdk-focus, var(--worn-focus, var(--worn-accent, currentColor))); outline-offset: -2px; }');
 		expect(readmeSource).toContain('The automatically focused search input has a contained, theme-safe visible outline');
 	});
 

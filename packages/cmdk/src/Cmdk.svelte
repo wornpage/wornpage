@@ -138,35 +138,35 @@
 		to { opacity: 1; transform: translateY(0); }
 	}
 	.cmdk { animation: cmdk-in 0.15s ease-out; width: min(520px, 92vw); max-width: 92vw; padding: 0;
-		border: 1px solid var(--cmdk-border, var(--cockpit-border-strong, #d0cac1)); border-radius: var(--cmdk-radius, 8px);
-		background: var(--cmdk-surface, var(--cockpit-surface, #fff)); color: var(--cmdk-text, var(--cockpit-text, #21322b));
+		border: 1px solid var(--cmdk-border, var(--worn-border-strong, #d0cac1)); border-radius: var(--cmdk-radius, 8px);
+		background: var(--cmdk-surface, var(--worn-surface, #fff)); color: var(--cmdk-text, var(--worn-text, #21322b));
 		box-shadow: 0 12px 40px rgba(0,0,0,0.3); margin: 12vh auto auto; }
 	.cmdk::backdrop { background: var(--cmdk-backdrop, rgba(0,0,0,0.45)); }
-	.cmdk-search-row { display: flex; align-items: center; border-bottom: 1px solid var(--cmdk-border, var(--cockpit-border, #e2ddd5)); padding-right: 4px; }
+	.cmdk-search-row { display: flex; align-items: center; border-bottom: 1px solid var(--cmdk-border, var(--worn-border, #e2ddd5)); padding-right: 4px; }
 	.cmdk-input { flex: 1; min-width: 0; box-sizing: border-box; border: 0; background: transparent;
 		color: inherit; font: inherit; font-size: 16px; padding: 14px 8px 14px 16px; }
-	.cmdk-input::placeholder { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); opacity: 1; }
-	.cmdk-input:focus-visible { outline: 2px solid var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: -2px; }
+	.cmdk-input::placeholder { color: var(--cmdk-text-muted, var(--worn-text-muted, #63746a)); opacity: 1; }
+	.cmdk-input:focus-visible { outline: 2px solid var(--cmdk-focus, var(--worn-focus, var(--worn-accent, currentColor))); outline-offset: -2px; }
 	.cmdk-close { position: relative; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; border: 0;
-		border-radius: 50%; background: transparent; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); cursor: pointer; }
+		border-radius: 50%; background: transparent; color: var(--cmdk-text-muted, var(--worn-text-muted, #63746a)); cursor: pointer; }
 	.cmdk-close::before, .cmdk-close::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px;
 		border-radius: 1px; background: currentColor; }
 	.cmdk-close::before { transform: translate(-50%, -50%) rotate(45deg); }
 	.cmdk-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 	@media (hover: hover) and (pointer: fine) {
-		.cmdk-close:hover { background: var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7)); }
+		.cmdk-close:hover { background: var(--cmdk-selected-bg, var(--worn-hover-bg, #d7efe7)); }
 	}
-	.cmdk-close:focus-visible { outline: 2px dashed var(--cmdk-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor))); outline-offset: 2px; }
+	.cmdk-close:focus-visible { outline: 2px dashed var(--cmdk-focus, var(--worn-focus, var(--worn-accent, currentColor))); outline-offset: 2px; }
 	.cmdk-list { list-style: none; margin: 0; padding: 6px; max-height: 46vh; overflow-y: auto; }
 	.cmdk-item { display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
 		padding: 8px 10px; border-radius: var(--cmdk-radius-sm, 6px); cursor: pointer;
 		width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-size: 14px;
 		text-align: left; }
-	.cmdk-item.is-active { background: var(--cmdk-selected-bg, var(--cockpit-hover-bg, #d7efe7)); }
-	.cmdk-item small { color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); font-size: 11px; white-space: nowrap; }
+	.cmdk-item.is-active { background: var(--cmdk-selected-bg, var(--worn-hover-bg, #d7efe7)); }
+	.cmdk-item small { color: var(--cmdk-text-muted, var(--worn-text-muted, #63746a)); font-size: 11px; white-space: nowrap; }
 	.cmdk-group-label { padding: 8px 10px 4px; font-size: 10px; font-weight: 600;
-		text-transform: uppercase; letter-spacing: 0.04em; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); }
-	.cmdk-empty { padding: 12px 10px; color: var(--cmdk-text-muted, var(--cockpit-text-muted, #63746a)); font-size: 13px; }
+		text-transform: uppercase; letter-spacing: 0.04em; color: var(--cmdk-text-muted, var(--worn-text-muted, #63746a)); }
+	.cmdk-empty { padding: 12px 10px; color: var(--cmdk-text-muted, var(--worn-text-muted, #63746a)); font-size: 13px; }
 	@media (pointer: coarse) { .cmdk-item { min-height: 44px; } }
 	@media (prefers-reduced-motion: reduce) { .cmdk { animation: none; } }
 </style>

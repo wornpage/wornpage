@@ -61,25 +61,25 @@
 		font-size: 14px;
 		line-height: 1.4;
 		padding: 9px 12px;
-		border: 1px solid var(--cockpit-border);
-		border-radius: var(--cockpit-radius-sm);
-		background: var(--cockpit-surface);
-		color: var(--cockpit-text);
+		border: 1px solid var(--worn-border);
+		border-radius: var(--worn-radius-sm);
+		background: var(--worn-surface);
+		color: var(--worn-text);
 		cursor: text;
 		touch-action: manipulation;
 	}
 
 	.worn-date-input:focus {
-		outline: 2px dashed var(--worn-date-input-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));
+		outline: 2px dashed var(--worn-date-input-focus, var(--worn-focus, var(--worn-text, currentColor)));
 		outline-offset: 2px;
-		border-color: var(--cockpit-accent);
-		box-shadow: 0 0 0 1px var(--cockpit-accent-50);
+		border-color: var(--worn-accent);
+		box-shadow: 0 0 0 1px var(--worn-accent-50);
 	}
 
 	.worn-date-input:disabled {
-		background-color: var(--cockpit-bg-secondary);
-		border-color: var(--cockpit-border);
-		color: var(--cockpit-text-muted);
+		background-color: var(--worn-bg-secondary);
+		border-color: var(--worn-border);
+		color: var(--worn-text-muted);
 		cursor: not-allowed;
 	}
 

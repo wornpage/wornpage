@@ -26,7 +26,7 @@ Danger alerts use an assertive live region; info, success, and warning alerts us
 
 When `dismissible` is true, `dismissLabel` overrides the accessible button name. Otherwise a titled alert uses `Dismiss {title}` and an untitled alert uses `Dismiss alert`. Keyboard dismissal hands focus to the next surviving focusable control in document order, or the previous control when nothing follows; pointer dismissal does not force a focus change.
 
-The dismiss button's keyboard-focus outline uses `--worn-alert-focus` when supplied. Its default fallback prefers the host's shared `--cockpit-focus` token, then `--cockpit-accent`, then the current text color so every alert tone can retain a high-contrast focus indicator without consumer selector overrides.
+The dismiss button's keyboard-focus outline uses `--worn-alert-focus` when supplied. Its default fallback prefers the host's shared `--worn-focus` token, then `--worn-accent`, then the current text color so every alert tone can retain a high-contrast focus indicator without consumer selector overrides.
 
 ## Browser bundle
 
@@ -53,18 +53,18 @@ The default slot contains the alert message.
 ## Theme tokens
 
 - `--worn-alert-focus`
-- `--cockpit-focus`
-- `--cockpit-accent-50`
-- `--cockpit-accent`
-- `--cockpit-text`
-- `--cockpit-success-bg`
-- `--cockpit-success-border`
-- `--cockpit-success-text`
-- `--cockpit-warning-bg`
-- `--cockpit-warning-border`
-- `--cockpit-warning-text`
-- `--cockpit-danger-bg`
-- `--cockpit-danger-border`
-- `--cockpit-danger-text`
-- `--cockpit-radius`
+- `--worn-focus`
+- `--worn-accent-50`
+- `--worn-accent`
+- `--worn-text`
+- `--worn-success-bg`
+- `--worn-success-border`
+- `--worn-success-text`
+- `--worn-warning-bg`
+- `--worn-warning-border`
+- `--worn-warning-text`
+- `--worn-danger-bg`
+- `--worn-danger-border`
+- `--worn-danger-text`
+- `--worn-radius`
 - `--font-typewriter`

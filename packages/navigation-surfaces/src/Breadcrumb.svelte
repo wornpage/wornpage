@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { assertSafeHref } from './safe-href';
+
 	export interface BreadcrumbItem {
 		label: string;
 		href?: string;
@@ -16,12 +18,13 @@
 	<nav class="worn-breadcrumb" aria-label={label}>
 		<ol class="worn-breadcrumb-list">
 			{#each items as item, i (i)}
+				{@const href = item.href === undefined ? undefined : assertSafeHref(item.href)}
 				<li class="worn-breadcrumb-item">
 					{#if i > 0}
 						<span class="worn-breadcrumb-sep" aria-hidden="true">/</span>
 					{/if}
-					{#if item.href && i < items.length - 1}
-						<a class="worn-breadcrumb-link" href={item.href}>{item.label}</a>
+					{#if href && i < items.length - 1}
+						<a class="worn-breadcrumb-link" href={href}>{item.label}</a>
 					{:else if i === items.length - 1}
 						<span class="worn-breadcrumb-current" aria-current="page">{item.label}</span>
 					{:else}
@@ -66,7 +69,7 @@
 
 	.worn-breadcrumb-sep {
 		flex: 0 0 auto;
-		color: var(--cockpit-text-muted, #506058);
+		color: var(--worn-text-muted, #506058);
 		font-size: 12px;
 	}
 
@@ -88,7 +91,7 @@
 		min-block-size: 44px;
 		min-inline-size: 44px;
 		font-weight: 520;
-		color: var(--cockpit-text-muted, #506058);
+		color: var(--worn-text-muted, #506058);
 		text-align: center;
 		text-decoration: none;
 		touch-action: manipulation;
@@ -97,16 +100,16 @@
 
 	.worn-breadcrumb-current {
 		font-weight: 600;
-		color: var(--cockpit-text, #1f2f28);
+		color: var(--worn-text, #1f2f28);
 	}
 
 	.worn-breadcrumb-text {
 		font-weight: 520;
-		color: var(--cockpit-text-muted, #506058);
+		color: var(--worn-text-muted, #506058);
 	}
 
 	.worn-breadcrumb-link:hover {
-		color: var(--cockpit-link, var(--cockpit-accent, #287f73));
+		color: var(--worn-link, var(--worn-accent, #287f73));
 	}
 
 	.worn-breadcrumb-link:focus-visible {

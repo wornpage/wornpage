@@ -5,7 +5,7 @@
     "": {
       "name": "@wornpage/async-states",
       "dependencies": {
-        "@wornpage/button": "https://codeload.github.com/wornpage/button/tar.gz/1af321063c107e7435597a5332e9e9b7e790cd59",
+        "@wornpage/button": "https://codeload.github.com/wornpage/button/tar.gz/ade0d9cb63830d7ae1f19b74d240e33a68c00a00",
       },
       "devDependencies": {
         "svelte": "^5.56.8",
@@ -32,7 +32,7 @@
 
     "@types/trusted-types": ["@types/trusted-types@2.0.7", "", {}, "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw=="],
 
-    "@wornpage/button": ["@wornpage/button@https://codeload.github.com/wornpage/button/tar.gz/1af321063c107e7435597a5332e9e9b7e790cd59", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-L4tmFYhxkJhoYCx2yhyVYrYNPf4/6LRuTEDamAygVbeii9od5rMCT4tiIT19hfTf6cb9B9vn6VlQDxIkZs8qNA=="],
+    "@wornpage/button": ["@wornpage/button@https://codeload.github.com/wornpage/button/tar.gz/ade0d9cb63830d7ae1f19b74d240e33a68c00a00", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-erSyGkyKP67ZffFwtv3ajzU7dNrYIr6RvmOK8EYa2jTe+AzmpvVcAuj+OSXFqD9yezYOy6YGrw0wA6yD4qr2Iw=="],
 
     "acorn": ["acorn@8.18.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ=="],
 

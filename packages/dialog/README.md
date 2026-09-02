@@ -32,7 +32,7 @@ previously focused element after close. Long unbroken content wraps or scrolls i
 dialog body instead of widening the modal or page.
 
 The close button exposes keyboard focus through `--worn-dialog-focus`, falling back to
-`--cockpit-focus` and then its current foreground color.
+`--worn-focus` and then its current foreground color.
 
 Set `dismissible={false}` while an action is in flight to disable Escape, backdrop, and
 close-button dismissal as one coherent state. Content actions remain owned by the caller.

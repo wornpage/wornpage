@@ -46,7 +46,7 @@ For mapped numeric scales, pass `valueText` to replace the visible value and set
 
 Every field owns its minimum touch size, responsive containment, focus-visible treatment, disabled/read-only states, coarse-pointer sizing, and reduced-motion behavior. The select arrow derives from `currentColor` instead of a fixed palette value. Range values remain contained without collapsing the visible track, and its native input owns keyboard behavior. The range paints the exact CSP-safe percentage with a decorative SVG, while its default fill derives from accent and text tokens to retain at least 3:1 contrast against the track across supported themes.
 
-Keyboard focus uses `--worn-field-focus`, falling back through `--cockpit-focus`, `--cockpit-text`, and `#21322b`. Set `--worn-range-focus` only when the range track needs a control-specific override.
+Keyboard focus uses `--worn-field-focus`, falling back through `--worn-focus`, `--worn-text`, and `#21322b`. Set `--worn-range-focus` only when the range track needs a control-specific override.
 
 ## Browser bundle
 
@@ -66,15 +66,15 @@ The bundle registers `<worn-input>`, `<worn-textarea>`, `<worn-select>`, and `<w
 
 ## Theme tokens
 
-- `--cockpit-surface`
-- `--cockpit-bg-secondary`
-- `--cockpit-border`
-- `--cockpit-border-strong`
-- `--cockpit-text`
-- `--cockpit-text-secondary`
-- `--cockpit-text-muted`
-- `--cockpit-accent`
-- `--cockpit-accent-50`
-- `--cockpit-focus`
-- `--cockpit-radius-sm`
+- `--worn-surface`
+- `--worn-bg-secondary`
+- `--worn-border`
+- `--worn-border-strong`
+- `--worn-text`
+- `--worn-text-secondary`
+- `--worn-text-muted`
+- `--worn-accent`
+- `--worn-accent-50`
+- `--worn-focus`
+- `--worn-radius-sm`
 - `--font-typewriter`

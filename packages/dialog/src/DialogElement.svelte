@@ -41,7 +41,7 @@
 <style>
   .worn-dialog-element-description {
     margin: 0;
-    color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
     line-height: 1.6;
     overflow-wrap: anywhere;
   }

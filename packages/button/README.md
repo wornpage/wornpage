@@ -12,11 +12,12 @@ Repository text is checked out as LF through `.gitattributes`, so generated outp
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
-## Install
+## Source use
 
-```bash
-npm install @wornpage/button
-```
+This package is not published to npm. Check out this repository at a reviewed commit, install its
+dependencies from `bun.lock`, and consume `src/index.ts` through a local workspace alias. The
+`@wornpage/button` imports below assume that local alias; they do not resolve from the public npm
+registry.
 
 ## Usage
 
@@ -51,7 +52,7 @@ The generated browser bundle registers `<worn-button>`. Its `label`, `variant`, 
 | `variant` | `'default' \| 'primary' \| 'danger' \| 'warning'` | `'default'` | Visual style; `IconButton` supports `default` and `danger` |
 | `size` | `'sm' \| 'md'` (`Button`), `'sm' \| 'md' \| 'lg'` (`IconButton`) | `'md'` | `IconButton` uses 36px, 44px, or 48px targets; small targets recover to 44px on coarse pointers |
 | `disabled` | `boolean` | `false` | Disabled state |
-| `href` | `string` | — | Renders as `<a>` link |
+| `href` | `string` | — | Renders as `<a>` after strict destination validation |
 | `class` | `string` | — | Additional classes merged with the component class |
 | `onclick` | `(e) => void` | — | Click handler |
 | `type` | `'button' \| 'submit'` | `'button'` | Button type |
@@ -77,11 +78,15 @@ target.
 ## CSS API
 
 The component uses CSS custom properties from the parent theme:
-- `--cockpit-text`, `--cockpit-surface`, `--cockpit-border`, `--cockpit-radius`
-- `--cockpit-accent`, `--cockpit-accent-text`
-- `--cockpit-danger-bg`, `--cockpit-danger-border`, `--cockpit-danger-text`
-- `--cockpit-warning-text`, `--cockpit-warning-bg`
+- `--worn-text`, `--worn-surface`, `--worn-border`, `--worn-radius`
+- `--worn-accent`, `--worn-accent-text`
+- `--worn-danger-bg`, `--worn-danger-border`, `--worn-danger-text`
+- `--worn-warning-text`, `--worn-warning-bg`
 - `--font-typewriter`
-- `--worn-button-focus` (optional focus-ring override; defaults to `--cockpit-focus`, then `--cockpit-text`)
+- `--worn-button-focus` (optional focus-ring override; defaults to `--worn-focus`, then `--worn-text`)
 
 Additional classes, including `is-active`, are merged with the component class. Link buttons keep button presentation without inherited underlines, and long labels wrap within their container.
+
+Link destinations may be relative or use `https:`, `mailto:`, or `tel:`. Empty values, network-path
+references, backslashes, separator/control/format characters, plain HTTP, and every other scheme
+are rejected with a `TypeError`; omit `href` to render a button.

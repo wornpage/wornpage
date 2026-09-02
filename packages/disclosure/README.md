@@ -73,14 +73,14 @@ The bundle registers `<worn-accordion>` and `<worn-collapsible>`. Their `change`
 
 ## Theme tokens
 
-- `--worn-disclosure-focus` — shared Accordion and Collapsible focus outline; falls back through `--cockpit-focus`, `--cockpit-accent`, then `currentColor`
-- `--cockpit-bg`
-- `--cockpit-surface`
-- `--cockpit-border`
-- `--cockpit-text`
-- `--cockpit-text-secondary`
-- `--cockpit-text-muted`
-- `--cockpit-accent`
-- `--cockpit-hover-bg`
-- `--cockpit-radius-sm`
+- `--worn-disclosure-focus` — shared Accordion and Collapsible focus outline; falls back through `--worn-focus`, `--worn-accent`, then `currentColor`
+- `--worn-bg`
+- `--worn-surface`
+- `--worn-border`
+- `--worn-text`
+- `--worn-text-secondary`
+- `--worn-text-muted`
+- `--worn-accent`
+- `--worn-hover-bg`
+- `--worn-radius-sm`
 - `--font-typewriter`

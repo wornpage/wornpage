@@ -14,11 +14,12 @@ Repository text is checked out as LF through `.gitattributes`, so generated outp
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
-## Install
+## Source use
 
-```sh
-bun add @wornpage/command-surfaces
-```
+This package is not published to npm. Check out this repository at a reviewed commit, install its
+dependencies from `bun.lock`, and consume `src/index.ts` through a local workspace alias. The
+`@wornpage/command-surfaces` imports below assume that local alias; they do not resolve from the
+public npm registry.
 
 ## Usage
 
@@ -69,7 +70,7 @@ Slot: `children` (optional label before the keys).
 
 ## Theme tokens
 
-The components use the existing Wornpage `--cockpit-*` tokens when available.
+The components use the existing Wornpage `--worn-*` tokens when available.
 Toolbar-specific values can be overridden with `--worn-toolbar-background`,
 `--worn-toolbar-border`, `--worn-toolbar-radius`, `--worn-toolbar-shadow`,
 `--worn-toolbar-padding`, and `--worn-toolbar-gap`.

@@ -14,11 +14,12 @@ Repository text is checked out as LF through `.gitattributes`, so generated outp
 The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
-## Install
+## Source use
 
-```bash
-bun add @wornpage/select-card
-```
+This package is not published to npm. Check out this repository at a reviewed commit, install its
+dependencies from `bun.lock`, and consume `src/index.ts` through a local workspace alias. The
+`@wornpage/select-card` imports below assume that local alias; they do not resolve from the public
+npm registry.
 
 ## Svelte
 
@@ -62,8 +63,8 @@ container only when a product surface needs a different established type size.
 
 ## Theme tokens
 
-- `--worn-select-card-focus` — focus outline; falls back to the card's
-  state-aware `currentColor`
+- `--worn-select-card-focus` — focus outline; falls back to the shared
+  `--worn-focus` theme token, then `currentColor`
 
 ## Commands
 

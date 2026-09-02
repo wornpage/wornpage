@@ -48,16 +48,16 @@ describe('multi-select source', () => {
 
 	test('uses the shared high-contrast field boundary and keyboard focus treatment', () => {
 		expect(source).toContain('--worn-multi-select-boundary: color-mix(');
-		expect(source).toContain('var(--cockpit-border-strong) 30%');
-		expect(source).toContain('var(--cockpit-text-muted)');
+		expect(source).toContain('var(--worn-border-strong) 30%');
+		expect(source).toContain('var(--worn-text-muted)');
 		expect(source).toContain('.worn-multi-select:focus-visible');
 		expect(source).not.toContain('.worn-multi-select:focus {');
 	});
 
 	test('owns a public theme-safe focus token', () => {
 		const focusRule = source.match(/\.worn-multi-select:focus-visible \{[\s\S]*?\}/u)?.[0] ?? '';
-		expect(focusRule).toContain('outline: 2px dashed var(--worn-multi-select-focus, var(--cockpit-focus, var(--cockpit-text, currentColor)));');
-		expect(focusRule.match(/outline:[^;]+;/u)?.[0] ?? '').not.toContain('--cockpit-accent');
+		expect(focusRule).toContain('outline: 2px dashed var(--worn-multi-select-focus, var(--worn-focus, var(--worn-text, currentColor)));');
+		expect(focusRule.match(/outline:[^;]+;/u)?.[0] ?? '').not.toContain('--worn-accent');
 		expect(readme).toContain('`--worn-multi-select-focus`');
 	});
 
@@ -66,7 +66,7 @@ describe('multi-select source', () => {
 	});
 
 	test('keeps disabled rows legible without browser opacity', () => {
-		expect(source).toContain('-webkit-text-fill-color: var(--cockpit-text-muted);');
+		expect(source).toContain('-webkit-text-fill-color: var(--worn-text-muted);');
 		expect(source).toContain('cursor: not-allowed;');
 		expect(source).toContain('opacity: 1;');
 	});

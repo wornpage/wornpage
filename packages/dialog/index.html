@@ -6,40 +6,40 @@
   <title>Wornpage Dialog</title>
   <style>
     :root {
-      --cockpit-bg: #101512;
-      --cockpit-surface: #19221d;
-      --cockpit-hover-bg: #25322b;
-      --cockpit-border: #46584f;
-      --cockpit-text: #f2f7f4;
-      --cockpit-text-muted: #b8c5be;
-      --cockpit-accent: #6fd8be;
-      --cockpit-radius: 6px;
+      --worn-bg: #101512;
+      --worn-surface: #19221d;
+      --worn-hover-bg: #25322b;
+      --worn-border: #46584f;
+      --worn-text: #f2f7f4;
+      --worn-text-muted: #b8c5be;
+      --worn-accent: #6fd8be;
+      --worn-radius: 6px;
       --font-family-display: Georgia, serif;
-      color: var(--cockpit-text);
-      background: var(--cockpit-bg);
+      color: var(--worn-text);
+      background: var(--worn-bg);
       font-family: Georgia, serif;
     }
     * { box-sizing: border-box; }
     body { min-height: 180vh; margin: 0; padding: 28px 18px 120px; }
     main { width: min(100%, 680px); margin: 0 auto; }
     h1 { margin: 0; font-size: 28px; }
-    .intro { color: var(--cockpit-text-muted); line-height: 1.6; }
+    .intro { color: var(--worn-text-muted); line-height: 1.6; }
     .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0; }
     button {
       min-height: 44px;
-      border: 1px solid var(--cockpit-border);
+      border: 1px solid var(--worn-border);
       border-radius: 5px;
       padding: 0 16px;
-      color: var(--cockpit-text);
-      background: var(--cockpit-surface);
+      color: var(--worn-text);
+      background: var(--worn-surface);
       font: 700 14px/1 Georgia, serif;
       cursor: pointer;
     }
-    button:hover { background: var(--cockpit-hover-bg); }
-    button:focus-visible { outline: 2px dashed var(--cockpit-accent); outline-offset: 3px; }
-    .activity { display: grid; gap: 1px; border: 1px solid var(--cockpit-border); background: var(--cockpit-border); }
-    .activity div { display: flex; justify-content: space-between; gap: 18px; padding: 14px; background: var(--cockpit-surface); }
-    .activity span { color: var(--cockpit-text-muted); }
+    button:hover { background: var(--worn-hover-bg); }
+    button:focus-visible { outline: 2px dashed var(--worn-accent); outline-offset: 3px; }
+    .activity { display: grid; gap: 1px; border: 1px solid var(--worn-border); background: var(--worn-border); }
+    .activity div { display: flex; justify-content: space-between; gap: 18px; padding: 14px; background: var(--worn-surface); }
+    .activity span { color: var(--worn-text-muted); }
   </style>
   <script type="module" src="./dist/worn-dialog.js"></script>
 </head>

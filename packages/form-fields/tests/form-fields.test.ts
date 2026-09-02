@@ -92,7 +92,7 @@ describe('native field contract', () => {
 
 describe('theme and state behavior', () => {
   test('uses one semantic focus token while preserving the range override', () => {
-    const focusToken = 'var(--worn-field-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)))';
+    const focusToken = 'var(--worn-field-focus, var(--worn-focus, var(--worn-text, #21322b)))';
     for (const source of [input, textarea, select]) {
       expect(source).toContain(`outline: 2px dashed ${focusToken};`);
     }
@@ -109,9 +109,9 @@ describe('theme and state behavior', () => {
       expect(source).toContain('@media (prefers-reduced-motion: reduce)');
       expect(source).toContain('transition: none;');
     }
-    expect(range).toContain('var(--cockpit-border, #d8d2c8)');
-    expect(range).toContain('var(--cockpit-accent, #0f766e)');
-    expect(range).toContain('var(--cockpit-text-muted, #506058)');
+    expect(range).toContain('var(--worn-border, #d8d2c8)');
+    expect(range).toContain('var(--worn-accent, #0f766e)');
+    expect(range).toContain('var(--worn-text-muted, #506058)');
     expect(select).toContain('linear-gradient(45deg, transparent 50%, currentColor 50%)');
     expect(select).not.toContain('data:image/svg+xml');
   });
@@ -123,7 +123,7 @@ describe('theme and state behavior', () => {
       expect(source).toContain(':read-only:not(:disabled)');
     }
     for (const source of [input, textarea, select]) {
-      expect(source).toContain('-webkit-text-fill-color: var(--cockpit-text-muted);');
+      expect(source).toContain('-webkit-text-fill-color: var(--worn-text-muted);');
       expect(source).toContain('cursor: not-allowed;');
     }
   });

@@ -77,12 +77,12 @@ describe('receipt semantics and interaction', () => {
 
 	test('owns touch, keyboard-focus, theme, and forced-color behavior', () => {
 		expect(source).toContain('--wrn-undo-boundary: var(');
-		expect(source).toContain('var(--cockpit-border, #c8c2b9) 60%');
+		expect(source).toContain('var(--worn-border, #c8c2b9) 60%');
 		expect(source).toContain('touch-action: manipulation;');
 		expect(source).toContain('@media (pointer: coarse)');
 		expect(source).toContain('min-height: 44px;');
 		expect(source).toContain('.wrn-undo-btn:focus-visible');
-		expect(source).toContain('var(--cockpit-surface, #fdfbf7)');
+		expect(source).toContain('var(--worn-surface, #fdfbf7)');
 		expect(source).toContain('@media (forced-colors: active)');
 	});
 });
@@ -111,7 +111,7 @@ describe('browsable history', () => {
 		expect(historySource).toContain('min-block-size: 44px;');
 		expect(historySource).toContain('touch-action: manipulation;');
 		expect(historySource).toContain('overflow-wrap: anywhere;');
-		expect(historySource).toContain('outline: 2px dashed var(--worn-undo-focus, var(--cockpit-focus, var(--cockpit-text, #21322b)));');
+		expect(historySource).toContain('outline: 2px dashed var(--worn-undo-focus, var(--worn-focus, var(--worn-text, #21322b)));');
 		expect(historySource).toContain('@media (prefers-reduced-motion: reduce)');
 		expect(historySource).toContain('@media (forced-colors: active)');
 	});

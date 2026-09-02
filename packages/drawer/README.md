@@ -34,8 +34,8 @@ previously focused element after close. Long unbroken content wraps or scrolls i
 drawer body instead of widening the panel or page.
 
 The close button's keyboard-focus outline uses `--worn-drawer-focus` when supplied. Its
-default fallback prefers the host's shared `--cockpit-focus` token, then
-`--cockpit-accent`, then the current text color, so applications can keep a high-contrast
+default fallback prefers the host's shared `--worn-focus` token, then
+`--worn-accent`, then the current text color, so applications can keep a high-contrast
 focus indicator across light and dark surfaces without overriding component selectors.
 
 ## Browser bundle

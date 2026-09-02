@@ -36,8 +36,8 @@
 		max-inline-size: 100%;
 		min-inline-size: 0;
 		box-sizing: border-box;
-		border: 1px solid var(--cockpit-border);
-		border-radius: var(--cockpit-radius);
+		border: 1px solid var(--worn-border);
+		border-radius: var(--worn-radius);
 		overflow: hidden;
 	}
 
@@ -75,14 +75,14 @@
 		line-height: 1.2;
 		text-align: center;
 		overflow-wrap: anywhere;
-		color: var(--cockpit-text-muted);
-		background: var(--cockpit-surface);
+		color: var(--worn-text-muted);
+		background: var(--worn-surface);
 		transition: background 0.12s, color 0.12s;
 	}
 
 	.worn-segment.active span {
-		background: var(--cockpit-accent);
-		color: var(--cockpit-accent-text);
+		background: var(--worn-accent);
+		color: var(--worn-accent-text);
 	}
 
 	.worn-segment input:focus-visible + span {
@@ -91,12 +91,12 @@
 	}
 
 	.worn-segment:not(.active):hover span {
-		background: var(--cockpit-accent-50);
-		color: var(--cockpit-text);
+		background: var(--worn-accent-50);
+		color: var(--worn-text);
 	}
 
 	.worn-segment + .worn-segment {
-		border-inline-start: 1px solid var(--cockpit-border);
+		border-inline-start: 1px solid var(--worn-border);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

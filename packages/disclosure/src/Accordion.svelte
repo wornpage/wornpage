@@ -41,7 +41,7 @@
     min-inline-size: 0;
     margin-top: 10px;
     padding-top: 8px;
-    border-top: 1px solid var(--cockpit-border);
+    border-top: 1px solid var(--worn-border);
   }
 
   .worn-accordion-summary {
@@ -54,7 +54,7 @@
     min-block-size: 44px;
     min-inline-size: 0;
     padding: 4px 0;
-    color: var(--cockpit-text-secondary);
+    color: var(--worn-text-secondary);
     font-family: var(--font-typewriter);
     font-size: 12px;
     font-weight: 550;
@@ -66,7 +66,7 @@
   .worn-accordion-summary::-webkit-details-marker { display: none; }
 
   .worn-accordion-summary:focus-visible {
-    outline: 2px dashed var(--worn-disclosure-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
+    outline: 2px dashed var(--worn-disclosure-focus, var(--worn-focus, var(--worn-accent, currentColor)));
     outline-offset: 2px;
   }
 
@@ -88,7 +88,7 @@
     display: block;
     max-inline-size: 100%;
     margin-top: 1px;
-    color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
     font-size: 11px;
     font-weight: 400;
     overflow-wrap: anywhere;
@@ -100,7 +100,7 @@
     block-size: 16px;
     flex: 0 0 16px;
     margin-inline-start: 8px;
-    color: var(--cockpit-text-muted);
+    color: var(--worn-text-muted);
   }
 
   .worn-accordion-icon::before {

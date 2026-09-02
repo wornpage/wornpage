@@ -6,43 +6,43 @@
   <title>Wornpage Binary Controls</title>
   <style>
     :root {
-      --cockpit-bg: #f5f0e8;
-      --cockpit-bg-secondary: #ece6dd;
-      --cockpit-surface: #fdfbf7;
-      --cockpit-border: #e2ddd5;
-      --cockpit-border-strong: #d0cac1;
-      --cockpit-text: #21322b;
-      --cockpit-text-muted: #506058;
-      --cockpit-accent: #0f766e;
-      --cockpit-accent-text: #fff;
+      --worn-bg: #f5f0e8;
+      --worn-bg-secondary: #ece6dd;
+      --worn-surface: #fdfbf7;
+      --worn-border: #e2ddd5;
+      --worn-border-strong: #d0cac1;
+      --worn-text: #21322b;
+      --worn-text-muted: #506058;
+      --worn-accent: #0f766e;
+      --worn-accent-text: #fff;
       --font-typewriter: ui-monospace, SFMono-Regular, Consolas, monospace;
       color-scheme: light;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --cockpit-bg: #0f1714;
-        --cockpit-bg-secondary: #131e19;
-        --cockpit-surface: #18241f;
-        --cockpit-border: #3a4d45;
-        --cockpit-border-strong: #4d5c52;
-        --cockpit-text: #f7fffc;
-        --cockpit-text-muted: #b0bcb4;
-        --cockpit-accent: #2f7665;
-        --cockpit-accent-text: #fff;
+        --worn-bg: #0f1714;
+        --worn-bg-secondary: #131e19;
+        --worn-surface: #18241f;
+        --worn-border: #3a4d45;
+        --worn-border-strong: #4d5c52;
+        --worn-text: #f7fffc;
+        --worn-text-muted: #b0bcb4;
+        --worn-accent: #2f7665;
+        --worn-accent-text: #fff;
         color-scheme: dark;
       }
     }
     * { box-sizing: border-box; }
-    body { margin: 0; padding: 24px; background: var(--cockpit-bg); color: var(--cockpit-text); font-family: Georgia, serif; }
+    body { margin: 0; padding: 24px; background: var(--worn-bg); color: var(--worn-text); font-family: Georgia, serif; }
     main { max-width: 620px; margin: 0 auto; }
     h1 { margin: 0 0 8px; font-size: 28px; }
-    p { margin: 0 0 22px; color: var(--cockpit-text-muted); }
-    .surface { border-block: 1px solid var(--cockpit-border); padding-block: 8px; }
-    .row { display: grid; grid-template-columns: minmax(76px, 0.38fr) minmax(0, 1fr); align-items: center; gap: 12px; min-height: 62px; border-block-end: 1px solid var(--cockpit-border); }
+    p { margin: 0 0 22px; color: var(--worn-text-muted); }
+    .surface { border-block: 1px solid var(--worn-border); padding-block: 8px; }
+    .row { display: grid; grid-template-columns: minmax(76px, 0.38fr) minmax(0, 1fr); align-items: center; gap: 12px; min-height: 62px; border-block-end: 1px solid var(--worn-border); }
     .row:last-child { border-block-end: 0; }
-    .state { font: 700 11px/1 var(--font-typewriter); text-transform: uppercase; color: var(--cockpit-text-muted); }
+    .state { font: 700 11px/1 var(--font-typewriter); text-transform: uppercase; color: var(--worn-text-muted); }
     .narrow { max-width: 230px; }
-    output { display: block; margin-top: 16px; min-height: 22px; font: 12px/1.5 var(--font-typewriter); color: var(--cockpit-text-muted); }
+    output { display: block; margin-top: 16px; min-height: 22px; font: 12px/1.5 var(--font-typewriter); color: var(--worn-text-muted); }
     @media (max-width: 380px) { body { padding: 14px; } }
   </style>
   <script type="module" src="./dist/worn-binary-controls.js"></script>

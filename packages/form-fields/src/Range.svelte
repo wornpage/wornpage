@@ -55,7 +55,7 @@
 
 <style>
   .worn-range {
-    --_worn-range-default-fill: var(--cockpit-focus, var(--cockpit-text, #21322b));
+    --_worn-range-default-fill: var(--worn-focus, var(--worn-text, #21322b));
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -103,11 +103,11 @@
     block-size: 8px;
     overflow: hidden;
     border-radius: var(--worn-range-radius, 4px);
-    background: var(--worn-range-track, var(--cockpit-border, #d8d2c8));
+    background: var(--worn-range-track, var(--worn-border, #d8d2c8));
   }
 
   .worn-range-input:focus-visible + .worn-range-track {
-    outline: 2px dashed var(--worn-range-focus, var(--worn-field-focus, var(--cockpit-focus, var(--cockpit-text, #21322b))));
+    outline: 2px dashed var(--worn-range-focus, var(--worn-field-focus, var(--worn-focus, var(--worn-text, #21322b))));
     outline-offset: 3px;
   }
 
@@ -119,7 +119,7 @@
 
   @supports (color: color-mix(in srgb, black, white)) {
     .worn-range {
-      --_worn-range-default-fill: color-mix(in srgb, var(--cockpit-accent, #0f766e) 55%, var(--cockpit-text, #21322b));
+      --_worn-range-default-fill: color-mix(in srgb, var(--worn-accent, #0f766e) 55%, var(--worn-text, #21322b));
     }
   }
 
@@ -128,7 +128,7 @@
     min-inline-size: 32px;
     max-inline-size: 40%;
     overflow: hidden;
-    color: var(--worn-range-value, var(--cockpit-text-muted, #506058));
+    color: var(--worn-range-value, var(--worn-text-muted, #506058));
     font-family: var(--font-typewriter, ui-monospace, SFMono-Regular, Consolas, monospace);
     font-size: 13px;
     line-height: 1.4;
@@ -139,16 +139,16 @@
   }
 
   .worn-range.is-disabled .worn-range-track {
-    background: var(--cockpit-bg-secondary, #ece6dd);
-    box-shadow: inset 0 0 0 1px var(--cockpit-border, #d8d2c8);
+    background: var(--worn-bg-secondary, #ece6dd);
+    box-shadow: inset 0 0 0 1px var(--worn-border, #d8d2c8);
   }
 
   .worn-range.is-disabled .worn-range-fill {
-    fill: var(--cockpit-text-muted, #506058);
+    fill: var(--worn-text-muted, #506058);
   }
 
   .worn-range.is-disabled .worn-range-value {
-    color: var(--cockpit-text-secondary, #394b43);
+    color: var(--worn-text-secondary, #394b43);
   }
 
   @media (pointer: coarse) {

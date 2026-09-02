@@ -124,8 +124,8 @@
 	.worn-drawer {
 		box-sizing: border-box;
 		position: absolute;
-		background: var(--cockpit-surface);
-		border: 1px solid var(--cockpit-border);
+		background: var(--worn-surface);
+		border: 1px solid var(--worn-border);
 		box-shadow: 0 8px 32px rgba(0,0,0,0.12);
 		width: min(380px, calc(100% - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
 		min-width: 0;
@@ -139,13 +139,13 @@
 		top: calc(16px + env(safe-area-inset-top, 0px));
 		bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 		right: calc(16px + env(safe-area-inset-right, 0px));
-		border-radius: var(--cockpit-radius) 0 0 var(--cockpit-radius);
+		border-radius: var(--worn-radius) 0 0 var(--worn-radius);
 	}
 	.worn-drawer.is-start {
 		top: calc(16px + env(safe-area-inset-top, 0px));
 		bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 		left: calc(16px + env(safe-area-inset-left, 0px));
-		border-radius: 0 var(--cockpit-radius) var(--cockpit-radius) 0;
+		border-radius: 0 var(--worn-radius) var(--worn-radius) 0;
 	}
 	.worn-drawer.is-bottom {
 		left: calc(16px + env(safe-area-inset-left, 0px));
@@ -153,7 +153,7 @@
 		bottom: calc(16px + env(safe-area-inset-bottom, 0px));
 		max-height: calc(60% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 		width: auto;
-		border-radius: var(--cockpit-radius) var(--cockpit-radius) 0 0;
+		border-radius: var(--worn-radius) var(--worn-radius) 0 0;
 	}
 	.worn-drawer-head {
 		display: flex;
@@ -165,7 +165,7 @@
 		font-family: var(--font-family-display);
 		font-size: 18px;
 		font-weight: 680;
-		color: var(--cockpit-text);
+		color: var(--worn-text);
 		margin: 0;
 		min-width: 0;
 		overflow-wrap: anywhere;
@@ -177,7 +177,7 @@
 		border-radius: 50%;
 		border: 0;
 		background: transparent;
-		color: var(--cockpit-text-muted);
+		color: var(--worn-text-muted);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -198,9 +198,9 @@
 	}
 	.worn-drawer-close::before { transform: translate(-50%, -50%) rotate(45deg); }
 	.worn-drawer-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
-	.worn-drawer-close:hover { background: var(--cockpit-hover-bg); }
+	.worn-drawer-close:hover { background: var(--worn-hover-bg); }
 	.worn-drawer-close:focus-visible {
-		outline: 2px dashed var(--worn-drawer-focus, var(--cockpit-focus, var(--cockpit-accent, currentColor)));
+		outline: 2px dashed var(--worn-drawer-focus, var(--worn-focus, var(--worn-accent, currentColor)));
 		outline-offset: 2px;
 	}
 	.worn-drawer-body {

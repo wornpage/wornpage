@@ -1,4 +1,5 @@
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as SidebarGroup } from './SidebarGroup.svelte';
 export { default as SidebarItem } from './SidebarItem.svelte';
-export type { NavItem, SidebarProps } from './types.js';
+export { assertSafeNavigationHref, isSafeNavigationHref, validateNavItems } from './navigation.js';
+export type { NavIcon, NavIconShape, NavItem, SidebarProps } from './types.js';
