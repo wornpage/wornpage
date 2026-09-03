@@ -3,7 +3,7 @@
   import { Button } from '@wornpage/button';
   import { Cmdk, type CmdkHandle, type CmdkItem } from '@wornpage/cmdk';
   import { Select } from '@wornpage/form-fields';
-  import { Sidebar, type NavItem } from '@wornpage/sidebar';
+  import { Sidebar, type NavIcon, type NavItem } from '@wornpage/sidebar';
   import { Theme } from '@wornpage/theme';
   import ComponentExample from './ComponentExample.svelte';
   import { CATALOG_GROUPS, DEMO_CATALOG, type CatalogCategory, type DemoCatalogId } from './sections';
@@ -36,12 +36,27 @@
     };
   });
 
-  function iconForCategory(category: CatalogCategory): string {
-    if (category === 'status') return '<circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>';
-    if (category === 'inputs') return '<path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="11" cy="18" r="2"/>';
-    if (category === 'commands') return '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>';
-    if (category === 'layout') return '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>';
-    return '<path d="M6 3h12v6H6z"/><path d="M6 15h12v6H6z"/><path d="M12 9v6"/>';
+  function iconForCategory(category: CatalogCategory): NavIcon {
+    if (category === 'status') return { shapes: [
+      { type: 'circle', cx: 12, cy: 12, r: 9 },
+      { type: 'path', d: 'M12 8v4M12 16h.01' },
+    ] };
+    if (category === 'inputs') return { shapes: [
+      { type: 'path', d: 'M4 6h16M4 12h16M4 18h16' },
+      { type: 'circle', cx: 9, cy: 6, r: 2 },
+      { type: 'circle', cx: 15, cy: 12, r: 2 },
+      { type: 'circle', cx: 11, cy: 18, r: 2 },
+    ] };
+    if (category === 'commands') return { shapes: [
+      { type: 'path', d: 'M5 12h14m-6-6 6 6-6 6' },
+    ] };
+    if (category === 'layout') return { shapes: [
+      { type: 'rect', x: 3, y: 4, width: 18, height: 16, rx: 2 },
+      { type: 'path', d: 'M9 4v16' },
+    ] };
+    return { shapes: [
+      { type: 'path', d: 'M6 3h12v6H6zM6 15h12v6H6zM12 9v6' },
+    ] };
   }
 
   const sidebarItems: NavItem[] = CATALOG_GROUPS.map((group) => ({
@@ -102,12 +117,13 @@
     <header class="demo-header">
       <div>
         <h1>Wornpage</h1>
-        <p>26 standalone component repositories, one inspectable catalog.</p>
+        <p>{DEMO_CATALOG.length} standalone component repositories, one inspectable catalog.</p>
       </div>
       <div class="header-actions">
         <Button onclick={openPalette}>Search catalog</Button>
         <Theme bind:theme={currentTheme} />
         <a href="https://github.com/wornpage/wornpage" class="repo-link">GitHub</a>
+        <a href="https://projects-webmcp-extension.pages.dev/webmcp-challenge" class="repo-link release-link">Projects release</a>
       </div>
       <div class="catalog-jump">
         <label for="catalog-jump">Jump to component</label>
@@ -174,6 +190,11 @@
   .repo-link { align-items: center; background: var(--cockpit-surface, #fff); border: 1px solid var(--cockpit-border, #ddd); border-radius: 6px; color: inherit; display: inline-flex; font-size: 13px; min-height: 36px; padding: 6px 12px; text-decoration: none; }
   .repo-link:hover { background: var(--cockpit-hover-bg, rgba(0,0,0,.05)); }
   .repo-link:focus-visible { outline: 2px dashed var(--cockpit-accent, currentColor); outline-offset: 2px; }
+  .release-link { background: var(--cockpit-accent, #23796d); border-color: var(--cockpit-accent, #23796d); color: var(--cockpit-accent-text, #fff); font-weight: 700; }
+  .release-link:hover { background: color-mix(in srgb, var(--cockpit-accent, #23796d) 88%, #000); }
+  @media (pointer: coarse) {
+    .repo-link { min-height: 44px; }
+  }
   .catalog-jump { display: grid; gap: 6px; max-width: 22rem; min-width: 0; }
   .catalog-jump label { color: var(--cockpit-text-muted, #6b6b6b); font-size: 12px; font-weight: 650; }
   .category-heading { align-items: center; border-bottom: 2px solid var(--cockpit-border, #ddd); color: var(--cockpit-text-muted, #6b6b6b); display: flex; font-size: 12px; font-weight: 700; justify-content: space-between; margin: 36px 0 0; padding: 0 0 8px; text-transform: uppercase; }
