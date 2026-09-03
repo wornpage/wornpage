@@ -4,6 +4,7 @@ import { COMPONENT_REPOSITORIES } from './component-repositories.ts';
 import { DEMO_CATALOG } from '../demo/src/sections.ts';
 
 const appSource = readFileSync(new URL('../demo/src/App.svelte', import.meta.url), 'utf8');
+const demoIndexSource = readFileSync(new URL('../demo/index.html', import.meta.url), 'utf8');
 const exampleSource = readFileSync(new URL('../demo/src/ComponentExample.svelte', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../demo/vite.config.ts', import.meta.url), 'utf8');
 const cmdkSource = readFileSync(new URL('../packages/cmdk/src/Cmdk.svelte', import.meta.url), 'utf8');
@@ -38,10 +39,26 @@ describe('aggregate demo contract', () => {
 
   test('uses the explicit catalog for grouped navigation and rendered sections', () => {
     expect(appSource).toContain('const sections = DEMO_CATALOG.map(({ id }) => id);');
+    expect(DEMO_CATALOG).toHaveLength(26);
+    expect(appSource).toContain('<p>{DEMO_CATALOG.length} standalone component repositories, one inspectable catalog.</p>');
+    expect(appSource).toContain('function iconForCategory(category: CatalogCategory): NavIcon');
+    expect(appSource).not.toMatch(/return ['"]<.+>/u);
     expect(appSource).toContain('const sidebarItems: NavItem[] = CATALOG_GROUPS.map');
     expect(appSource).toContain('{#each CATALOG_GROUPS as group (group.id)}');
     expect(appSource).toContain('{#each group.entries as entry (entry.id)}');
     expect(appSource).toContain('<ComponentExample id={entry.id} {openPalette} />');
+  });
+
+  test('links the catalog to its released Projects consumer', () => {
+    expect(appSource).toContain('href="https://projects-webmcp-extension.pages.dev/webmcp-challenge"');
+    expect(appSource).toContain('class="repo-link release-link">Projects release</a>');
+    expect(appSource).toMatch(/@media \(pointer: coarse\)\s*\{\s*\.repo-link \{ min-height: 44px; \}/u);
+  });
+
+  test('ships one token owner and a local favicon without placeholder CSS', () => {
+    expect(demoIndexSource.match(/<style>/gu)?.length).toBe(1);
+    expect(demoIndexSource).not.toContain('...tokens...');
+    expect(demoIndexSource).toContain('<link rel="icon" href="./favicon.svg" type="image/svg+xml" />');
   });
 
   test('renders one package-owned example for every catalog entry', () => {

@@ -1,9 +1,13 @@
 # Wornpage
 
-> Component library + dev toolkit. **The tools are framework-agnostic.**
+> 26 standalone component repositories + 3 framework-agnostic dev tools + 1 CLI.
 > **This monorepo is a mirror.** Individual packages have their own repos.
 > Install standalone packages from reviewed Git commits; the `@wornpage` npm
 > scope is not a supported distribution path.
+
+Live catalog: <https://wornpage.pages.dev>
+
+Release example: [Wornpage Projects — WebMCP Challenge](https://projects-webmcp-extension.pages.dev/webmcp-challenge)
 
 ## Quick start — browsing
 
