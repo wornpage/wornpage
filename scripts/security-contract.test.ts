@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { STANDALONE_SOURCES } from "./component-repositories.ts";
 
 const workflow = readFileSync(new URL("../.github/workflows/mirror-check.yml", import.meta.url), "utf8");
+const rootLicense = readFileSync(new URL("../LICENSE", import.meta.url), "utf8");
 const publicInstructions = [
 	readFileSync(new URL("../README.md", import.meta.url), "utf8"),
 	readFileSync(new URL("../CONTRIBUTING.md", import.meta.url), "utf8"),
@@ -10,6 +11,12 @@ const publicInstructions = [
 ].join("\n");
 
 describe("repository security contract", () => {
+	it("publishes the MIT license declared by the root package and README", () => {
+		expect(rootLicense).toContain("MIT License");
+		expect(rootLicense).toContain("Copyright (c) 2026 Wornpage");
+		expect(rootLicense).toContain("Permission is hereby granted, free of charge");
+	});
+
 	it("pins every third-party action to a full commit", () => {
 		const references = [...workflow.matchAll(/^\s*uses:\s*([^\s#]+)/gmu)].map((match) => match[1]);
 		expect(references.length).toBeGreaterThan(0);
