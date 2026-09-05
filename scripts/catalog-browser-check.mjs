@@ -349,6 +349,7 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
         : [];
       const primary = document.querySelector('#button .worn-btn.is-primary');
       const primaryStyle = primary ? getComputedStyle(primary) : null;
+      const guide = document.querySelector('.guide-link');
       const bodyStyle = getComputedStyle(document.body);
       return {
         sectionIds: sections.map((section) => section.id),
@@ -367,6 +368,12 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
         },
         inputSizes,
         targets,
+        guide: guide ? {
+          href: guide.href,
+          visible: guide.getClientRects().length > 0,
+          width: guide.getBoundingClientRect().width,
+          height: guide.getBoundingClientRect().height,
+        } : null,
       };
     }, { expectedIds: EXPECTED_IDS, requiredTokens: REQUIRED_TOKENS, compact: viewportConfig.id === 'compact-touch' });
 
@@ -380,10 +387,13 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
     assert.ok(contrast(coverage.body.color, coverage.body.background) >= 4.5, `${label} body text contrast is below 4.5`);
     assert.ok(coverage.primary, `${label} did not render the primary button variant`);
     assert.ok(contrast(coverage.primary.color, coverage.primary.background) >= 4.5, `${label} primary button contrast is below 4.5`);
+    assert.ok(coverage.guide?.visible, `${label} does not expose a visible setup guide link`);
+    assert.equal(coverage.guide?.href, 'https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md', `${label} setup guide link target drifted`);
     if (viewportConfig.id === 'compact-touch') {
       assert.deepEqual(coverage.inputSizes.filter((size) => size < 16), [], `${label} has editable text below 16px`);
       const undersized = coverage.targets.filter(({ width, height }) => width < 43.5 || height < 43.5);
       assert.deepEqual(undersized, [], `${label} has undersized touch targets`);
+      assert.ok(coverage.guide.width >= 43.5 && coverage.guide.height >= 43.5, `${label} setup guide link is not a 44px touch target`);
     }
 
     const outcomes = await exerciseFamilies(page, label);

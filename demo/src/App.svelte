@@ -178,6 +178,7 @@
       <div class="header-actions">
         <Button onclick={openPalette}>Search catalog</Button>
         <Theme bind:theme={currentTheme} />
+        <a href="https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md" class="repo-link guide-link">Setup guide</a>
         <a href="https://github.com/wornpage/wornpage" class="repo-link">GitHub</a>
         <a href="https://projects-webmcp-extension.pages.dev/webmcp-challenge" class="repo-link release-link">Projects release</a>
       </div>
