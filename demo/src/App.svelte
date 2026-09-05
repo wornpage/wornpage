@@ -19,18 +19,27 @@
 
   let sidebarCollapsed = $state(typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches);
   let activeSection = $state<DemoCatalogId>(typeof window === 'undefined' ? sections[0] : sectionFromHash(window.location.hash));
-  let pendingPaletteSection = $state<DemoCatalogId | null>(null);
+  let paletteFocusPhase = $state<'idle' | 'open' | 'closing'>('idle');
+  let pendingPaletteFocus = $state<DemoCatalogId | null>(null);
+  let paletteCycle = 0;
+  let navigationRequest = 0;
 
   function reducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   async function revealSection(section: DemoCatalogId, focus: boolean) {
+    const request = ++navigationRequest;
     await tick();
+    if (request !== navigationRequest) return;
     const target = document.getElementById(section);
     target?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
     if (!focus) return;
-    requestAnimationFrame(() => document.getElementById(`${section}-heading`)?.focus({ preventScroll: true }));
+    if (paletteFocusPhase !== 'idle') {
+      pendingPaletteFocus = section;
+      return;
+    }
+    document.getElementById(`${section}-heading`)?.focus({ preventScroll: true });
   }
 
   onMount(() => {
@@ -100,7 +109,11 @@
   }));
 
   function openPalette() {
-    cmdkRef?.open();
+    if (!cmdkRef) throw new Error('Command palette handle is unavailable');
+    paletteCycle += 1;
+    pendingPaletteFocus = null;
+    paletteFocusPhase = 'open';
+    cmdkRef.open();
   }
 
   function navigateTo(section: DemoCatalogId, focus = true) {
@@ -111,15 +124,22 @@
   }
 
   function navigateFromPalette(section: DemoCatalogId) {
-    pendingPaletteSection = section;
+    pendingPaletteFocus = section;
     navigateTo(section, false);
   }
 
   function handlePaletteClose() {
-    const destination = pendingPaletteSection;
-    pendingPaletteSection = null;
-    if (!destination) return;
-    setTimeout(() => requestAnimationFrame(() => void revealSection(destination, true)), 0);
+    const closingCycle = paletteCycle;
+    paletteFocusPhase = 'closing';
+    // Cmdk calls onclose before it queues opener restoration. Register the host
+    // flush afterward so the latest navigation intent owns the final focus.
+    queueMicrotask(() => setTimeout(() => {
+      if (closingCycle !== paletteCycle || paletteFocusPhase !== 'closing') return;
+      paletteFocusPhase = 'idle';
+      const destination = pendingPaletteFocus;
+      pendingPaletteFocus = null;
+      if (destination) void revealSection(destination, true);
+    }, 0));
   }
 
   function handleNavigate(href: string) {

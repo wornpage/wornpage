@@ -95,6 +95,9 @@ describe('aggregate demo contract', () => {
     expect(appSource).toContain("scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' })");
     expect(appSource).toContain("compactQuery.addEventListener('change', syncSidebarForViewport)");
     expect(appSource).toContain('Expand navigation');
+    expect(appSource).toContain("paletteFocusPhase = 'closing'");
+    expect(appSource).toContain('queueMicrotask(() => setTimeout(() => {');
+    expect(appSource).toContain('pendingPaletteFocus = section;');
     expect(appSource).toContain('grid-template-columns: auto minmax(0, 1fr)');
     expect(appSource).toContain('.demo-main { box-sizing: border-box; min-width: 0;');
     expect(appSource).toContain('--wrn-theme-text: var(--worn-text);');
@@ -133,6 +136,8 @@ describe('aggregate demo contract', () => {
     expect(catalogVerifierSource).toContain("skipped.status = 'skipped'");
     expect(browserCheckSource).toContain('familyOutcomeChecks');
     expect(browserCheckSource).toContain('distinctPaletteSignaturesPerViewport');
+    expect(browserCheckSource).toContain('assertPaletteCancellationNavigation(browser, reducedMotion, iterations = 20)');
+    expect(browserCheckSource).toContain('40/40 cancellation-to-navigation focus ordering checks passed');
     expect(browserCheckSource).toContain("pendingDeviceCoverage: ['current iOS Safari', 'installed iOS PWA standalone']");
   });
 

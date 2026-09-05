@@ -28,6 +28,13 @@ Theme is the named live consumer, the catalog owns the mapping, and the matrix
 checks the control in every palette. Remove the mapping only if a reviewed
 Theme revision adopts semantic `--worn-*` fallbacks directly.
 
+Compatibility retained:
+- Consumer: Catalog host navigation immediately after `@wornpage/cmdk` closes.
+- Owner: `demo/src/App.svelte` `openPalette` / `handlePaletteClose` focus phase.
+- Removal condition: A reviewed Cmdk revision invokes `onclose` only after its opener-focus restoration has settled, and the updated pin reaches this mirror.
+- Test coverage: The built-browser gate runs 20 cancellation-to-navigation checks with normal motion and 20 with reduced motion, including navigation triggered by native opener restoration.
+- Why hard cutover is unsafe now: `packages/cmdk` is generated from its canonical standalone repository and cannot be patched in this mirror.
+
 ## Verification denominators
 
 The named-theme matrix is exactly 16 cells: compact `320x900` with touch and
@@ -70,3 +77,13 @@ continues streaming to the terminal, so local and CI logs remain useful too.
 The runner never retries a failed stage. A nonzero stage remains the overall
 nonzero result and prevents every later stage from running. CI uploads the
 ignored verification directory even on failure.
+
+For a bounded regression while working specifically on palette-cancellation
+focus ordering, run:
+
+```bash
+bun run test:catalog:browser -- --focus-ordering
+```
+
+This runs 20 normal-motion and 20 reduced-motion cancellation-to-navigation
+checks. It is a diagnostic subset, not a substitute for `bun run verify:catalog`.

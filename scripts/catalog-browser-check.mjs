@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +24,10 @@ const REQUIRED_TOKENS = [
   '--worn-success-bg', '--worn-success-border', '--worn-success-text', '--worn-warning-bg',
   '--worn-warning-border', '--worn-warning-text', '--worn-danger-bg', '--worn-danger-border', '--worn-danger-text',
 ];
+const browserArguments = process.argv.slice(2);
+const unsupportedArguments = browserArguments.filter((argument) => argument !== '--focus-ordering');
+if (unsupportedArguments.length) throw new Error(`Unsupported catalog browser option: ${unsupportedArguments.join(', ')}`);
+const focusOrderingOnly = browserArguments.includes('--focus-ordering');
 
 function rgb(value) {
   const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number);
@@ -505,6 +509,47 @@ async function assertInteractions(browser) {
   }
 }
 
+async function assertPaletteCancellationNavigation(browser, reducedMotion, iterations = 20) {
+  const label = `palette-cancel-navigation-${reducedMotion}`;
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion });
+  const page = await context.newPage();
+  const assertClean = watchPage(page, label);
+  try {
+    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    const search = page.getByRole('button', { name: 'Search catalog', exact: true });
+    for (let iteration = 0; iteration < iterations; iteration += 1) {
+      const destination = iteration % 2 === 0 ? 'workflow' : 'alert';
+      console.log(`catalog browser focus ordering start: ${label} ${iteration + 1}/${iterations} -> ${destination}`);
+      await search.click();
+      await page.getByRole('dialog', { name: 'Command palette' }).waitFor();
+      await page.evaluate((target) => {
+        const opener = [...document.querySelectorAll('button')].find((node) => node.textContent?.trim() === 'Search catalog');
+        const jump = document.querySelector('#catalog-jump');
+        if (!opener || !(jump instanceof HTMLSelectElement)) throw new Error('Palette cancellation regression controls are unavailable');
+        const navigateOnNativeRestore = (event) => {
+          if (event.target !== opener) return;
+          document.removeEventListener('focusin', navigateOnNativeRestore, true);
+          jump.value = target;
+          jump.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+        document.addEventListener('focusin', navigateOnNativeRestore, true);
+      }, destination);
+      await page.keyboard.press('Escape');
+      await page.locator(`#${destination}-heading:focus`).waitFor({ timeout: 5000 });
+      await page.waitForTimeout(25);
+      assert.equal(await page.locator(`#${destination}-heading`).evaluate((node) => node === document.activeElement), true, `${label} iteration ${iteration + 1} let delayed opener restoration steal focus`);
+      assert.equal(new URL(page.url()).hash, `#${destination}`);
+    }
+    assertClean();
+    return { label, passed: iterations, expected: iterations };
+  } catch (error) {
+    console.error(`catalog browser ${label} failed\n${error?.stack || error}`);
+    throw error;
+  } finally {
+    try { await context.close(); } catch (error) { console.error(`catalog browser ${label} cleanup failed\n${error?.stack || error}`); throw error; }
+  }
+}
+
 async function assertReducedMotionAndKeyboard(browser) {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
@@ -557,7 +602,6 @@ async function assertReducedMotionAndKeyboard(browser) {
   }
 }
 
-await rm(OUTPUT_DIR, { recursive: true, force: true });
 await mkdir(OUTPUT_DIR, { recursive: true });
 const viteCli = fileURLToPath(new URL('../demo/node_modules/vite/bin/vite.js', import.meta.url));
 const preview = spawn(process.execPath, [viteCli, 'preview', '--host', HOST, '--port', String(PORT), '--strictPort'], {
@@ -574,6 +618,20 @@ try {
   await waitForPreview(preview);
   console.log('catalog browser phase start: chromium launch');
   browser = await chromium.launch({ headless: true });
+  if (focusOrderingOnly) {
+    console.log('catalog browser phase start: palette cancellation navigation 20 no-preference + 20 reduce');
+    const cases = [
+      await assertPaletteCancellationNavigation(browser, 'no-preference'),
+      await assertPaletteCancellationNavigation(browser, 'reduce'),
+    ];
+    const report = {
+      passed: cases.reduce((total, scenario) => total + scenario.passed, 0),
+      expected: cases.reduce((total, scenario) => total + scenario.expected, 0),
+      cases,
+    };
+    await writeFile(join(OUTPUT_DIR, 'focus-ordering-report.json'), `${JSON.stringify(report, null, 2)}\n`);
+    console.log(`catalog browser: ${report.passed}/${report.expected} cancellation-to-navigation focus ordering checks passed`);
+  } else {
   const matrix = [];
   for (const viewport of VIEWPORTS) {
     for (const theme of THEMES) {
@@ -587,6 +645,11 @@ try {
   const system = [await assertSystemCase(browser, 'light'), await assertSystemCase(browser, 'dark')];
   console.log('catalog browser phase start: navigation-responsive');
   const interactions = await assertInteractions(browser);
+  console.log('catalog browser phase start: palette cancellation navigation 20 no-preference + 20 reduce');
+  const paletteCancellationNavigation = [
+    await assertPaletteCancellationNavigation(browser, 'no-preference'),
+    await assertPaletteCancellationNavigation(browser, 'reduce'),
+  ];
   console.log('catalog browser phase start: motion-keyboard');
   const accessibility = await assertReducedMotionAndKeyboard(browser);
   const paletteKey = (palette) => `${palette.background}|${palette.surface}|${palette.accent}`;
@@ -607,6 +670,11 @@ try {
     },
     system: { passed: system.length, expected: 2, cases: system },
     interactions,
+    paletteCancellationNavigation: {
+      passed: paletteCancellationNavigation.reduce((total, scenario) => total + scenario.passed, 0),
+      expected: paletteCancellationNavigation.reduce((total, scenario) => total + scenario.expected, 0),
+      cases: paletteCancellationNavigation,
+    },
     accessibility,
     screenshots: matrix.length * 4 + system.length,
     pendingDeviceCoverage: ['current iOS Safari', 'installed iOS PWA standalone'],
@@ -617,7 +685,9 @@ try {
   console.log(`catalog browser: ${matrix.length}/16 named-theme cells, ${matrix.length * EXPECTED_IDS.length}/416 presence checks, ${matrix.length * EXPECTED_IDS.length}/416 family outcome checks`);
   console.log('catalog browser: 8/8 distinct computed palette signatures per viewport');
   console.log('catalog browser: 2/2 System light/dark cases; motion, keyboard, focus, state, and containment passed');
+  console.log('catalog browser: 40/40 cancellation-to-navigation focus ordering checks passed');
   console.log('catalog browser: iOS Safari and installed iOS PWA remain pending real-device coverage');
+  }
 } catch (error) {
   if (previewOutput.trim()) console.error(previewOutput.trim());
   throw error;
