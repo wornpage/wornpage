@@ -16,11 +16,13 @@ git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
 bunx playwright install chromium # one-time local browser install; Node 24.18.0 required
-bun run check:workspace
-bun run check:components
-bun test          # 100+ tests across all packages and tools
 bun run verify:catalog # full contracts, build, and Chromium catalog matrix
 ```
+
+`verify:catalog` runs the six documented checks once, in order, and preserves
+per-stage stdout, stderr, exit status, phase, and timing under
+`output/verify-catalog/runs/`. The directory is ignored locally and uploaded by
+CI even when a stage fails.
 
 ## Quick start — using in your app
 

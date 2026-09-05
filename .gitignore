@@ -5,3 +5,4 @@ dist/*.map
 
 demo/dist/
 output/playwright/
+output/verify-catalog/

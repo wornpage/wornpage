@@ -14,6 +14,7 @@ emit telemetry, or represent local example state as a persisted save.
 | Reviewed source metadata | `scripts/component-repositories.ts` through `demo/src/sections.ts` | Repository, exact revision, codeload install command, and sample import are generated from the reviewed pin manifest. |
 | Example state | `demo/src/ComponentExample.svelte` | Local models expose outcomes, reset paths, and applicable disabled, loading, empty, error, undo, and redo states. |
 | Rendered verification | `scripts/catalog-browser-check.mjs` | Tests the built output and writes ignored evidence under `output/playwright/catalog/`. |
+| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, sync, Bun tests, build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
 
 `--worn-muted` and `--worn-subtle` are retained semantic spellings because the
 live `@wornpage/undo` consumer reads them. Their values are owned by the host
@@ -50,3 +51,22 @@ Chromium emulation is not proof of current iOS Safari or installed iOS PWA
 behavior. The browser gate covers compact touch emulation, editable 16px text,
 44px targets, focus, containment, overlays, and safe-area-aware CSS. Current
 iOS Safari and standalone-PWA device runs remain a release-owner device check.
+
+## Failure evidence
+
+Run the complete contract with the stable public command:
+
+```bash
+bun run verify:catalog
+```
+
+Each invocation creates a new `output/verify-catalog/runs/<run-id>/` directory.
+`summary.json` records the current or failed phase, timestamps, duration, exit
+code, signal, and whether later stages were skipped. Every stage owns separate
+stdout and stderr logs. `output/verify-catalog/latest.json` mirrors the newest
+summary for quick discovery without replacing any prior run directory. Output
+continues streaming to the terminal, so local and CI logs remain useful too.
+
+The runner never retries a failed stage. A nonzero stage remains the overall
+nonzero result and prevents every later stage from running. CI uploads the
+ignored verification directory even on failure.

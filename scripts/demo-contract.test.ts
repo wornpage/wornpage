@@ -8,6 +8,7 @@ const demoIndexSource = readFileSync(new URL('../demo/index.html', import.meta.u
 const exampleSource = readFileSync(new URL('../demo/src/ComponentExample.svelte', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../demo/vite.config.ts', import.meta.url), 'utf8');
 const browserCheckSource = readFileSync(new URL('./catalog-browser-check.mjs', import.meta.url), 'utf8');
+const catalogVerifierSource = readFileSync(new URL('./verify-catalog.mjs', import.meta.url), 'utf8');
 const rootPackage = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
   scripts: Record<string, string>;
   devDependencies: Record<string, string>;
@@ -125,7 +126,11 @@ describe('aggregate demo contract', () => {
   test('runs the durable rendered catalog matrix from the fixed verification gate', () => {
     expect(rootPackage.devDependencies.playwright).toBe('1.62.0');
     expect(rootPackage.scripts['test:catalog:browser']).toBe('node scripts/catalog-browser-check.mjs');
-    expect(rootPackage.scripts['verify:catalog']).toContain('bun run test:catalog:browser');
+    expect(rootPackage.scripts['verify:catalog']).toBe('node scripts/verify-catalog.mjs');
+    for (const command of ['bun run check:workspace', 'bun run check:components', 'bun run sync --check', 'bun test', 'bun run build', 'bun run test:catalog:browser']) {
+      expect(catalogVerifierSource).toContain(`command: '${command}'`);
+    }
+    expect(catalogVerifierSource).toContain("skipped.status = 'skipped'");
     expect(browserCheckSource).toContain('familyOutcomeChecks');
     expect(browserCheckSource).toContain('distinctPaletteSignaturesPerViewport');
     expect(browserCheckSource).toContain("pendingDeviceCoverage: ['current iOS Safari', 'installed iOS PWA standalone']");

@@ -16,7 +16,7 @@
     "check:components": "bun run scripts/check-component-delivery.ts",
     "check:workspace": "bun run scripts/check-workspace-contract.ts",
     "test:catalog:browser": "node scripts/catalog-browser-check.mjs",
-    "verify:catalog": "bun run check:workspace && bun run check:components && bun run sync --check && bun test && bun run build && bun run test:catalog:browser",
+    "verify:catalog": "node scripts/verify-catalog.mjs",
     "new": "bun run packages/cli/src/index.ts new",
     "sync": "bun run scripts/sync.ts"
   },

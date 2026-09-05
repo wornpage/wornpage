@@ -413,8 +413,11 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
     await page.screenshot({ path: join(OUTPUT_DIR, `${label}-metadata.png`) });
     assertClean();
     return { label, theme, viewport: viewportConfig.id, sectionsPresent: coverage.sectionIds.length, outcomesExercised: outcomes, metadata: coverage.metadataIds.length, examples: coverage.exampleIds.length, palette: coverage.palette };
+  } catch (error) {
+    console.error(`catalog browser cell failed: ${label}\n${error?.stack || error}`);
+    throw error;
   } finally {
-    await context.close();
+    try { await context.close(); } catch (error) { console.error(`catalog browser cell cleanup failed: ${label}\n${error?.stack || error}`); throw error; }
   }
 }
 
@@ -444,8 +447,11 @@ async function assertSystemCase(browser, colorScheme) {
     await page.screenshot({ path: join(OUTPUT_DIR, `${label}-header-nav.png`) });
     assertClean();
     return { label, effectiveTheme: colorScheme, liveOsChange: true, palette: signature };
+  } catch (error) {
+    console.error(`catalog browser System case failed: ${label}\n${error?.stack || error}`);
+    throw error;
   } finally {
-    await context.close();
+    try { await context.close(); } catch (error) { console.error(`catalog browser System cleanup failed: ${label}\n${error?.stack || error}`); throw error; }
   }
 }
 
@@ -491,8 +497,11 @@ async function assertInteractions(browser) {
 
     assertClean();
     return { searchFocus: true, jumpFocus: true, hashHistory: true, desktopToCompact: true, mobileFilterNavigation: true };
+  } catch (error) {
+    console.error(`catalog browser navigation-responsive failed\n${error?.stack || error}`);
+    throw error;
   } finally {
-    await context.close();
+    try { await context.close(); } catch (error) { console.error(`catalog browser navigation-responsive cleanup failed\n${error?.stack || error}`); throw error; }
   }
 }
 
@@ -540,8 +549,11 @@ async function assertReducedMotionAndKeyboard(browser) {
     assert.equal(reducedNavigation.visible, true, 'Reduced-motion destination was not visible');
     assertClean();
     return { reducedMotionCss: true, reducedMotionJs: true, keyboardFocus: true, paletteReturnFocus: true };
+  } catch (error) {
+    console.error(`catalog browser motion-keyboard failed\n${error?.stack || error}`);
+    throw error;
   } finally {
-    await context.close();
+    try { await context.close(); } catch (error) { console.error(`catalog browser motion-keyboard cleanup failed\n${error?.stack || error}`); throw error; }
   }
 }
 
@@ -560,17 +572,22 @@ preview.stderr.on('data', (chunk) => { previewOutput += chunk; preview.previewOu
 let browser;
 try {
   await waitForPreview(preview);
+  console.log('catalog browser phase start: chromium launch');
   browser = await chromium.launch({ headless: true });
   const matrix = [];
   for (const viewport of VIEWPORTS) {
     for (const theme of THEMES) {
+      console.log(`catalog browser cell start: ${viewport.id}-${theme}`);
       const cell = await assertCatalogCell(browser, viewport, theme);
       matrix.push(cell);
       console.log(`catalog browser cell: ${cell.label} — 26 present, 26 outcomes`);
     }
   }
+  console.log('catalog browser phase start: System light/dark');
   const system = [await assertSystemCase(browser, 'light'), await assertSystemCase(browser, 'dark')];
+  console.log('catalog browser phase start: navigation-responsive');
   const interactions = await assertInteractions(browser);
+  console.log('catalog browser phase start: motion-keyboard');
   const accessibility = await assertReducedMotionAndKeyboard(browser);
   const paletteKey = (palette) => `${palette.background}|${palette.surface}|${palette.accent}`;
   for (const viewport of VIEWPORTS) {
