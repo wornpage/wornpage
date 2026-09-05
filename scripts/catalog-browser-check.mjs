@@ -1,15 +1,17 @@
 import assert from 'node:assert/strict';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { catalogOutputDirectory, prepareCatalogOutput } from './catalog-browser-output.mjs';
 import { COMPONENT_SOURCES } from './component-repositories.ts';
 
 const HOST = '127.0.0.1';
 const PORT = 4173;
 const BASE_URL = `http://${HOST}:${PORT}`;
-const OUTPUT_DIR = fileURLToPath(new URL('../output/playwright/catalog/', import.meta.url));
+const REPOSITORY_ROOT = fileURLToPath(new URL('..', import.meta.url));
+const OUTPUT_DIR = catalogOutputDirectory(REPOSITORY_ROOT);
 const THEMES = ['light', 'dark', 'forest', 'ocean', 'sepia', 'halloween', 'winter', 'holiday'];
 const THEME_LABELS = Object.fromEntries(THEMES.map((theme) => [theme, theme[0].toUpperCase() + theme.slice(1)]));
 const VIEWPORTS = [
@@ -602,7 +604,7 @@ async function assertReducedMotionAndKeyboard(browser) {
   }
 }
 
-await mkdir(OUTPUT_DIR, { recursive: true });
+await prepareCatalogOutput({ repositoryRoot: REPOSITORY_ROOT, clean: !focusOrderingOnly });
 const viteCli = fileURLToPath(new URL('../demo/node_modules/vite/bin/vite.js', import.meta.url));
 const preview = spawn(process.execPath, [viteCli, 'preview', '--host', HOST, '--port', String(PORT), '--strictPort'], {
   cwd: fileURLToPath(new URL('../demo/', import.meta.url)),

@@ -87,3 +87,8 @@ bun run test:catalog:browser -- --focus-ordering
 
 This runs 20 normal-motion and 20 reduced-motion cancellation-to-navigation
 checks. It is a diagnostic subset, not a substitute for `bun run verify:catalog`.
+The full gate clears only its dedicated `output/playwright/catalog/` directory
+before capturing fresh screenshots and `report.json`. The bounded focus-ordering
+diagnostic preserves those full-run artifacts; durable staged logs under
+`output/verify-catalog/` are owned separately and are never cleared by the
+browser harness.

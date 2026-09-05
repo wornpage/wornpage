@@ -8,6 +8,7 @@ const demoIndexSource = readFileSync(new URL('../demo/index.html', import.meta.u
 const exampleSource = readFileSync(new URL('../demo/src/ComponentExample.svelte', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../demo/vite.config.ts', import.meta.url), 'utf8');
 const browserCheckSource = readFileSync(new URL('./catalog-browser-check.mjs', import.meta.url), 'utf8');
+const browserOutputSource = readFileSync(new URL('./catalog-browser-output.mjs', import.meta.url), 'utf8');
 const catalogVerifierSource = readFileSync(new URL('./verify-catalog.mjs', import.meta.url), 'utf8');
 const rootPackage = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
   scripts: Record<string, string>;
@@ -25,6 +26,12 @@ const demoPackage = JSON.parse(readFileSync(new URL('../demo/package.json', impo
 const combinedDemoSource = `${appSource}\n${exampleSource}`;
 
 describe('aggregate demo contract', () => {
+  test('cleans only full-run catalog artifacts while preserving bounded diagnostic evidence', () => {
+    expect(browserCheckSource).toContain('clean: !focusOrderingOnly');
+    expect(browserOutputSource).toContain("const CATALOG_OUTPUT_RELATIVE_PATH = 'output/playwright/catalog';");
+    expect(browserOutputSource).toContain("if (clean) await rm(outputDirectory, { recursive: true, force: true });");
+  });
+
   test('derives catalog coverage from the component repository denominator', () => {
     const expectedIds = [...COMPONENT_REPOSITORIES].sort();
     const catalogIds = DEMO_CATALOG.map(({ id }) => id).sort();
