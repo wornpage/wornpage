@@ -29,7 +29,7 @@ export const COMPONENT_SOURCES = [
 	{ name: "sync", revision: "79fd644a819f1a25e7e20dd2011fbb3c97f67e65" },
 	{ name: "tabs", revision: "816df623aff0a12aea47fd63b3e0cecafbbbc488" },
 	{ name: "theme", revision: "f9ef5f1b5cccc90ac43695bd23ed735776b593d5" },
-	{ name: "toast", revision: "e58675ad9e945776e0715a0ccfdf7b3aaf6af0e1" },
+	{ name: "toast", revision: "2049e21d86a8e394ca2093528e639c025c1a8842" },
 	{ name: "undo", revision: "b7f7e42bb362f6886f11001f55a68c3fef1abc23" },
 	{ name: "workflow", revision: "7e705da0d1349487458b4b3feb28d8ebc52aeec0" },
 ] as const satisfies readonly StandaloneSource[];

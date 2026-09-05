@@ -66,12 +66,25 @@ Toasts use stylesheet animations instead of inline transition styles, so they wo
 
 ## Theming
 
+Put the shared host palette on an ancestor that contains every toast (often `:root` when notifications render at the document level). Success and error variants use their semantic palette when it is present, then fall back to the component base pair (`--wrn-toast-bg` / `--wrn-toast-text`) and the shared host pair (`--worn-surface` / `--worn-text`). This keeps a minimal light or dark host palette coherent without requiring status tokens.
+
+Status-specific background and text tokens are paired overrides: set `--wrn-toast-error-bg` with `--wrn-toast-error-text`, and `--wrn-toast-success-bg` with `--wrn-toast-success-text`. The shared `--worn-danger-*` and `--worn-success-*` pairs remain the next precedence level.
+
 ```css
-.wrn-toast {
+:root {
+  --worn-surface: #fdfbf7;
+  --worn-text: #21322b;
+}
+
+.toast-host {
   --wrn-toast-bg: #fdfbf7;
   --wrn-toast-border: #e2ddd5;
   --wrn-toast-text: #21322b;
+  --wrn-toast-error-bg: #fdf0ef;
+  --wrn-toast-error-text: #8f2119;
   --wrn-toast-error-border: #e74c3c;
+  --wrn-toast-success-bg: #edf9f0;
+  --wrn-toast-success-text: #176b3a;
   --wrn-toast-success-border: #27ae60;
   --wrn-toast-focus: #21322b;
 }
