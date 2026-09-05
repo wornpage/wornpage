@@ -1,5 +1,24 @@
 # Wornpage
 
+I build accessible Svelte interfaces and tools for reliable, human-controlled AI workflows.
+
+## Selected work
+
+| Project | What it demonstrates | Explore |
+| --- | --- | --- |
+| **Wornpage Projects** | A work tracker where browser agents inspect visible evidence and prepare next actions for human approval. | [Try the demo](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Source](https://github.com/wornpage/projects-webmcp-extension) |
+| **Wornpage components** | Reusable Svelte 5 interfaces with keyboard interaction, themes, and checked package delivery. | [Browse the live catalog](https://wornpage.pages.dev) · [Component guide](#component-library) |
+| **WebMCP conformance** | Framework-neutral validation and fixtures for page-owned tool catalogs, authority boundaries, and receipts. | [Explore the tooling](https://github.com/wornpage/webmcp-conformance) |
+
+My work connects usable interfaces with explicit action boundaries: people can inspect what an agent sees, review what it prepares, and control the final decision.
+
+## Component library
+
+This repository is also the integration catalog for 26 standalone components, three development tools, and a CLI. Individual component repositories remain the canonical sources.
+
+<details>
+<summary><strong>Installation, component catalog, architecture, and contributing</strong></summary>
+
 > 26 standalone component repositories + 3 framework-agnostic dev tools + 1 CLI.
 > **This monorepo is a mirror.** Individual packages have their own repos.
 > Install standalone packages from reviewed Git commits; the `@wornpage` npm
@@ -104,3 +123,5 @@ bun add "https://codeload.github.com/wornpage/toast/tar.gz/e58675ad9e945776e0715
 ## License
 
 MIT
+
+</details>
