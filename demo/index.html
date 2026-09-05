@@ -7,19 +7,99 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--cockpit-bg); color: var(--cockpit-text); }
+    html { background: var(--worn-bg); color-scheme: light; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--worn-bg); color: var(--worn-text); }
     :root {
-      --cockpit-bg: #f5f3ef; --cockpit-surface: #ffffff; --cockpit-text: #1a1a1a;
-      --cockpit-text-muted: #6b6b6b; --cockpit-border: #ddd; --cockpit-border-strong: #bbb;
-      --cockpit-accent: #0d9488; --cockpit-accent-text: #ffffff; --cockpit-accent-50: rgba(13,148,136,0.15);
-      --cockpit-hover-bg: rgba(0,0,0,0.05); --cockpit-nav-bg: #f5f3ef; --cockpit-radius: 8px;
-      --cockpit-shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --font-typewriter: SF Mono, monospace;
+      --worn-bg: #f5f3ef; --worn-bg-secondary: #ece9e2; --worn-surface: #ffffff; --worn-surface-raised: #ffffff;
+      --worn-text: #18231f; --worn-text-secondary: #34463f; --worn-text-muted: #56665f;
+      --worn-border: #c8cec9; --worn-border-strong: #78857f;
+      --worn-accent: #0b6f65; --worn-accent-text: #ffffff; --worn-accent-50: #dcefeb; --worn-link: #075f57;
+      --worn-hover-bg: #e2efeb; --worn-selected-bg: #dcefeb; --worn-selected-fg: #12352f; --worn-focus: #075f57;
+      --worn-success-bg: #e6f4ea; --worn-success-border: #3b7d4f; --worn-success-text: #205b33;
+      --worn-warning-bg: #fff3d6; --worn-warning-border: #8a6500; --worn-warning-text: #5c4500;
+      --worn-danger-bg: #fbe9e7; --worn-danger-border: #a43a30; --worn-danger-text: #7a241d;
+      --worn-radius: 8px; --worn-radius-sm: 6px; --worn-shadow-sm: 0 1px 3px rgb(24 35 31 / 12%); --worn-shadow-md: 0 5px 18px rgb(24 35 31 / 16%);
+      --worn-muted: var(--worn-text-muted); --worn-subtle: var(--worn-bg-secondary); --font-typewriter: "SFMono-Regular", Consolas, monospace;
     }
     [data-theme="dark"] {
-      --cockpit-bg: #0f1714; --cockpit-surface: #1a2420; --cockpit-text: #e0e0e0;
-      --cockpit-text-muted: #889990; --cockpit-border: #2a3a30; --cockpit-border-strong: #3a4a40;
-      --cockpit-accent: #4db6ac; --cockpit-accent-text: #0f1714; --cockpit-accent-50: rgba(77,182,172,0.15);
-      --cockpit-hover-bg: rgba(255,255,255,0.05); --cockpit-nav-bg: #0f1714;
+      color-scheme: dark;
+      --worn-bg: #101713; --worn-bg-secondary: #1b2822; --worn-surface: #202e27; --worn-surface-raised: #293a32;
+      --worn-text: #f1f6f3; --worn-text-secondary: #d1ddd7; --worn-text-muted: #a9bbb2;
+      --worn-border: #455b50; --worn-border-strong: #72877d;
+      --worn-accent: #79d2c5; --worn-accent-text: #10251f; --worn-accent-50: #25483f; --worn-link: #94e6da;
+      --worn-hover-bg: #2d473e; --worn-selected-bg: #31584c; --worn-selected-fg: #f4fffb; --worn-focus: #a7f3e7;
+      --worn-success-bg: #173d29; --worn-success-border: #65b77f; --worn-success-text: #b9f2c9;
+      --worn-warning-bg: #423512; --worn-warning-border: #d2ac45; --worn-warning-text: #ffe6a2;
+      --worn-danger-bg: #43221f; --worn-danger-border: #dc746b; --worn-danger-text: #ffc2bc;
+    }
+    [data-theme="forest"] {
+      color-scheme: dark;
+      --worn-bg: #0e1a13; --worn-bg-secondary: #17281d; --worn-surface: #203328; --worn-surface-raised: #294234;
+      --worn-text: #f0f7ed; --worn-text-secondary: #d2e4cd; --worn-text-muted: #aac3a4;
+      --worn-border: #45644b; --worn-border-strong: #769177;
+      --worn-accent: #9bd18b; --worn-accent-text: #142511; --worn-accent-50: #31543a; --worn-link: #b8e7aa;
+      --worn-hover-bg: #2b4934; --worn-selected-bg: #365d40; --worn-selected-fg: #f4fff1; --worn-focus: #d0f4c5;
+      --worn-success-bg: #234329; --worn-success-border: #79bd7d; --worn-success-text: #cff5cf;
+      --worn-warning-bg: #403611; --worn-warning-border: #c9ae50; --worn-warning-text: #f8e7a7;
+      --worn-danger-bg: #45221f; --worn-danger-border: #d77a72; --worn-danger-text: #ffd0ca;
+    }
+    [data-theme="ocean"] {
+      color-scheme: dark;
+      --worn-bg: #071a24; --worn-bg-secondary: #0e2937; --worn-surface: #153746; --worn-surface-raised: #1c4658;
+      --worn-text: #eefaff; --worn-text-secondary: #cce8f1; --worn-text-muted: #9fc7d5;
+      --worn-border: #386778; --worn-border-strong: #6b93a1;
+      --worn-accent: #70d4ed; --worn-accent-text: #062630; --worn-accent-50: #174d60; --worn-link: #96e5f7;
+      --worn-hover-bg: #1b4b5e; --worn-selected-bg: #205b70; --worn-selected-fg: #f3fcff; --worn-focus: #b5effc;
+      --worn-success-bg: #123f37; --worn-success-border: #58b79f; --worn-success-text: #b9f0e0;
+      --worn-warning-bg: #423610; --worn-warning-border: #d0ad47; --worn-warning-text: #ffe9a5;
+      --worn-danger-bg: #462326; --worn-danger-border: #dc7880; --worn-danger-text: #ffcbd0;
+    }
+    [data-theme="sepia"] {
+      color-scheme: light;
+      --worn-bg: #f2e4c8; --worn-bg-secondary: #e8d4ae; --worn-surface: #fff7e5; --worn-surface-raised: #fffbef;
+      --worn-text: #352719; --worn-text-secondary: #57422d; --worn-text-muted: #6f5840;
+      --worn-border: #c5aa7e; --worn-border-strong: #8d704d;
+      --worn-accent: #7a4b18; --worn-accent-text: #ffffff; --worn-accent-50: #ead6b5; --worn-link: #694014;
+      --worn-hover-bg: #ead8b8; --worn-selected-bg: #dfc494; --worn-selected-fg: #3d2814; --worn-focus: #694014;
+      --worn-success-bg: #e5eed0; --worn-success-border: #66813d; --worn-success-text: #3f5820;
+      --worn-warning-bg: #f9e6b4; --worn-warning-border: #886100; --worn-warning-text: #5a4100;
+      --worn-danger-bg: #f4d8cf; --worn-danger-border: #984738; --worn-danger-text: #752d22;
+    }
+    [data-theme="halloween"] {
+      color-scheme: dark;
+      --worn-bg: #171019; --worn-bg-secondary: #26182a; --worn-surface: #312037; --worn-surface-raised: #3c2943;
+      --worn-text: #fff4e9; --worn-text-secondary: #ead7e8; --worn-text-muted: #c6aac4;
+      --worn-border: #684969; --worn-border-strong: #98739a;
+      --worn-accent: #ff9f43; --worn-accent-text: #2b1300; --worn-accent-50: #5d3827; --worn-link: #ffbd7d;
+      --worn-hover-bg: #4b3048; --worn-selected-bg: #653c32; --worn-selected-fg: #fff8f0; --worn-focus: #ffd0a3;
+      --worn-success-bg: #244328; --worn-success-border: #75b97a; --worn-success-text: #cef2cf;
+      --worn-warning-bg: #4c3515; --worn-warning-border: #e1a649; --worn-warning-text: #ffe0a0;
+      --worn-danger-bg: #4b202c; --worn-danger-border: #e27691; --worn-danger-text: #ffc6d5;
+    }
+    [data-theme="winter"] {
+      color-scheme: light;
+      --worn-bg: #edf4f8; --worn-bg-secondary: #dfeaf0; --worn-surface: #ffffff; --worn-surface-raised: #ffffff;
+      --worn-text: #172c3a; --worn-text-secondary: #334e5e; --worn-text-muted: #526c7a;
+      --worn-border: #b9ced9; --worn-border-strong: #718d9c;
+      --worn-accent: #176b87; --worn-accent-text: #ffffff; --worn-accent-50: #d4eaf2; --worn-link: #125b73;
+      --worn-hover-bg: #d9ebf2; --worn-selected-bg: #c9e3ed; --worn-selected-fg: #173c4b; --worn-focus: #125b73;
+      --worn-success-bg: #e1f1e8; --worn-success-border: #417b5a; --worn-success-text: #28583d;
+      --worn-warning-bg: #fff0cb; --worn-warning-border: #896300; --worn-warning-text: #5c4500;
+      --worn-danger-bg: #f8e4e5; --worn-danger-border: #a33f47; --worn-danger-text: #792832;
+    }
+    [data-theme="holiday"] {
+      color-scheme: dark;
+      --worn-bg: #111914; --worn-bg-secondary: #1c2920; --worn-surface: #26342a; --worn-surface-raised: #304138;
+      --worn-text: #fff9ef; --worn-text-secondary: #e7ded0; --worn-text-muted: #beb5a8;
+      --worn-border: #56685c; --worn-border-strong: #839088;
+      --worn-accent: #f2c35b; --worn-accent-text: #2d2206; --worn-accent-50: #4e4323; --worn-link: #ffe091;
+      --worn-hover-bg: #394a3e; --worn-selected-bg: #5a4b29; --worn-selected-fg: #fffaf0; --worn-focus: #ffe6a6;
+      --worn-success-bg: #1d432d; --worn-success-border: #63b980; --worn-success-text: #bef0cd;
+      --worn-warning-bg: #4a3b16; --worn-warning-border: #ddb852; --worn-warning-text: #ffe7a3;
+      --worn-danger-bg: #4b2023; --worn-danger-border: #df7378; --worn-danger-text: #ffc7ca;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
     }
   </style>
 </head>

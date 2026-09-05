@@ -34,10 +34,14 @@ Release example: [Wornpage Projects — WebMCP Challenge](https://projects-webmc
 git clone https://github.com/wornpage/wornpage.git
 cd wornpage
 bun install
-bun run check:workspace
-bun run check:components
-bun test          # 100+ tests across all packages and tools
+bunx playwright install chromium # one-time local browser install; Node 24.18.0 required
+bun run verify:catalog # full contracts, build, and Chromium catalog matrix
 ```
+
+`verify:catalog` runs the six documented checks once, in order, and preserves
+per-stage stdout, stderr, exit status, phase, and timing under
+`output/verify-catalog/runs/`. The directory is ignored locally and uploaded by
+CI even when a stage fails.
 
 ## Quick start — using in your app
 
@@ -112,6 +116,9 @@ bun add "https://codeload.github.com/wornpage/toast/tar.gz/e58675ad9e945776e0715
 - **The root build is an integration build.** `bun run build` compiles the demo
   against mirrored `workspace:*` sources without generating package `dist/`
   trees inside the mirror.
+- **The catalog is a working playground.** Its host token ownership, local
+  interaction examples, reviewed-source disclosures, and browser matrix are
+  specified in [`docs/catalog-contract.md`](docs/catalog-contract.md).
 
 ## Contributing
 

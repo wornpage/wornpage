@@ -58,19 +58,23 @@ checkout to verify a standalone repository before shipping.
 - Tests if applicable
 
 ### CSS theming
-Components use `--cockpit-*` CSS custom properties. Fall back to sensible defaults
-for standalone use. See `@wornpage/sidebar` for the reference pattern.
+Components use the semantic `--worn-*` CSS custom properties documented in
+[`docs/catalog-contract.md`](docs/catalog-contract.md). The host owns those
+tokens; standalone components retain their documented fallbacks.
 
 ## Running tests
 
 ```bash
 cd wornpage
 bun install
-bun run check:workspace
-bun run check:components
-bun run sync --check
-bun test
+bunx playwright install chromium # one-time local browser install; Node 24.18.0 required
+bun run verify:catalog
 ```
+
+The catalog verifier stops at the first failed stage, preserves that exit code,
+and records later stages as skipped. Inspect `output/verify-catalog/latest.json`
+and its referenced per-run stdout/stderr logs; do not rerun merely to replace a
+failed receipt.
 
 `check:components` is the fleet gate. It checks every mirrored package's
 delivery declaration, exports, README, and release workflow in one pass;
