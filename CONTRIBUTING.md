@@ -58,18 +58,21 @@ checkout to verify a standalone repository before shipping.
 - Tests if applicable
 
 ### CSS theming
-Components use `--cockpit-*` CSS custom properties. Fall back to sensible defaults
-for standalone use. See `@wornpage/sidebar` for the reference pattern.
+Components use the semantic `--worn-*` CSS custom properties documented in
+[`docs/catalog-contract.md`](docs/catalog-contract.md). The host owns those
+tokens; standalone components retain their documented fallbacks.
 
 ## Running tests
 
 ```bash
 cd wornpage
 bun install
+bunx playwright install chromium # one-time local browser install; Node 24.18.0 required
 bun run check:workspace
 bun run check:components
 bun run sync --check
 bun test
+bun run verify:catalog
 ```
 
 `check:components` is the fleet gate. It checks every mirrored package's

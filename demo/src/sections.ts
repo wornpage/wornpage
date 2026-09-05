@@ -17,6 +17,14 @@ export interface DemoCatalogEntry {
   exampleKind: 'component' | 'output';
 }
 
+export interface CatalogMetadata {
+  repositoryUrl: string;
+  revision: string;
+  sourceUrl: string;
+  installCommand: string;
+  usageImport: string;
+}
+
 export const DEMO_CATALOG = [
   { id: 'alert', label: 'Alert', category: 'status', description: 'Inline feedback with clear tone and dismiss semantics.', exampleMarker: 'Alert', exampleKind: 'component' },
   { id: 'async-states', label: 'Async states', category: 'status', description: 'Loading, empty, and retry states for bounded application workflows.', exampleMarker: 'Spinner', exampleKind: 'component' },
@@ -52,7 +60,22 @@ export const DEMO_CATALOG = [
 
 export type DemoCatalogId = (typeof DEMO_CATALOG)[number]['id'];
 
+export function catalogMetadata(id: DemoCatalogId): CatalogMetadata {
+  const source = COMPONENT_SOURCES.find((candidate) => candidate.name === id);
+  const entry = DEMO_CATALOG.find((candidate) => candidate.id === id);
+  if (!source || !entry) throw new Error(`Missing reviewed catalog metadata for ${id}`);
+  const repositoryUrl = `https://github.com/wornpage/${id}`;
+  return {
+    repositoryUrl,
+    revision: source.revision,
+    sourceUrl: `${repositoryUrl}/tree/${source.revision}`,
+    installCommand: `bun add "https://codeload.github.com/wornpage/${id}/tar.gz/${source.revision}"`,
+    usageImport: `import { ${entry.exampleMarker} } from '@wornpage/${id}';`,
+  };
+}
+
 export const CATALOG_GROUPS = CATALOG_CATEGORIES.map((category) => ({
   ...category,
   entries: DEMO_CATALOG.filter((entry) => entry.category === category.id),
 }));
+import { COMPONENT_SOURCES } from '../../scripts/component-repositories';

@@ -22,6 +22,11 @@ jobs:
         with:
           bun-version: 1.3.14
 
+      - name: Set up Node for Playwright
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.18.0
+
       - name: Check workspace dependency contract
         run: bun run check:workspace
 
@@ -31,11 +36,8 @@ jobs:
       - name: Install workspace dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check canonical repository drift
-        run: bun run sync --check
+      - name: Install catalog Chromium
+        run: bunx playwright install --with-deps chromium
 
-      - name: Run cross-package tests
-        run: bun test
-
-      - name: Build workspace demo
-        run: bun run build
+      - name: Verify mirror and rendered catalog
+        run: bun run verify:catalog

@@ -7,6 +7,11 @@ const appSource = readFileSync(new URL('../demo/src/App.svelte', import.meta.url
 const demoIndexSource = readFileSync(new URL('../demo/index.html', import.meta.url), 'utf8');
 const exampleSource = readFileSync(new URL('../demo/src/ComponentExample.svelte', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../demo/vite.config.ts', import.meta.url), 'utf8');
+const browserCheckSource = readFileSync(new URL('./catalog-browser-check.mjs', import.meta.url), 'utf8');
+const rootPackage = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+  scripts: Record<string, string>;
+  devDependencies: Record<string, string>;
+};
 const cmdkSource = readFileSync(new URL('../packages/cmdk/src/Cmdk.svelte', import.meta.url), 'utf8');
 const cmdkIndexSource = readFileSync(new URL('../packages/cmdk/src/index.ts', import.meta.url), 'utf8');
 const sidebarIndexSource = readFileSync(new URL('../packages/sidebar/src/index.ts', import.meta.url), 'utf8');
@@ -58,6 +63,13 @@ describe('aggregate demo contract', () => {
   test('ships one token owner and a local favicon without placeholder CSS', () => {
     expect(demoIndexSource.match(/<style>/gu)?.length).toBe(1);
     expect(demoIndexSource).not.toContain('...tokens...');
+    expect(`${demoIndexSource}\n${combinedDemoSource}`).not.toContain('--cockpit-');
+    for (const theme of ['dark', 'forest', 'ocean', 'sepia', 'halloween', 'winter', 'holiday']) {
+      expect(demoIndexSource).toContain(`[data-theme="${theme}"]`);
+    }
+    for (const token of ['--worn-bg', '--worn-surface', '--worn-text', '--worn-text-muted', '--worn-border', '--worn-accent', '--worn-focus']) {
+      expect(demoIndexSource).toContain(token);
+    }
     expect(demoIndexSource).toContain('<link rel="icon" href="./favicon.svg" type="image/svg+xml" />');
   });
 
@@ -71,7 +83,7 @@ describe('aggregate demo contract', () => {
 
   test('mounts one native command palette for both open actions', () => {
     expect(combinedDemoSource.match(/<Cmdk\b/gu)?.length).toBe(1);
-    expect(appSource).toContain('<Cmdk bind:this={cmdkRef} items={cmdkItems} />');
+    expect(appSource).toContain('<Cmdk bind:this={cmdkRef} items={cmdkItems} onclose={handlePaletteClose} />');
     expect(combinedDemoSource.match(/onclick=\{openPalette\}/gu)?.length).toBe(2);
     expect(combinedDemoSource).not.toContain('cmdk-overlay');
   });
@@ -79,10 +91,12 @@ describe('aggregate demo contract', () => {
   test('preserves hash navigation, scrolling, and compact containment', () => {
     expect(appSource).toContain("window.matchMedia('(max-width: 720px)').matches");
     expect(appSource).toContain("window.history.pushState(null, '', hash)");
-    expect(appSource).toContain("scrollIntoView({ behavior: 'smooth', block: 'start' })");
+    expect(appSource).toContain("scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' })");
+    expect(appSource).toContain("compactQuery.addEventListener('change', syncSidebarForViewport)");
+    expect(appSource).toContain('Expand navigation');
     expect(appSource).toContain('grid-template-columns: auto minmax(0, 1fr)');
     expect(appSource).toContain('.demo-main { box-sizing: border-box; min-width: 0;');
-    expect(appSource).toContain('--wrn-theme-text: var(--cockpit-text');
+    expect(appSource).toContain('--wrn-theme-text: var(--worn-text);');
     expect(exampleSource).toContain('.table-scroll { max-width: 100%; overflow-x: auto; }');
     expect(tabsSource).toMatch(/\.worn-tabs\s*\{[^}]*overflow-x:\s*auto;/su);
     expect(appSource).not.toContain('overflow-x:');
@@ -91,15 +105,30 @@ describe('aggregate demo contract', () => {
   });
 
   test('uses the defined readable muted token for secondary catalog text', () => {
-    expect(combinedDemoSource).not.toContain('--cockpit-text-secondary');
-    expect(combinedDemoSource).not.toMatch(/var\(--cockpit-text-secondary,\s*#(?:555|4e5f57)\)/iu);
-    expect(appSource).toMatch(/\.catalog-jump label\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
-    expect(appSource).toMatch(/\.category-heading\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
-    expect(appSource).toMatch(/\.section-heading code\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
-    expect(exampleSource).toMatch(/\.live-output, \.standup\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
-    expect(exampleSource).toMatch(/\.field-label\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
-    expect(exampleSource).toMatch(/\.data-list span\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
-    expect(exampleSource).toMatch(/\.tab-panel\s*\{[^}]*color:\s*var\(--cockpit-text-muted,/su);
+    expect(combinedDemoSource).not.toContain('--cockpit-');
+    expect(appSource).toMatch(/\.catalog-jump label\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(appSource).toMatch(/\.category-heading\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(appSource).toMatch(/\.section-heading code\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(exampleSource).toMatch(/\.live-output, \.standup\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(exampleSource).toMatch(/\.field-label\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(exampleSource).toMatch(/\.data-list span\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(exampleSource).toMatch(/\.tab-panel\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+  });
+
+  test('derives reviewed source and install details from the canonical pin manifest', () => {
+    expect(appSource).toContain('catalogMetadata(entry.id)');
+    expect(appSource).toContain('data-source-revision={metadata.revision}');
+    expect(readFileSync(new URL('../demo/src/sections.ts', import.meta.url), 'utf8')).toContain("COMPONENT_SOURCES.find((candidate) => candidate.name === id)");
+    expect(exampleSource).not.toMatch(/codeload\.github\.com\/wornpage\//u);
+  });
+
+  test('runs the durable rendered catalog matrix from the fixed verification gate', () => {
+    expect(rootPackage.devDependencies.playwright).toBe('1.62.0');
+    expect(rootPackage.scripts['test:catalog:browser']).toBe('node scripts/catalog-browser-check.mjs');
+    expect(rootPackage.scripts['verify:catalog']).toContain('bun run test:catalog:browser');
+    expect(browserCheckSource).toContain('familyOutcomeChecks');
+    expect(browserCheckSource).toContain('distinctPaletteSignaturesPerViewport');
+    expect(browserCheckSource).toContain("pendingDeviceCoverage: ['current iOS Safari', 'installed iOS PWA standalone']");
   });
 
   test('keeps all component packages on their canonical entrypoints', () => {

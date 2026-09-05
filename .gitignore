@@ -4,3 +4,4 @@ dist/*.map
 .sync-tmp/
 
 demo/dist/
+output/playwright/
