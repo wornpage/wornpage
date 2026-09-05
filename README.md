@@ -16,6 +16,8 @@ My work connects usable interfaces with explicit action boundaries: people can i
 
 This repository is also the integration catalog for 26 standalone components, three development tools, and a CLI. Individual component repositories remain the canonical sources.
 
+Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-started.md).
+
 <details>
 <summary><strong>Installation, component catalog, architecture, and contributing</strong></summary>
 
@@ -43,15 +45,11 @@ per-stage stdout, stderr, exit status, phase, and timing under
 `output/verify-catalog/runs/`. The directory is ignored locally and uploaded by
 CI even when a stage fails.
 
-## Quick start — using in your app
+## Use in your app
 
-```bash
-# Import reviewed standalone commits (canonical source):
-bun add "https://codeload.github.com/wornpage/sidebar/tar.gz/919dadb0f62b8fa6c7f35470279b5782ba2bc84d"
-bun add "https://codeload.github.com/wornpage/button/tar.gz/6da25ba40af71d3329abc2a4631d46047abd180b"
-bun add "https://codeload.github.com/wornpage/cmdk/tar.gz/2b81e02c079213c2da6f42385b87be418ef489d4"
-bun add "https://codeload.github.com/wornpage/toast/tar.gz/e58675ad9e945776e0715a0ccfdf7b3aaf6af0e1"
-```
+Follow the canonical [Svelte 5 component setup guide](docs/getting-started.md)
+for reviewed Button and Theme installs, a complete example, and the promotion
+path for catalog pins.
 
 ## What's inside
 
