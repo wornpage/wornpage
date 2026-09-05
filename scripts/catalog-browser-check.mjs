@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { catalogOutputDirectory, prepareCatalogOutput } from './catalog-browser-output.mjs';
+import { observePreviewStartup, waitForPreview } from './catalog-preview-readiness.mjs';
 import { COMPONENT_SOURCES } from './component-repositories.ts';
 
 const HOST = '127.0.0.1';
@@ -48,21 +49,6 @@ function contrast(foreground, background) {
   const a = luminance(foreground);
   const b = luminance(background);
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-}
-
-async function waitForPreview(child) {
-  let lastError;
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    if (child.exitCode !== null) throw new Error(`Preview exited early with ${child.exitCode}`);
-    try {
-      const response = await fetch(BASE_URL);
-      if (response.ok && child.previewOutput?.includes('Local:')) return;
-    } catch (error) {
-      lastError = error;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  }
-  throw new Error(`Preview did not start: ${lastError?.message ?? 'timeout'}`);
 }
 
 function watchPage(page, label) {
@@ -610,14 +596,11 @@ const preview = spawn(process.execPath, [viteCli, 'preview', '--host', HOST, '--
   cwd: fileURLToPath(new URL('../demo/', import.meta.url)),
   stdio: ['ignore', 'pipe', 'pipe'],
 });
-let previewOutput = '';
-preview.previewOutput = '';
-preview.stdout.on('data', (chunk) => { previewOutput += chunk; preview.previewOutput += chunk; });
-preview.stderr.on('data', (chunk) => { previewOutput += chunk; preview.previewOutput += chunk; });
+const previewStartup = observePreviewStartup(preview);
 
 let browser;
 try {
-  await waitForPreview(preview);
+  await waitForPreview(preview, previewStartup, { url: BASE_URL });
   console.log('catalog browser phase start: chromium launch');
   browser = await chromium.launch({ headless: true });
   if (focusOrderingOnly) {
@@ -691,7 +674,7 @@ try {
   console.log('catalog browser: iOS Safari and installed iOS PWA remain pending real-device coverage');
   }
 } catch (error) {
-  if (previewOutput.trim()) console.error(previewOutput.trim());
+  if (previewStartup.output.trim()) console.error(previewStartup.output.trim());
   throw error;
 } finally {
   await browser?.close();
