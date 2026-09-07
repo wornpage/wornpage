@@ -35,6 +35,28 @@ Compatibility retained:
 - Test coverage: The built-browser gate runs 20 cancellation-to-navigation checks with normal motion and 20 with reduced motion, including navigation triggered by native opener restoration.
 - Why hard cutover is unsafe now: Cmdk currently restores opener focus after calling `onclose`; removing this host phase would race that restoration and lose the requested navigation focus. The source consolidation preserves this existing interaction contract.
 
+## Catalog layout
+
+`demo/src/App.svelte` owns the root catalog layout. Its desktop shell is centered
+at a maximum of 1180px, with 48px outer margins at narrower widths, a 248px
+sidebar, a 48px column gap, and a main column capped at 840px. The sidebar starts
+24px below the viewport when sticky and fits within the viewport height.
+
+| Viewport width | Sidebar | Column gap | Shell width |
+| --- | --- | --- | --- |
+| Above 1100px | 248px | 48px | Smaller of 1180px and viewport minus 96px |
+| 951–1100px | 224px | 32px | Viewport minus 96px |
+| 721–950px | 224px | 24px | Viewport minus 56px |
+| 720px and below | 72px collapsed rail; expanded navigation overlays the content | 0 | Full viewport |
+
+Header and section descriptions are limited to 65ch with a 1.65 line height.
+Catalog h1 and h2 headings use the system sans-serif stack. Component and body
+fonts remain owned by their existing styles. Desktop sections have 32px top and
+36px bottom padding, 24px below their headings, and 24px before metadata.
+Compact sections use 24px/28px padding and an 18px heading gap. Safe-area padding,
+44px navigation targets, contained content, and visible keyboard focus remain
+part of the mobile contract.
+
 ## Verification denominators
 
 The named-theme matrix is exactly 16 cells: compact `320x900` with touch and
