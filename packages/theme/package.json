@@ -9,13 +9,14 @@
   },
   "scripts": {
     "test": "bun test",
+    "check:types": "svelte-check --tsconfig ./tests/type-consumer/tsconfig.json --fail-on-warnings",
     "build": "vite build"
   },
   "main": "./dist/worn-theme.js",
   "svelte": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./src/types.ts",
+      "types": "./src/index.ts",
       "svelte": "./src/index.ts",
       "default": "./dist/worn-theme.js"
     }
@@ -35,6 +36,8 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "svelte-check": "4.7.6",
+    "typescript": "5.9.3",
     "vite": "^8.1.5"
   }
 }

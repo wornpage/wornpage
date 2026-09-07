@@ -126,7 +126,12 @@ you only need the pure functions.
 
 ```bash
 bun test
+bun run check:types
 ```
+
+The consumer type check imports `@wornpage/theme` by its public package name,
+so TypeScript resolves the package export map before checking the component,
+helpers, and theme types. It runs in CI alongside the release contract.
 
 ## License
 
