@@ -119,6 +119,14 @@ describe('toast component', () => {
 		expect(toastSource).toContain('if (element.contains(event.relatedTarget as Node | null)) return;');
 	});
 
+	test('recovers visible keyboard focus before manual dismissal removes the toast', () => {
+		expect(toastSource).toContain("import { recoverKeyboardDismissFocus } from './focus-recovery';");
+		expect(toastSource).toContain('let toastRoot = $state<HTMLElement>();');
+		expect(toastSource).toMatch(/function dismiss\(event\?: MouseEvent\)[\s\S]*?recoverKeyboardDismissFocus\(event, toastRoot\);/u);
+		expect(toastSource).toContain('bind:this={toastRoot}');
+		expect(readmeSource).toContain('Keyboard dismissal moves focus to the next visible control');
+	});
+
 	test('uses the theme focus token before the accent fallback', () => {
 		expect(toastSource).toContain('var(--worn-focus, var(--worn-accent, currentColor))');
 	});

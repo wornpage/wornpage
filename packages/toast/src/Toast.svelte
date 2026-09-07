@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { prefersReducedMotion } from 'svelte/motion';
+	import { recoverKeyboardDismissFocus } from './focus-recovery';
 	import type { ToastProps } from './types.js';
 
 	let { message, kind = 'info', dismissLabel = 'Dismiss notification', ondismiss, duration = 3000 }: ToastProps = $props();
 
 	let visible = $state(true);
 	let dismissing = $state(false);
+	let toastRoot = $state<HTMLElement>();
 	const EXIT_DURATION_MS = 180;
 	let autoDismissTimer: ReturnType<typeof setTimeout> | undefined;
 	let remainingDuration = 0;
@@ -23,8 +25,9 @@
 		ondismiss?.();
 	}
 
-	function dismiss() {
+	function dismiss(event?: MouseEvent) {
 		if (dismissing) return;
+		if (event && toastRoot) recoverKeyboardDismissFocus(event, toastRoot);
 		dismissing = true;
 		clearAutoDismissTimer();
 		if (prefersReducedMotion.current) {
@@ -76,7 +79,7 @@
 </script>
 
 {#if visible}
-	<div class="wrn-toast" class:is-error={kind === 'error'} class:is-success={kind === 'success'} class:is-dismissing={dismissing}
+	<div bind:this={toastRoot} class="wrn-toast" class:is-error={kind === 'error'} class:is-success={kind === 'success'} class:is-dismissing={dismissing}
 		role={kind === 'error' ? 'alert' : 'status'}
 		aria-live={kind === 'error' ? 'assertive' : 'polite'}
 		aria-atomic="true"
