@@ -6,9 +6,7 @@ business owner, with qualified legal review where appropriate.
 
 ## Current scope and evidence
 
-The root `README.md` describes this repository as a mirror: standalone package
-repositories are canonical, `packages/` is generated, and the demo consumes
-the mirrored workspaces. The root and inspected package manifests currently
+This repository is canonical for `packages/`, its development tools, and the catalog. Standalone source histories are retained as described in `docs/component-migration.md`. The root and inspected package manifests currently
 declare `MIT`; the root `package.json` also declares `MIT`. This document does
 not change those declarations, package metadata, generated files, or canonical
 repositories.
@@ -37,7 +35,7 @@ no protectable expression or that MIT is inappropriate. A component is not
 
 ### Generic development tooling
 
-`@wornpage/cli` scaffolds, builds, and publishes components. The monorepo-native
+`@wornpage/cli` scaffolds and verifies workspace components; the root release workflow owns publication. The monorepo-native
 tools `apca-lc`, `public-audit`, and `find-unused-css` provide contrast
 calculation, deploy-safety checks, and CSS analysis. These are reusable tools,
 not hosted product data or private application logic. Their manifests declare
@@ -51,9 +49,9 @@ rendering primitives:
 
 | Package | Canonical repository | Current description boundary | Prospective owner decision |
 | --- | --- | --- | --- |
-| `@wornpage/workflow` | [github.com/wornpage/workflow](https://github.com/wornpage/workflow) | Pack state machine, including blocker/next/doneWhen filtering and ordering | Keep MIT; dual-license future releases; use a source-available license for future releases; or move unreleased product logic private |
-| `@wornpage/sync` | [github.com/wornpage/sync](https://github.com/wornpage/sync) | Demo state sync-code generation, hashing, QR encoding, and no-account sharing behavior | Same four options |
-| `@wornpage/scenarios` | [github.com/wornpage/scenarios](https://github.com/wornpage/scenarios) | Shared scenario definitions and validators for Wornpage demo apps | Same four options |
+| `@wornpage/workflow` | [packages/workflow](../packages/workflow) | Pack state machine, including blocker/next/doneWhen filtering and ordering | Keep MIT; dual-license future releases; use a source-available license for future releases; or move unreleased product logic private |
+| `@wornpage/sync` | [packages/sync](../packages/sync) | Demo state sync-code generation, hashing, QR encoding, and no-account sharing behavior | Same four options |
+| `@wornpage/scenarios` | [packages/scenarios](../packages/scenarios) | Shared scenario definitions and validators for Wornpage demo apps | Same four options |
 
 This table is not a recommendation to relicense today. Before any new release
 of one of these packages, the owner should record: (1) whether the release is
@@ -123,5 +121,4 @@ owner should approve one explicit choice: **MIT**, **dual-license**,
 **source-available**, or **private for unreleased logic**. The release must
 identify the covered version and files, preserve required third-party notices,
 and avoid suggesting that a license change is a technical safety fix. The
-decision should be recorded in the canonical standalone repository; this
-mirror adopts it only after the reviewed standalone commit pin is updated.
+decision should be recorded here with the covered package version. The source-consolidation release preserves the existing MIT declarations and grants; it changes repository ownership and delivery, not licensing.

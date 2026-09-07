@@ -1,5 +1,8 @@
 # @wornpage/date-input
 
+> Part of **[Wornpage Components](https://github.com/wornpage/wornpage#component-library)**.
+> [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md) · [Wornpage overview](https://github.com/wornpage/wornpage)
+
 Svelte 5 date input with shared app-shell styling and native date-picker semantics. It keeps a compact desktop field and uses a 44px minimum target on coarse pointers.
 
 <!-- wornpage-delivery:v2 source -->
@@ -9,7 +12,7 @@ Svelte 5 date input with shared app-shell styling and native date-picker semanti
 
 Repository text is checked out as LF through `.gitattributes`, so generated output is byte-stable across Windows and Linux.
 
-The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+The shared [component delivery contract](https://github.com/wornpage/wornpage/blob/main/packages/cli/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
 ## Source use

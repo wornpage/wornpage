@@ -11,8 +11,8 @@ const publicDocs = [
 describe('public documentation', () => {
   it('uses an owner-neutral portfolio verification command', () => {
     for (const [name, text] of publicDocs) {
-      expect(text, name).toContain('wornpage verify . --all --frozen-dist');
-      expect(text, name).not.toMatch(/[A-Za-z]:[\\/]/);
+      expect(text, name).toContain('bun run verify:catalog');
+      expect(text, name).not.toMatch(/\b[A-Za-z]:[\\/]/);
       expect(text, name).not.toMatch(/\/(?:Users|home)\/[^/\s`]+/i);
     }
   });

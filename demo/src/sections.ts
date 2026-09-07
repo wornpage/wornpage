@@ -19,7 +19,7 @@ export interface DemoCatalogEntry {
 
 export interface CatalogMetadata {
   repositoryUrl: string;
-  revision: string;
+  releaseTag: string;
   sourceUrl: string;
   installCommand: string;
   usageImport: string;
@@ -61,15 +61,14 @@ export const DEMO_CATALOG = [
 export type DemoCatalogId = (typeof DEMO_CATALOG)[number]['id'];
 
 export function catalogMetadata(id: DemoCatalogId): CatalogMetadata {
-  const source = COMPONENT_SOURCES.find((candidate) => candidate.name === id);
+  const source = componentRelease(id);
   const entry = DEMO_CATALOG.find((candidate) => candidate.id === id);
-  if (!source || !entry) throw new Error(`Missing reviewed catalog metadata for ${id}`);
-  const repositoryUrl = `https://github.com/wornpage/${id}`;
+  if (!entry) throw new Error(`Missing catalog metadata for ${id}`);
   return {
-    repositoryUrl,
-    revision: source.revision,
-    sourceUrl: `${repositoryUrl}/tree/${source.revision}`,
-    installCommand: `bun add "https://codeload.github.com/wornpage/${id}/tar.gz/${source.revision}"`,
+    repositoryUrl: source.repositoryUrl,
+    releaseTag: source.releaseTag,
+    sourceUrl: source.sourceUrl,
+    installCommand: componentInstallCommand(id),
     usageImport: `import { ${entry.exampleMarker} } from '@wornpage/${id}';`,
   };
 }
@@ -78,4 +77,4 @@ export const CATALOG_GROUPS = CATALOG_CATEGORIES.map((category) => ({
   ...category,
   entries: DEMO_CATALOG.filter((entry) => entry.category === category.id),
 }));
-import { COMPONENT_SOURCES } from '../../scripts/component-repositories';
+import { componentInstallCommand, componentRelease } from '../../scripts/components';

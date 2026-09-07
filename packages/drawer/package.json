@@ -20,7 +20,11 @@
       "default": "./dist/worn-drawer.js"
     }
   },
-  "files": ["dist", "src", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "peerDependencies": {
     "svelte": "^5.56.8"
   },
@@ -32,6 +36,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wornpage/drawer.git"
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/drawer"
   }
 }

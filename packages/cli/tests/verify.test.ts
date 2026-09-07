@@ -6,17 +6,10 @@ import {
   DELIVERY_CONTRACT_VERSION,
   DELIVERY_GIT_ATTRIBUTES,
   renderDeliveryReadmeSection,
-  renderDeliveryWorkflow,
 } from '../src/delivery.ts';
 
 const TMP = join(import.meta.dir, '..', '.verify-tmp');
 setDefaultTimeout(30_000);
-
-async function writeReleaseWorkflow(root: string) {
-  const workflowDirectory = join(root, '.github', 'workflows');
-  await mkdir(workflowDirectory, { recursive: true });
-  await writeFile(join(workflowDirectory, 'release-contract.yml'), renderDeliveryWorkflow());
-}
 
 async function writeDeliveryAttributes(root: string) {
   await writeFile(join(root, '.gitattributes'), DELIVERY_GIT_ATTRIBUTES);
@@ -27,7 +20,6 @@ async function makeSourcePackage(name: string) {
   await mkdir(join(root, 'src'), { recursive: true });
   await writeFile(join(root, 'src', 'index.ts'), 'export const component = true;\n');
   await writeFile(join(root, 'README.md'), `# Source fixture\n\n${renderDeliveryReadmeSection('source')}\n`);
-  await writeReleaseWorkflow(root);
   await writeDeliveryAttributes(root);
   await writeFile(join(root, 'package.json'), JSON.stringify({
     name: `@wornpage/${name}`,
@@ -50,7 +42,6 @@ async function makeBundlePackage(name: string, distContent: string) {
   await writeFile(join(root, 'src', 'index.ts'), 'export const component = true;\n');
   await writeFile(join(root, 'dist', 'widget.js'), distContent);
   await writeFile(join(root, 'README.md'), `# Bundle fixture\n\n${renderDeliveryReadmeSection('browser-bundle')}\n`);
-  await writeReleaseWorkflow(root);
   await writeDeliveryAttributes(root);
   await writeFile(join(root, 'build.ts'), [
     "import { mkdir, writeFile } from 'node:fs/promises';",
@@ -135,24 +126,6 @@ describe('component release contract', () => {
     await mkdir(join(root, 'dist'));
 
     await expect(inspectPackage(root)).rejects.toThrow('must not contain a dist/ directory');
-  });
-
-  it('rejects packages without the shared push and pull-request contract', async () => {
-    const root = await makeSourcePackage('workflow-fixture');
-    await rm(join(root, '.github'), { recursive: true });
-
-    await expect(inspectPackage(root)).rejects.toThrow('release-contract.yml');
-  });
-
-  it('accepts any immutable CLI workflow revision and rejects mutable refs', async () => {
-    const root = await makeSourcePackage('immutable-workflow-fixture');
-    const workflowPath = join(root, '.github', 'workflows', 'release-contract.yml');
-    const generated = await readFile(workflowPath, 'utf8');
-    await writeFile(workflowPath, generated.replace(/@[0-9a-f]{40}/u, `@${'f'.repeat(40)}`));
-    expect((await inspectPackage(root)).name).toBe('@wornpage/immutable-workflow-fixture');
-
-    await writeFile(workflowPath, generated.replace(/@[0-9a-f]{40}/u, '@master'));
-    await expect(inspectPackage(root)).rejects.toThrow('<full-lowercase-commit-sha>');
   });
 
   it('detects stale bundles and accepts a reproducible rebuild', async () => {

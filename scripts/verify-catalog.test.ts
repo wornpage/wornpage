@@ -34,8 +34,8 @@ describe('catalog verification runner', () => {
     expect(CATALOG_VERIFY_STAGES.map(({ command }) => command)).toEqual([
       'bun run check:workspace',
       'bun run check:components',
-      'bun run sync --check',
       'bun test',
+      'bun run pack:components',
       'bun run build',
       'bun run test:catalog:browser',
     ]);

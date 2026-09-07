@@ -1,5 +1,8 @@
 # @wornpage/sync
 
+> Part of **[Wornpage Components](https://github.com/wornpage/wornpage#component-library)**.
+> [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md) · [Wornpage overview](https://github.com/wornpage/wornpage)
+
 Demo state sync codes — generation, normalization, and hashing for
 no-account sharing. Pure TypeScript, zero dependencies.
 
@@ -14,14 +17,13 @@ using the same code reads the same server row.
 
 Repository text is checked out as LF through `.gitattributes`, so generated output is byte-stable across Windows and Linux.
 
-The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+The shared [component delivery contract](https://github.com/wornpage/wornpage/blob/main/packages/cli/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
 ## Source use
 
-This package is not published to npm. Check out this repository at a reviewed commit and consume it
-from a local workspace after installing dependencies from `bun.lock`. The `@wornpage/sync` import
-below assumes that workspace mapping; it does not resolve from the public npm registry.
+This package is not published to npm. Install the immutable package archive linked by the [catalog](https://wornpage-components.pages.dev). The `@wornpage/sync` import
+below resolves from the installed archive; it does not resolve from the public npm registry.
 
 ## Usage
 

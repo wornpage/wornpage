@@ -1,15 +1,33 @@
 {
   "name": "@wornpage/cli",
-  "version": "0.1.0",
-  "description": "CLI for creating, building, and publishing @wornpage Svelte 5 components",
+  "version": "0.2.0",
+  "description": "Internal Wornpage workspace scaffolding and package verification",
   "type": "module",
   "main": "./src/index.ts",
-  "bin": { "wornpage": "./src/index.ts" },
-  "scripts": { "test": "bun test" },
+  "bin": {
+    "wornpage": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
   "dependencies": {
     "commander": "^13.1.0"
   },
-  "peerDependencies": { "bun": ">=1.0.0" },
-  "keywords": ["wornpage", "svelte", "cli", "scaffold", "component"],
-  "license": "MIT"
+  "peerDependencies": {
+    "bun": ">=1.0.0"
+  },
+  "keywords": [
+    "wornpage",
+    "svelte",
+    "cli",
+    "scaffold",
+    "component"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/cli"
+  },
+  "private": true
 }

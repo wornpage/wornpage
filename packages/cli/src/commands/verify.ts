@@ -4,7 +4,6 @@ import { relative, resolve, sep } from 'node:path';
 import {
   DELIVERY_CONTRACT_VERSION,
   DELIVERY_GIT_ATTRIBUTES,
-  DELIVERY_WORKFLOW_PREFIX,
   renderDeliveryReadmeSection,
   type DeliveryDeclaration,
 } from '../delivery.ts';
@@ -145,21 +144,6 @@ export async function inspectPackage(directory = '.'): Promise<PackageContract> 
     const expectedSection = renderDeliveryReadmeSection(deliveryDeclaration);
     if (!readme.includes(expectedSection)) {
       issues.push(`README.md must include the v${DELIVERY_CONTRACT_VERSION} ${deliveryDeclaration} delivery section.`);
-    }
-  }
-
-  const workflowPath = resolve(root, '.github', 'workflows', 'release-contract.yml');
-  if (!(await exists(workflowPath))) {
-    issues.push('Add .github/workflows/release-contract.yml to enforce this contract on pushes and pull requests.');
-  } else {
-    const workflow = (await readFile(workflowPath, 'utf8')).replaceAll('\r\n', '\n');
-    const cliReferences = [...workflow.matchAll(/^\s+uses:\s*(wornpage\/cli\/\.github\/workflows\/component-release-contract\.yml@\S+)\s*$/gmu)]
-      .map((match) => match[1]);
-    if (cliReferences.length !== 1 || !new RegExp(`^${DELIVERY_WORKFLOW_PREFIX}[0-9a-f]{40}$`, 'u').test(cliReferences[0])) {
-      issues.push(`The release workflow must call ${DELIVERY_WORKFLOW_PREFIX}<full-lowercase-commit-sha>.`);
-    }
-    if (!/^\s{2}push:\s*$/mu.test(workflow) || !/^\s{2}pull_request:\s*$/mu.test(workflow)) {
-      issues.push('The release workflow must run on both push and pull_request.');
     }
   }
 
@@ -379,7 +363,7 @@ export async function findComponentPackages(directory: string): Promise<string[]
 
 export async function verifyWorkspace(directory: string, options: VerifyOptions = {}): Promise<PackageContract[]> {
   const roots = await findComponentPackages(directory);
-  if (roots.length === 0) throw new Error(`No standalone @wornpage packages found under ${resolve(directory)}.`);
+  if (roots.length === 0) throw new Error(`No workspace @wornpage packages found under ${resolve(directory)}.`);
 
   const contracts: PackageContract[] = [];
   const failures: string[] = [];
@@ -402,7 +386,7 @@ export default async function verifyCommand(directory = '.', options: VerifyComm
   if (options.all) {
     const contracts = await verifyWorkspace(directory, options);
     for (const contract of contracts) printContract(contract, options);
-    console.log(`Verified ${contracts.length} standalone packages.`);
+    console.log(`Verified ${contracts.length} workspace packages.`);
     return;
   }
 

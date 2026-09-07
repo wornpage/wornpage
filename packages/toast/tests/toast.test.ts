@@ -9,6 +9,16 @@ const demoSource = readFileSync(new URL('../index.html', import.meta.url), 'utf8
 const readmeSource = readFileSync(new URL('../README.md', import.meta.url), 'utf8').replace(/\r\n/gu, '\n');
 const packageManifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
+function contrastRatio(foreground: string, background: string): number {
+	const luminance = (hex: string) => {
+		const channels = hex.match(/[a-f\d]{2}/giu)?.map(channel => Number.parseInt(channel, 16) / 255) ?? [];
+		const linear = channels.map(channel => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
+		return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+	};
+	const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+	return (values[0] + 0.05) / (values[1] + 0.05);
+}
+
 function createToast(items: ToastItem[], item: Omit<ToastItem, 'id'>): ToastItem[] {
 	const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 	return [...items, { id, ...item }];
@@ -54,8 +64,21 @@ describe('toast component', () => {
 	test('uses shared theme tokens with standalone fallbacks', () => {
 		expect(toastSource).toContain('var(--wrn-toast-bg, var(--worn-surface, #fdfbf7))');
 		expect(toastSource).toContain('var(--wrn-toast-text, var(--worn-text, #21322b))');
-		expect(toastSource).toContain('var(--wrn-toast-error-bg, var(--worn-danger-bg, #fdf0ef))');
-		expect(toastSource).toContain('var(--wrn-toast-success-bg, var(--worn-success-bg, #edf9f0))');
+		expect(toastSource).toContain('var(--wrn-toast-error-bg, var(--worn-danger-bg, var(--wrn-toast-bg, var(--worn-surface, #fdf0ef))))');
+		expect(toastSource).toContain('var(--wrn-toast-success-bg, var(--worn-success-bg, var(--wrn-toast-bg, var(--worn-surface, #edf9f0))))');
+	});
+
+	test('pairs status palettes through component and host base tokens', () => {
+		expect(toastSource).toContain('var(--wrn-toast-error-text, var(--worn-danger-text, var(--wrn-toast-text, var(--worn-text, #21322b))))');
+		expect(toastSource).toContain('var(--wrn-toast-success-text, var(--worn-success-text, var(--wrn-toast-text, var(--worn-text, #21322b))))');
+		expect(toastSource).not.toContain('var(--wrn-toast-error-bg, var(--worn-danger-bg, #fdf0ef))');
+		expect(toastSource).not.toContain('var(--wrn-toast-success-bg, var(--worn-success-bg, #edf9f0))');
+		expect(readmeSource).toContain('Status-specific background and text tokens are paired overrides');
+	});
+
+	test('keeps the no-token status defaults readable', () => {
+		expect(contrastRatio('#21322b', '#fdf0ef')).toBeGreaterThanOrEqual(4.5);
+		expect(contrastRatio('#21322b', '#edf9f0')).toBeGreaterThanOrEqual(4.5);
 	});
 
 	test('announces messages and uses a dedicated dismiss control', () => {

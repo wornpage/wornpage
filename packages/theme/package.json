@@ -1,7 +1,7 @@
 {
   "name": "@wornpage/theme",
   "version": "0.1.2",
-  "description": "Svelte 5 theme system — multi-theme CSS custom properties, persist, auto-detect",
+  "description": "Svelte 5 theme system \u2014 multi-theme CSS custom properties, persist, auto-detect",
   "type": "module",
   "wornpage": {
     "contractVersion": 2,
@@ -20,14 +20,18 @@
       "default": "./dist/worn-theme.js"
     }
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "peerDependencies": {
     "svelte": "^5.56.8"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wornpage/theme.git"
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/theme"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.2.0",

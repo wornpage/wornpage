@@ -19,17 +19,29 @@
       "default": "./src/index.ts"
     }
   },
-  "files": ["src", "README.md"],
+  "files": [
+    "src",
+    "README.md"
+  ],
   "peerDependencies": {
     "svelte": "^5.56.8"
   },
   "devDependencies": {
     "svelte": "^5.56.8"
   },
-  "keywords": ["svelte", "breadcrumb", "navigation-list", "pagination", "navigation", "responsive", "wornpage"],
+  "keywords": [
+    "svelte",
+    "breadcrumb",
+    "navigation-list",
+    "pagination",
+    "navigation",
+    "responsive",
+    "wornpage"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wornpage/navigation-surfaces.git"
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/navigation-surfaces"
   }
 }

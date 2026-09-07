@@ -26,7 +26,7 @@ for (const required of ["packages/*", "demo"]) {
 	}
 }
 
-const mirroredNames = new Set(
+const workspaceNames = new Set(
 	readdirSync(join(ROOT, "packages"), { withFileTypes: true })
 		.filter((entry) => entry.isDirectory())
 		.flatMap((entry) => {
@@ -40,8 +40,8 @@ const mirroredNames = new Set(
 const demoDependencies = { ...demo.dependencies, ...demo.devDependencies };
 for (const [name, specifier] of Object.entries(demoDependencies)) {
 	if (!name.startsWith("@wornpage/")) continue;
-	if (!mirroredNames.has(name)) {
-		issues.push(`Demo dependency ${name} has no mirrored workspace package.`);
+	if (!workspaceNames.has(name)) {
+		issues.push(`Demo dependency ${name} has no canonical workspace package.`);
 	}
 	if (specifier !== "workspace:*") {
 		issues.push(`Demo dependency ${name} must use workspace:* instead of ${specifier}.`);
@@ -63,4 +63,4 @@ if (issues.length > 0) {
 	process.exit(1);
 }
 
-console.log(`Workspace dependency contract passed for ${mirroredNames.size} mirrored packages.`);
+console.log(`Workspace dependency contract passed for ${workspaceNames.size} workspace packages.`);

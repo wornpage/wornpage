@@ -20,8 +20,8 @@ const bunExecutable = resolveBunExecutable();
 export const CATALOG_VERIFY_STAGES = Object.freeze([
   { id: 'workspace', label: 'Workspace dependency contract', command: 'bun run check:workspace', executable: bunExecutable, args: ['run', 'check:workspace'] },
   { id: 'delivery', label: 'Component delivery contract', command: 'bun run check:components', executable: bunExecutable, args: ['run', 'check:components'] },
-  { id: 'sync', label: 'Canonical repository drift', command: 'bun run sync --check', executable: bunExecutable, args: ['run', 'sync', '--check'] },
   { id: 'tests', label: 'Cross-package Bun tests', command: 'bun test', executable: bunExecutable, args: ['test'] },
+  { id: 'packages', label: 'Build and pack component releases', command: 'bun run pack:components', executable: bunExecutable, args: ['run', 'pack:components'] },
   { id: 'build', label: 'Production catalog build', command: 'bun run build', executable: bunExecutable, args: ['run', 'build'] },
   { id: 'browser', label: 'Built-catalog browser verification', command: 'bun run test:catalog:browser', executable: bunExecutable, args: ['run', 'test:catalog:browser'] },
 ]);

@@ -173,7 +173,7 @@
     <header class="demo-header">
       <div>
         <h1>Wornpage</h1>
-        <p>{DEMO_CATALOG.length} standalone component repositories, one inspectable catalog.</p>
+        <p>{DEMO_CATALOG.length} components and supporting packages, one interface library.</p>
       </div>
       <div class="header-actions">
         <Button onclick={openPalette}>Search catalog</Button>
@@ -209,12 +209,12 @@
             <code>@wornpage/{entry.id}</code>
           </div>
           <ComponentExample id={entry.id} {openPalette} />
-          <details class="component-meta" data-component-meta={entry.id} data-source-revision={metadata.revision}>
+          <details class="component-meta" data-component-meta={entry.id} data-component-release={metadata.releaseTag}>
             <summary>Usage and reviewed source</summary>
             <div class="component-meta-grid">
               <div><strong>Canonical repository</strong><a href={metadata.repositoryUrl}>{metadata.repositoryUrl}</a></div>
-              <div><strong>Reviewed revision</strong><a href={metadata.sourceUrl}><code>{metadata.revision}</code></a></div>
-              <div><strong>Install reviewed commit</strong><code>{metadata.installCommand}</code></div>
+              <div><strong>Published release</strong><a href={metadata.sourceUrl}><code>{metadata.releaseTag}</code></a></div>
+              <div><strong>Install release packages</strong><code>{metadata.installCommand}</code></div>
               <div><strong>Example import</strong><code>{metadata.usageImport}</code><small>Adapt this sample import to the exports your application uses.</small></div>
             </div>
           </details>

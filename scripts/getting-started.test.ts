@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { readFile } from 'node:fs/promises';
 import { compile } from '../demo/node_modules/svelte/compiler/index.js';
-import { COMPONENT_SOURCES } from './component-repositories.ts';
+import { componentRelease } from './components.ts';
 
 const guidePath = new URL('../docs/getting-started.md', import.meta.url);
 
@@ -15,14 +15,12 @@ async function documentedExample() {
 describe('getting-started guide', () => {
   test('uses reviewed Button and Theme archives with named Svelte imports', async () => {
     const { guide, example } = await documentedExample();
-    const button = COMPONENT_SOURCES.find((component) => component.name === 'button');
-    const theme = COMPONENT_SOURCES.find((component) => component.name === 'theme');
-    if (!button || !theme) throw new Error('Button and Theme must remain in the reviewed source manifest');
-
-    expect(guide).toContain(`https://codeload.github.com/wornpage/button/tar.gz/${button.revision}`);
-    expect(guide).toContain(`https://codeload.github.com/wornpage/theme/tar.gz/${theme.revision}`);
-    expect(guide).toContain(`https://github.com/wornpage/button/tree/${button.revision}`);
-    expect(guide).toContain(`https://github.com/wornpage/theme/tree/${theme.revision}`);
+    const button = componentRelease('button');
+    const theme = componentRelease('theme');
+    expect(guide).toContain(button.archiveUrl);
+    expect(guide).toContain(theme.archiveUrl);
+    expect(guide).toContain(button.sourceUrl);
+    expect(guide).toContain(theme.sourceUrl);
     expect(example).toContain("import { Button } from '@wornpage/button';");
     expect(example).toContain("import { Theme, type ThemeName } from '@wornpage/theme';");
   });

@@ -31,7 +31,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wornpage/segmented-control.git"
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/segmented-control"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
