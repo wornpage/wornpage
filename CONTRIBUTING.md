@@ -18,10 +18,10 @@ bunx playwright install chromium
 bun run verify:catalog
 ```
 
-Use Bun 1.3.14 and Node 24.18.0. The gate checks workspace dependencies and
-delivery declarations, runs package tests, builds and packs releases, builds the
-catalog, and runs the browser matrix. It stops on a failed stage and preserves
-logs under `output/verify-catalog/`.
+Use Bun 1.3.14 and Node 24.18.0. The gate checks workspace dependencies,
+delivery declarations, and Theme consumer types, runs package tests, builds and
+packs releases, builds the catalog, and runs the browser matrix. It stops on a
+failed stage and preserves logs under `output/verify-catalog/`.
 
 ## Package conventions
 

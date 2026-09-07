@@ -30,10 +30,11 @@ afterEach(async () => {
 });
 
 describe('catalog verification runner', () => {
-  test('owns the exact six production stages in their established order', () => {
+  test('checks consumer types before tests, release packing, and browser verification', () => {
     expect(CATALOG_VERIFY_STAGES.map(({ command }) => command)).toEqual([
       'bun run check:workspace',
       'bun run check:components',
+      'bun run --cwd packages/theme check:types',
       'bun test',
       'bun run pack:components',
       'bun run build',
