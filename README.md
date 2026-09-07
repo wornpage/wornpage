@@ -1,28 +1,37 @@
 # Wornpage
 
-I build accessible Svelte interfaces and tools for reliable, human-controlled AI workflows.
+**Interfaces and tools that keep people in control of agent-assisted work.**
 
-## Selected work
+I build Wornpage around a practical loop: make the work visible, make actions
+inspectable, and keep the final decision with a person.
 
-| Project | What it demonstrates | Explore |
+## Start here
+
+| Part of Wornpage | What it is for | Explore |
 | --- | --- | --- |
-| **Wornpage Projects** | A work tracker where browser agents inspect visible evidence and prepare next actions for human approval. | [Try the demo](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Source](https://github.com/wornpage/projects-webmcp-extension) |
-| **Wornpage components** | Reusable Svelte 5 interfaces with keyboard interaction, themes, and checked package delivery. | [Browse the live catalog](https://wornpage.pages.dev) · [Component guide](#component-library) |
-| **WebMCP conformance** | Framework-neutral validation and fixtures for page-owned tool catalogs, authority boundaries, and receipts. | [Explore the tooling](https://github.com/wornpage/webmcp-conformance) |
+| **Projects — the application** | Track blockers, owners, and next actions. The public WebMCP Challenge edition lets browser agents inspect visible evidence and prepare drafts for human review. | [Try Projects](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Source](https://github.com/wornpage/projects-webmcp-extension) |
+| **Components — the interface library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage.pages.dev) · [Use a component](docs/getting-started.md) |
+| **WebMCP Conformance — the validation toolkit** | Check page-owned tool declarations, authority limits, lifecycle behavior, and action receipts. | [Source and checks](https://github.com/wornpage/webmcp-conformance) |
+| **PR Machine — the delivery tool** | Turn reviewed agent work into a verified draft pull request. The repository owner controls merging. Public beta. | [Install and use](https://github.com/wornpage/projects-pr-machine#install) · [Workflow evidence](https://github.com/wornpage/projects-pr-machine/blob/main/docs/challenge-extension-case-study.md) |
 
-My work connects usable interfaces with explicit action boundaries: people can inspect what an agent sees, review what it prepares, and control the final decision.
+These are the four public entry points. The smaller package repositories belong
+to **Wornpage Components**; use the catalog to discover them together. See the
+[repository map](docs/repository-map.md) for source ownership and contribution paths.
 
 ## Component library
 
-This repository is also the integration catalog for 26 standalone components, three development tools, and a CLI. Individual component repositories remain the canonical sources.
+This repository is the Wornpage overview and the integration catalog for 26
+component and supporting packages, three development tools, and a CLI. The
+catalog brings the library together; individual repositories own package source
+and reviewed releases.
 
 Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-started.md).
 
 <details>
 <summary><strong>Installation, component catalog, architecture, and contributing</strong></summary>
 
-> 26 standalone component repositories + 3 framework-agnostic dev tools + 1 CLI.
-> **This monorepo is a mirror.** Individual packages have their own repos.
+> One component library: 26 component and supporting packages, three development
+> tools, and one CLI. This catalog mirrors reviewed standalone source commits.
 > Install standalone packages from reviewed Git commits; the `@wornpage` npm
 > scope is not a supported distribution path.
 
@@ -53,7 +62,7 @@ path for catalog pins.
 
 ## What's inside
 
-### Components (`packages/` — mirrored from standalone repos)
+### Components and supporting packages (`packages/` — mirrored from standalone repos)
 
 | Package | Standalone repo | Delivery | Description |
 |---|---|---|---|
@@ -127,6 +136,7 @@ path for catalog pins.
 
 ## License
 
-MIT
+This catalog is MIT-licensed. Each linked project documents its own license;
+PR Machine is AGPL-3.0-only.
 
 </details>
