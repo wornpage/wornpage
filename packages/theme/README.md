@@ -126,7 +126,13 @@ you only need the pure functions.
 
 ```bash
 bun test
+bun run check:types
 ```
+
+Install dependencies from the repository root before running these commands.
+The consumer type check imports `@wornpage/theme` by its public package name,
+so TypeScript resolves the package export map before checking the component,
+helpers, and theme types. The root `verify:catalog` gate runs this check.
 
 ## License
 

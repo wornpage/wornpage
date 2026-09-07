@@ -14,7 +14,7 @@ emit telemetry, or represent local example state as a persisted save.
 | Published source metadata | `components-release.json` through `scripts/components.ts` and `demo/src/sections.ts` | Canonical source path, named immutable release, package archive, and sample import share one release manifest. |
 | Example state | `demo/src/ComponentExample.svelte` | Local models expose outcomes, reset paths, and applicable disabled, loading, empty, error, undo, and redo states. |
 | Rendered verification | `scripts/catalog-browser-check.mjs` | Tests the built output and writes ignored evidence under `output/playwright/catalog/`. |
-| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, Bun tests, component packaging, catalog build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
+| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, Theme consumer types, Bun tests, component packaging, catalog build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
 
 `--worn-muted` and `--worn-subtle` are retained semantic spellings because the
 live `@wornpage/undo` consumer reads them. Their values are owned by the host
