@@ -289,6 +289,18 @@ async function exerciseFamilies(page, label) {
   await toast.getByRole('status').waitFor();
   await toast.getByRole('button', { name: 'Dismiss catalog notification', exact: true }).click();
   await toast.getByRole('status').waitFor({ state: 'detached' });
+  const showToast = toast.getByRole('button', { name: 'Show local notification', exact: true });
+  await showToast.click();
+  await toast.getByRole('status').waitFor();
+  await showToast.focus();
+  await page.keyboard.press('Tab');
+  assert.equal(await toast.getByRole('button', { name: 'Reset notification', exact: true }).evaluate((element) => element === document.activeElement), true, `${label} Toast reset was not next in keyboard order`);
+  await page.keyboard.press('Tab');
+  const dismissToast = toast.getByRole('button', { name: 'Dismiss catalog notification', exact: true });
+  assert.equal(await dismissToast.evaluate((element) => element === document.activeElement && element.matches(':focus-visible')), true, `${label} Toast dismiss did not receive visible keyboard focus`);
+  await page.keyboard.press('Enter');
+  await toast.getByRole('status').waitFor({ state: 'detached' });
+  assert.equal(await toast.locator('.component-meta summary').evaluate((element) => element === document.activeElement && element.matches(':focus-visible')), true, `${label} Toast keyboard dismissal lost visible focus`);
   mark('toast');
 
   const undo = page.locator('#undo');

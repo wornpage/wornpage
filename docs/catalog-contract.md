@@ -14,7 +14,8 @@ emit telemetry, or represent local example state as a persisted save.
 | Published source metadata | `components-release.json` through `scripts/components.ts` and `demo/src/sections.ts` | Canonical source path, named immutable release, package archive, and sample import share one release manifest. |
 | Example state | `demo/src/ComponentExample.svelte` | Local models expose outcomes, reset paths, and applicable disabled, loading, empty, error, undo, and redo states. |
 | Rendered verification | `scripts/catalog-browser-check.mjs` | Tests the built output and writes ignored evidence under `output/playwright/catalog/`. |
-| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, Theme consumer types, Bun tests, component packaging, catalog build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
+| Toast focus regression | `scripts/toast-focus-browser-check.mjs` | Exercises actual Toast controls, native modal focus boundaries, and open shadow hosts before the catalog build. |
+| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, Theme consumer types, Bun tests, component packaging, Toast focus regression, catalog build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
 
 `--worn-muted` and `--worn-subtle` are retained semantic spellings because the
 live `@wornpage/undo` consumer reads them. Their values are owned by the host
@@ -58,6 +59,12 @@ Compact sections use 24px/28px padding and an 18px heading gap. Safe-area paddin
 part of the mobile contract.
 
 ## Verification denominators
+
+The Toast focus regression is a separate 72-case Chromium check of the actual
+Svelte component and built custom element. It covers native dialogs, open shadow
+hosts and slots, focus delegation, keyboard keys, motion preferences, and
+pointer/automatic dismissal. These cases are separate from the catalog's
+theme/viewport cells; they are not users or additional component families.
 
 The named-theme matrix is exactly 16 cells: compact `320x900` with touch and
 desktop `1440x1000` with a fine pointer, each across light, dark, forest,
