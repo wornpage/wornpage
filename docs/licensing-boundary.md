@@ -35,7 +35,8 @@ no protectable expression or that MIT is inappropriate. A component is not
 
 ### Generic development tooling
 
-`@wornpage/cli` scaffolds and verifies workspace components; the root release workflow owns publication. The monorepo-native
+`@wornpage/cli` scaffolds and verifies workspace components; the repository owner
+publishes through the root release helper after verification. The monorepo-native
 tools `apca-lc`, `public-audit`, and `find-unused-css` provide contrast
 calculation, deploy-safety checks, and CSS analysis. These are reusable tools,
 not hosted product data or private application logic. Their manifests declare

@@ -45,9 +45,14 @@ to npm.
 ## Releases
 
 Update package versions and the dated release tag in `components-release.json`.
-Submit and merge the change here after verification, then run the component
-release workflow from the default branch. Consumer applications deliberately
-update to the published archive and its lockfile integrity.
+Submit and merge the change here after verification. The **Component release
+verification** workflow verifies and packs that source and uploads evidence.
+The owner prepares a draft from a clean checkout of current `main`, using their local
+GitHub authentication and the existing `scripts/prepare-component-release.ts`
+helper, then reviews and publishes that draft. Follow the commands and permission
+requirements in [component delivery](packages/cli/docs/component-delivery.md#publish).
+Consumer applications deliberately update to the published archive and its
+lockfile integrity.
 
 Historical standalone repositories are explained in
 [the migration record](docs/component-migration.md). New issues and PRs belong

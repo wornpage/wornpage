@@ -109,9 +109,11 @@ preference persists.
 
 Component source is reviewed in this repository. The root verification gate
 tests the workspace, builds the browser bundles, packs each declared consumer
-entry, and verifies the catalog. The release workflow publishes those packages
-as immutable GitHub assets. Keep the resulting archive URL and SHA-512 lockfile
-entry together when upgrading a consumer. This is not npm scope publication.
+entry, and verifies the catalog. The repository owner prepares a draft through
+the guarded release helper, then publishes those packages as immutable GitHub
+assets. Keep the resulting
+archive URL and SHA-512 lockfile entry together when upgrading a consumer.
+This is not npm scope publication.
 
 For component API details, use the current canonical
 [Button source](https://github.com/wornpage/wornpage/tree/components-2026.09.07.1/packages/button) and
