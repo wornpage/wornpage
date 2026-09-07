@@ -18,6 +18,7 @@ packed exports. `verify:catalog` is the complete repository gate. Browser bundle
 output is generated and ignored; `--frozen-dist` is available when comparing an
 existing generated bundle to a rebuild.
 
-The former standalone `ship` command has been removed. Releases are owned by
-the root component-release workflow. Read [component delivery](docs/component-delivery.md)
+The former standalone `ship` command has been removed. The root release workflow
+verifies and packs components; the repository owner publishes through the existing
+root release helper. Read [component delivery](docs/component-delivery.md)
 for the only supported publication path.
