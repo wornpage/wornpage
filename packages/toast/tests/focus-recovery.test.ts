@@ -32,6 +32,7 @@ class FakeElement {
 	inert = false;
 	ariaHidden = false;
 	focused = false;
+	isConnected = true;
 	parentElement: FakeElement | null = null;
 	root: FakeDocument | FakeShadowRoot;
 	children: FakeElement[] = [];
@@ -82,6 +83,7 @@ class FakeElement {
 	}
 
 	matches(selector: string) {
+		if (selector === ':focus') return this.ownerDocument.activeElement === this || (this.root instanceof FakeShadowRoot && this.root.activeElement === this);
 		return selector === ':disabled' ? this.disabled : true;
 	}
 }
@@ -89,6 +91,7 @@ class FakeElement {
 class FakeShadowRoot {
 	host: FakeElement;
 	children: FakeElement[] = [];
+	activeElement: FakeElement | null = null;
 
 	constructor(host: FakeElement) {
 		this.host = host;
@@ -126,6 +129,54 @@ function recover(detail: number, toast: FakeElement, dismiss: FakeElement) {
 }
 
 describe('toast keyboard-dismiss focus recovery', () => {
+	it('tries the remaining candidates when the browser ignores focus', () => {
+		const { document, toast, dismiss } = fixture();
+		const ignored = new FakeElement('Ignored', document);
+		ignored.focus = () => {};
+		const next = new FakeElement('Next', document);
+		setDocumentOrder(document, toast, ignored, next);
+		dismiss.focus();
+		recover(0, toast, dismiss);
+		expect(document.activeElement).toBe(next);
+	});
+
+	it('continues to the previous control when a host delegates focus back into the toast', () => {
+		const { document, toast, dismiss } = fixture();
+		const previous = new FakeElement('Previous', document);
+		const host = new FakeElement('Host', document);
+		const shadow = host.attachShadowRoot();
+		shadow.append(toast);
+		host.focus = () => { document.activeElement = host; shadow.activeElement = dismiss; };
+		setDocumentOrder(document, previous, host);
+		dismiss.focus();
+		recover(0, toast, dismiss);
+		expect(document.activeElement).toBe(previous);
+	});
+
+	it('respects intentional focus redirection outside the toast', () => {
+		const { document, toast, dismiss } = fixture();
+		const redirected = new FakeElement('Redirected heading', document, -1);
+		const next = new FakeElement('Next', document);
+		const later = new FakeElement('Later', document);
+		next.focus = () => redirected.focus();
+		setDocumentOrder(document, toast, next, later, redirected);
+		dismiss.focus();
+		recover(0, toast, dismiss);
+		expect(document.activeElement).toBe(redirected);
+		expect(later.focused).toBe(false);
+	});
+
+	it('continues when the focused candidate is removed by its focus handler', () => {
+		const { document, toast, dismiss } = fixture();
+		const removed = new FakeElement('Removed', document);
+		removed.focus = () => { document.activeElement = removed; removed.isConnected = false; };
+		const next = new FakeElement('Next', document);
+		setDocumentOrder(document, toast, removed, next);
+		dismiss.focus();
+		recover(0, toast, dismiss);
+		expect(document.activeElement).toBe(next);
+	});
+
 	it('focuses the next visible light-DOM control', () => {
 		const { document, toast, dismiss } = fixture();
 		const previous = new FakeElement('Previous', document);

@@ -23,6 +23,7 @@ export const CATALOG_VERIFY_STAGES = Object.freeze([
   { id: 'theme-types', label: 'Theme public consumer types', command: 'bun run --cwd packages/theme check:types', executable: bunExecutable, args: ['run', '--cwd', 'packages/theme', 'check:types'] },
   { id: 'tests', label: 'Cross-package Bun tests', command: 'bun test', executable: bunExecutable, args: ['test'] },
   { id: 'packages', label: 'Build and pack component releases', command: 'bun run pack:components', executable: bunExecutable, args: ['run', 'pack:components'] },
+  { id: 'toast-focus', label: 'Toast keyboard focus in Chromium', command: 'bun run test:toast:focus', executable: bunExecutable, args: ['run', 'test:toast:focus'] },
   { id: 'build', label: 'Production catalog build', command: 'bun run build', executable: bunExecutable, args: ['run', 'build'] },
   { id: 'browser', label: 'Built-catalog browser verification', command: 'bun run test:catalog:browser', executable: bunExecutable, args: ['run', 'test:catalog:browser'] },
 ]);

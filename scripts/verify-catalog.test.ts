@@ -37,6 +37,7 @@ describe('catalog verification runner', () => {
       'bun run --cwd packages/theme check:types',
       'bun test',
       'bun run pack:components',
+      'bun run test:toast:focus',
       'bun run build',
       'bun run test:catalog:browser',
     ]);

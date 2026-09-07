@@ -1,5 +1,5 @@
 {
-  "tag": "components-2026.09.07.1",
+  "tag": "components-2026.09.07.2",
   "packages": {
     "alert": "0.1.2",
     "async-states": "0.1.5",
@@ -24,7 +24,7 @@
     "sync": "0.1.0",
     "tabs": "0.1.1",
     "theme": "0.1.3",
-    "toast": "0.1.5",
+    "toast": "0.1.6",
     "undo": "0.1.1",
     "workflow": "0.1.0"
   },

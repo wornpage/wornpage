@@ -44,7 +44,8 @@ bunx playwright install chromium # one-time local browser install; Node 24.18.0 
 bun run verify:catalog # full contracts, build, and Chromium catalog matrix
 ```
 
-`verify:catalog` runs seven checks once in order, including Theme consumer types.
+`verify:catalog` runs eight checks once in order, including Theme consumer types
+and Toast keyboard focus in Chromium.
 It preserves per-stage stdout, stderr, exit status, phase, and timing under
 `output/verify-catalog/runs/`. The directory is ignored locally and uploaded by
 CI even when a stage fails.

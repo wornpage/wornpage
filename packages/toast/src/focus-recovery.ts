@@ -29,7 +29,7 @@ function hasExcludedComposedAncestor(candidate: HTMLElement): boolean {
 }
 
 function isVisibleFocusable(candidate: HTMLElement, toastRoot: HTMLElement): boolean {
-	if (composedContains(toastRoot, candidate) || candidate.tabIndex < 0 || candidate.matches(':disabled')) return false;
+	if (!candidate.isConnected || composedContains(toastRoot, candidate) || candidate.tabIndex < 0 || candidate.matches(':disabled')) return false;
 	if (hasExcludedComposedAncestor(candidate) || candidate.getClientRects().length === 0) return false;
 	const visibility = candidate.ownerDocument.defaultView?.getComputedStyle(candidate).visibility;
 	return visibility !== 'hidden' && visibility !== 'collapse';
@@ -61,19 +61,18 @@ function composedElements(ownerDocument: Document): HTMLElement[] {
 	return elements;
 }
 
-export function adjacentFocusTarget(toastRoot: HTMLElement): HTMLElement | undefined {
+function* adjacentFocusTargets(toastRoot: HTMLElement): Generator<HTMLElement> {
 	const elements = composedElements(toastRoot.ownerDocument);
 	const toastIndex = elements.indexOf(toastRoot);
-	if (toastIndex < 0) return undefined;
+	if (toastIndex < 0) return;
 	for (let index = toastIndex + 1; index < elements.length; index += 1) {
 		const candidate = elements[index];
-		if (isVisibleFocusable(candidate, toastRoot)) return candidate;
+		if (isVisibleFocusable(candidate, toastRoot)) yield candidate;
 	}
 	for (let index = toastIndex - 1; index >= 0; index -= 1) {
 		const candidate = elements[index];
-		if (isVisibleFocusable(candidate, toastRoot)) return candidate;
+		if (isVisibleFocusable(candidate, toastRoot)) yield candidate;
 	}
-	return undefined;
 }
 
 export function recoverKeyboardDismissFocus(
@@ -84,5 +83,10 @@ export function recoverKeyboardDismissFocus(
 	const HTMLElementCtor = toastRoot.ownerDocument.defaultView?.HTMLElement;
 	const source = event.currentTarget;
 	if (event.detail !== 0 || !HTMLElementCtor || !(source instanceof HTMLElementCtor) || !isFocusVisible(source)) return;
-	adjacentFocusTarget(toastRoot)?.focus();
+	for (const target of adjacentFocusTargets(toastRoot)) {
+		target.focus();
+		let active = toastRoot.ownerDocument.activeElement;
+		while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
+		if (active instanceof HTMLElementCtor && active.isConnected && active.matches(':focus') && !composedContains(toastRoot, active)) return;
+	}
 }

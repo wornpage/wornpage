@@ -104,7 +104,7 @@ describe('toast component', () => {
 		expect(toastSource).toContain("import { prefersReducedMotion } from 'svelte/motion';");
 		expect(toastSource).toContain('function completeDismissal()');
 		expect(toastSource).toMatch(/if \(prefersReducedMotion\.current\) \{\s*completeDismissal\(\);\s*return;\s*\}\s*setTimeout\(completeDismissal, EXIT_DURATION_MS\);/u);
-		expect(packageManifest.version).toBe('0.1.5');
+		expect(packageManifest.version).toBe('0.1.6');
 		expect(readmeSource).toContain('Reduced-motion dismissal completes immediately instead of waiting for an exit animation that is not rendered');
 	});
 
