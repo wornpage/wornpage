@@ -26,6 +26,7 @@ for (const name of ['index.html', 'fixture.js']) {
 const viteConfig = {
   root: join(root, 'demo'),
   configFile: false,
+  publicDir: false,
   plugins: [svelte({ onwarn(warning) { throw new Error(`[svelte:${warning.code}] ${warning.message}`); } })],
   base: './',
   build: { outDir: app, emptyOutDir: true, rollupOptions: { input: join(entry, 'index.html') } },
