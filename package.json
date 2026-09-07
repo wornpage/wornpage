@@ -2,7 +2,7 @@
   "name": "wornpage",
   "private": true,
   "type": "module",
-  "description": "Wornpage — Svelte 5 component library and development toolkit. A collection of reusable UI components, CSS audit tools, and the CLI that ties them together.",
+  "description": "Wornpage \u2014 Svelte 5 component library and development toolkit. A collection of reusable UI components, CSS audit tools, and the CLI that ties them together.",
   "workspaces": [
     "packages/*",
     "tools/*",
@@ -12,13 +12,12 @@
     "build": "bun run --cwd demo build",
     "test": "bun test --coverage",
     "lint": "bun run --filter '*' lint",
-    "clean": "rm -rf packages/*/dist tools/*/dist packages/*/node_modules tools/*/node_modules",
     "check:components": "bun run scripts/check-component-delivery.ts",
     "check:workspace": "bun run scripts/check-workspace-contract.ts",
     "test:catalog:browser": "node scripts/catalog-browser-check.mjs",
     "verify:catalog": "node scripts/verify-catalog.mjs",
     "new": "bun run packages/cli/src/index.ts new",
-    "sync": "bun run scripts/sync.ts"
+    "pack:components": "bun run scripts/pack-components.ts"
   },
   "devDependencies": {
     "bun-types": "latest",

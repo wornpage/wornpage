@@ -1,5 +1,8 @@
 # @wornpage/workflow
 
+> Part of **[Wornpage Components](https://github.com/wornpage/wornpage#component-library)**.
+> [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md) · [Wornpage overview](https://github.com/wornpage/wornpage)
+
 The pack state machine — the blocker / next-action / done-when triad, plus
 filtering, ordering and label derivation. Pure TypeScript, zero dependencies,
 no Svelte required.
@@ -13,14 +16,13 @@ no Svelte required.
 
 Repository text is checked out as LF through `.gitattributes`, so generated output is byte-stable across Windows and Linux.
 
-The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+The shared [component delivery contract](https://github.com/wornpage/wornpage/blob/main/packages/cli/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
 ## Source use
 
-This package is not published to npm. Check out this repository at a reviewed commit and consume it
-from a local workspace after installing dependencies from `bun.lock`. The `@wornpage/workflow`
-imports below assume that workspace mapping; they do not resolve from the public npm registry.
+This package is not published to npm. Install the immutable package archive linked by the [catalog](https://wornpage-components.pages.dev). The `@wornpage/workflow`
+imports below resolve from the installed archive; they do not resolve from the public npm registry.
 
 ## The model
 

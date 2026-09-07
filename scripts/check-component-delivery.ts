@@ -7,7 +7,7 @@ import {
 	inspectPackage,
 	type PackageContract,
 } from "../packages/cli/src/commands/verify.ts";
-import { COMPONENT_REPOSITORIES } from "./component-repositories.ts";
+import { COMPONENT_NAMES, COMPONENT_VERSIONS } from "./components.ts";
 
 const ROOT = join(import.meta.dir, "..");
 const PACKAGES_ROOT = join(ROOT, "packages");
@@ -36,7 +36,11 @@ const issues: string[] = [];
 
 for (const root of roots) {
 	try {
-		contracts.push(await inspectPackage(root));
+		const contract = await inspectPackage(root);
+        const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+        const slug = contract.name.slice("@wornpage/".length);
+        if (pkg.version !== COMPONENT_VERSIONS[slug]) issues.push(`${contract.name} version differs from components-release.json.`);
+        contracts.push(contract);
 	} catch (error) {
 		issues.push(error instanceof Error ? error.message : String(error));
 	}
@@ -44,10 +48,10 @@ for (const root of roots) {
 
 const documented = documentedDeliveries(await readFile(join(ROOT, "README.md"), "utf8"));
 const contractNames = new Set(contracts.map((contract) => contract.name));
-const expectedNames = new Set(COMPONENT_REPOSITORIES.map((name) => `@wornpage/${name}`));
+const expectedNames = new Set(COMPONENT_NAMES.map((name) => `@wornpage/${name}`));
 
 for (const name of expectedNames) {
-	if (!contractNames.has(name)) issues.push(`packages/ must mirror ${name} from its standalone repository.`);
+	if (!contractNames.has(name)) issues.push(`packages/ must contain canonical source for ${name}.`);
 }
 
 for (const name of contractNames) {

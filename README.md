@@ -10,20 +10,17 @@ inspectable, and keep the final decision with a person.
 | Part of Wornpage | What it is for | Explore |
 | --- | --- | --- |
 | **Projects — the application** | Track blockers, owners, and next actions. The public WebMCP Challenge edition lets browser agents inspect visible evidence and prepare drafts for human review. | [Try Projects](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Source](https://github.com/wornpage/projects-webmcp-extension) |
-| **Components — the interface library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage.pages.dev) · [Use a component](docs/getting-started.md) |
+| **Components — the interface library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage-components.pages.dev) · [Use a component](docs/getting-started.md) |
 | **WebMCP Conformance — the validation toolkit** | Check page-owned tool declarations, authority limits, lifecycle behavior, and action receipts. | [Source and checks](https://github.com/wornpage/webmcp-conformance) |
 | **PR Machine — the delivery tool** | Turn reviewed agent work into a verified draft pull request. The repository owner controls merging. Public beta. | [Install and use](https://github.com/wornpage/projects-pr-machine#install) · [Workflow evidence](https://github.com/wornpage/projects-pr-machine/blob/main/docs/challenge-extension-case-study.md) |
 
-These are the four public entry points. The smaller package repositories belong
-to **Wornpage Components**; use the catalog to discover them together. See the
+These are the four public entry points. All component source now lives here under **`packages/`**; use the catalog to discover the library together. See the
 [repository map](docs/repository-map.md) for source ownership and contribution paths.
 
 ## Component library
 
 This repository is the Wornpage overview and the integration catalog for 26
-component and supporting packages, three development tools, and a CLI. The
-catalog brings the library together; individual repositories own package source
-and reviewed releases.
+component and supporting packages, three development tools, and a CLI. This repository owns package source, the catalog, and immutable component releases.
 
 Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-started.md).
 
@@ -31,11 +28,9 @@ Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-s
 <summary><strong>Installation, component catalog, architecture, and contributing</strong></summary>
 
 > One component library: 26 component and supporting packages, three development
-> tools, and one CLI. This catalog mirrors reviewed standalone source commits.
-> Install standalone packages from reviewed Git commits; the `@wornpage` npm
-> scope is not a supported distribution path.
+> tools, and one internal CLI. Install versioned package archives from this repository's immutable GitHub releases. The `@wornpage` npm scope is not a supported distribution path.
 
-Live catalog: <https://wornpage.pages.dev>
+Live catalog: <https://wornpage-components.pages.dev>
 
 Release example: [Wornpage Projects — WebMCP Challenge](https://projects-webmcp-extension.pages.dev/webmcp-challenge)
 
@@ -57,42 +52,41 @@ CI even when a stage fails.
 ## Use in your app
 
 Follow the canonical [Svelte 5 component setup guide](docs/getting-started.md)
-for reviewed Button and Theme installs, a complete example, and the promotion
-path for catalog pins.
+for Button and Theme release archives and a complete example.
 
 ## What's inside
 
-### Components and supporting packages (`packages/` — mirrored from standalone repos)
+### Components and supporting packages (`packages/` — canonical source)
 
-| Package | Standalone repo | Delivery | Description |
+| Package | Source | Delivery | Description |
 |---|---|---|---|
-| `@wornpage/alert` | [wornpage/alert](https://github.com/wornpage/alert) | `browser-bundle` | Inline alerts with live-region semantics and contextual dismissal |
-| `@wornpage/async-states` | [wornpage/async-states](https://github.com/wornpage/async-states) | `source` | Loading, empty, error, spinner, and skeleton states |
-| `@wornpage/binary-controls` | [wornpage/binary-controls](https://github.com/wornpage/binary-controls) | `browser-bundle` | Native checkbox and switch controls with touch-safe targets |
-| `@wornpage/button` | [wornpage/button](https://github.com/wornpage/button) | `browser-bundle` | Buttons and button links with shared variants and disabled states |
-| `@wornpage/cmdk` | [wornpage/cmdk](https://github.com/wornpage/cmdk) | `browser-bundle` | Keyboard-first command palette with fuzzy search |
-| `@wornpage/command-surfaces` | [wornpage/command-surfaces](https://github.com/wornpage/command-surfaces) | `source` | Compact command toolbars and keyboard hints |
-| `@wornpage/data-display` | [wornpage/data-display](https://github.com/wornpage/data-display) | `source` | Badges, chips, avatars, progress, and timelines |
-| `@wornpage/date-input` | [wornpage/date-input](https://github.com/wornpage/date-input) | `source` | Native date input with touch-safe styling |
-| `@wornpage/dialog` | [wornpage/dialog](https://github.com/wornpage/dialog) | `browser-bundle` | Modal dialog with focus trapping and reduced motion |
-| `@wornpage/disclosure` | [wornpage/disclosure](https://github.com/wornpage/disclosure) | `browser-bundle` | Native accordion and collapsible disclosures |
-| `@wornpage/drawer` | [wornpage/drawer](https://github.com/wornpage/drawer) | `browser-bundle` | Edge drawer with modal isolation and focus management |
-| `@wornpage/form-fields` | [wornpage/form-fields](https://github.com/wornpage/form-fields) | `browser-bundle` | Input, textarea, select, and range controls |
-| `@wornpage/layout-surfaces` | [wornpage/layout-surfaces](https://github.com/wornpage/layout-surfaces) | `source` | Panels, containers, cards, dividers, and resizable panes |
-| `@wornpage/multi-select` | [wornpage/multi-select](https://github.com/wornpage/multi-select) | `source` | Compact multi-select control with touch-safe defaults |
-| `@wornpage/navigation-surfaces` | [wornpage/navigation-surfaces](https://github.com/wornpage/navigation-surfaces) | `source` | Breadcrumb and pagination navigation |
-| `@wornpage/receipt` | [wornpage/receipt](https://github.com/wornpage/receipt) | `source` | Undo-capable action receipt cards |
-| `@wornpage/scenarios` | [wornpage/scenarios](https://github.com/wornpage/scenarios) | `source` | Shared scenario definitions and validators |
-| `@wornpage/segmented-control` | [wornpage/segmented-control](https://github.com/wornpage/segmented-control) | `browser-bundle` | Segmented native radio groups |
-| `@wornpage/select-card` | [wornpage/select-card](https://github.com/wornpage/select-card) | `browser-bundle` | Card-based selection with pressed and disabled states |
-| `@wornpage/sidebar` | [wornpage/sidebar](https://github.com/wornpage/sidebar) | `browser-bundle` | Collapsible navigation with search and keyboard support |
-| `@wornpage/sync` | [wornpage/sync](https://github.com/wornpage/sync) | `source` | Sync-code generation, hashing, and QR encoding |
-| `@wornpage/tabs` | [wornpage/tabs](https://github.com/wornpage/tabs) | `browser-bundle` | Roving tabs with stable panels and compact overflow |
-| `@wornpage/theme` | [wornpage/theme](https://github.com/wornpage/theme) | `browser-bundle` | Persistent multi-theme CSS custom properties |
-| `@wornpage/toast` | [wornpage/toast](https://github.com/wornpage/toast) | `browser-bundle` | Toast notifications with contextual dismissal |
-| `@wornpage/undo` | [wornpage/undo](https://github.com/wornpage/undo) | `browser-bundle` | Receipt-oriented undo and redo stack |
-| `@wornpage/workflow` | [wornpage/workflow](https://github.com/wornpage/workflow) | `source` | Pack state machine for blocker and next-action flow |
-| `@wornpage/cli` | [wornpage/cli](https://github.com/wornpage/cli) | `tooling` | Scaffold + ship new components |
+| `@wornpage/alert` | [packages/alert](packages/alert) | `browser-bundle` | Inline alerts with live-region semantics and contextual dismissal |
+| `@wornpage/async-states` | [packages/async-states](packages/async-states) | `source` | Loading, empty, error, spinner, and skeleton states |
+| `@wornpage/binary-controls` | [packages/binary-controls](packages/binary-controls) | `browser-bundle` | Native checkbox and switch controls with touch-safe targets |
+| `@wornpage/button` | [packages/button](packages/button) | `browser-bundle` | Buttons and button links with shared variants and disabled states |
+| `@wornpage/cmdk` | [packages/cmdk](packages/cmdk) | `browser-bundle` | Keyboard-first command palette with fuzzy search |
+| `@wornpage/command-surfaces` | [packages/command-surfaces](packages/command-surfaces) | `source` | Compact command toolbars and keyboard hints |
+| `@wornpage/data-display` | [packages/data-display](packages/data-display) | `source` | Badges, chips, avatars, progress, and timelines |
+| `@wornpage/date-input` | [packages/date-input](packages/date-input) | `source` | Native date input with touch-safe styling |
+| `@wornpage/dialog` | [packages/dialog](packages/dialog) | `browser-bundle` | Modal dialog with focus trapping and reduced motion |
+| `@wornpage/disclosure` | [packages/disclosure](packages/disclosure) | `browser-bundle` | Native accordion and collapsible disclosures |
+| `@wornpage/drawer` | [packages/drawer](packages/drawer) | `browser-bundle` | Edge drawer with modal isolation and focus management |
+| `@wornpage/form-fields` | [packages/form-fields](packages/form-fields) | `browser-bundle` | Input, textarea, select, and range controls |
+| `@wornpage/layout-surfaces` | [packages/layout-surfaces](packages/layout-surfaces) | `source` | Panels, containers, cards, dividers, and resizable panes |
+| `@wornpage/multi-select` | [packages/multi-select](packages/multi-select) | `source` | Compact multi-select control with touch-safe defaults |
+| `@wornpage/navigation-surfaces` | [packages/navigation-surfaces](packages/navigation-surfaces) | `source` | Breadcrumb and pagination navigation |
+| `@wornpage/receipt` | [packages/receipt](packages/receipt) | `source` | Undo-capable action receipt cards |
+| `@wornpage/scenarios` | [packages/scenarios](packages/scenarios) | `source` | Shared scenario definitions and validators |
+| `@wornpage/segmented-control` | [packages/segmented-control](packages/segmented-control) | `browser-bundle` | Segmented native radio groups |
+| `@wornpage/select-card` | [packages/select-card](packages/select-card) | `browser-bundle` | Card-based selection with pressed and disabled states |
+| `@wornpage/sidebar` | [packages/sidebar](packages/sidebar) | `browser-bundle` | Collapsible navigation with search and keyboard support |
+| `@wornpage/sync` | [packages/sync](packages/sync) | `source` | Sync-code generation, hashing, and QR encoding |
+| `@wornpage/tabs` | [packages/tabs](packages/tabs) | `browser-bundle` | Roving tabs with stable panels and compact overflow |
+| `@wornpage/theme` | [packages/theme](packages/theme) | `browser-bundle` | Persistent multi-theme CSS custom properties |
+| `@wornpage/toast` | [packages/toast](packages/toast) | `browser-bundle` | Toast notifications with contextual dismissal |
+| `@wornpage/undo` | [packages/undo](packages/undo) | `browser-bundle` | Receipt-oriented undo and redo stack |
+| `@wornpage/workflow` | [packages/workflow](packages/workflow) | `source` | Pack state machine for blocker and next-action flow |
+| `@wornpage/cli` | [packages/cli](packages/cli) | `tooling` | Workspace scaffolding and release verification |
 
 ### Tools (`tools/` — monorepo-native)
 
@@ -104,35 +98,20 @@ path for catalog pins.
 
 ## Architecture
 
-- **Standalone repos are canonical.** Each `@wornpage/*` package lives in its own repo.
-- **This monorepo mirrors them.** `bun run sync` fetches only the exact reviewed
-  commits in `scripts/component-repositories.ts`.
-- **`packages/` is generated — never hand-edit it.** A change made here reaches
-  nobody, because nothing installs from this repo. `bun run sync` overwrites it.
-- **The demo consumes only mirrored workspaces.** Every internal dependency uses
-  `workspace:*`; sibling `file:` paths and floating internal versions are
-  rejected by `bun run check:workspace` before CI installs the frozen lockfile.
-- **`bun run sync --check` reports drift** without changing anything or executing
-  fetched package code, and exits non-zero when the mirror no longer matches the
-  pinned manifest. CI runs it on repository changes and daily.
-- **Tools live here.** `apca-lc`, `public-audit`, `find-unused-css` are monorepo-native.
-- **Tests run across everything.** `bun test` validates all packages and tools together.
-- **Delivery is checked as a fleet.** `bun run check:components` inspects every
-  mirrored component's versioned declaration, exports, local Delivery section,
-  release workflow, and source/runtime boundary without rebuilding generated output.
-- **The root build is an integration build.** `bun run build` compiles the demo
-  against mirrored `workspace:*` sources without generating package `dist/`
-  trees inside the mirror.
-- **The catalog is a working playground.** Its host token ownership, local
-  interaction examples, reviewed-source disclosures, and browser matrix are
-  specified in [`docs/catalog-contract.md`](docs/catalog-contract.md).
+- **This repository is canonical.** Edit component implementations in `packages/<name>/src/`.
+- **One workspace and lockfile.** The catalog consumes `workspace:*` dependencies; `bun.lock` fixes the build environment.
+- **One release path.** `components-release.json` names the release and package versions. `bun run pack:components` builds browser bundles and packs the declared consumer entries.
+- **Generated bundles stay generated.** Package `dist/` directories are ignored build output, never a second implementation.
+- **Immutable public delivery.** GitHub release assets contain package archives, integrity hashes, and their source commit. The catalog links to the same release.
+- **Historical sources remain available where required.** See [the migration record](docs/component-migration.md) for protected consumers and retained archive addresses.
+- **The catalog is a working playground.** Its interaction and browser contracts are in [docs/catalog-contract.md](docs/catalog-contract.md).
 
 ## Contributing
 
-1. Find the package you want to change in the table above
-2. Clone its standalone repo
-3. Make your changes, run `bun test`, submit a PR there
-4. After review, update the standalone commit pin and regenerate the mirror
+1. Change the owning package here and add the relevant behavior test.
+2. Run `bun run verify:catalog` from the repository root.
+3. Submit a PR to this repository.
+4. Follow [component delivery](packages/cli/docs/component-delivery.md) to publish the next immutable release.
 
 ## License
 

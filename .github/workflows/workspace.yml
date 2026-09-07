@@ -1,10 +1,8 @@
-name: Mirror contract
+name: Wornpage workspace
 
 on:
   push:
   pull_request:
-  schedule:
-    - cron: "17 8 * * *"
   workflow_dispatch:
 
 permissions:
@@ -14,7 +12,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out mirror
+      - name: Check out canonical workspace
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Set up Bun
@@ -39,7 +37,7 @@ jobs:
       - name: Install catalog Chromium
         run: bunx playwright install --with-deps chromium
 
-      - name: Verify mirror and rendered catalog
+      - name: Verify packages and rendered catalog
         run: bun run verify:catalog
 
       - name: Upload catalog verification evidence

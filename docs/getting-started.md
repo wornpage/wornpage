@@ -5,12 +5,12 @@ Start with an existing Svelte 5 browser app. If you need one, use the
 The Svelte entries below are resolved by your browser bundler; their
 browser-default entries are not SSR-safe.
 
-Install the reviewed standalone archives with Bun (see
+Install the immutable component release archives with Bun (see
 [Bun's `add` reference](https://bun.sh/docs/pm/cli/add)):
 
 ```bash
-bun add "https://codeload.github.com/wornpage/button/tar.gz/6da25ba40af71d3329abc2a4631d46047abd180b"
-bun add "https://codeload.github.com/wornpage/theme/tar.gz/f9ef5f1b5cccc90ac43695bd23ed735776b593d5"
+bun add "https://github.com/wornpage/wornpage/releases/download/components-2026.09.07/wornpage-button-0.2.2.tgz"
+bun add "https://github.com/wornpage/wornpage/releases/download/components-2026.09.07/wornpage-theme-0.1.2.tgz"
 ```
 
 Put this complete example in a `.svelte` file. It uses native buttons and
@@ -104,14 +104,14 @@ preference persists.
 - Verify contrast, touch targets, and zoom at the sizes your users need.
 - Honor reduced-motion preferences for any motion you introduce.
 
-## How a reviewed pin reaches consumers
+## How a release reaches consumers
 
-Standalone repositories are staged and reviewed at a full SHA. That SHA is
-then regenerated into this catalog mirror. A consumer deliberately promotes
-the reviewed archive to its own dependency pin and existing package-manager
-lockfile. This is not npm scope publishing, and Bun does not replace a
-consumer production app's existing lockfile.
+Component source is reviewed in this repository. The root verification gate
+tests the workspace, builds the browser bundles, packs each declared consumer
+entry, and verifies the catalog. The release workflow publishes those packages
+as immutable GitHub assets. Keep the resulting archive URL and SHA-512 lockfile
+entry together when upgrading a consumer. This is not npm scope publication.
 
 For component API details, use the current canonical
-[Button source](https://github.com/wornpage/button/tree/6da25ba40af71d3329abc2a4631d46047abd180b) and
-[Theme source](https://github.com/wornpage/theme/tree/f9ef5f1b5cccc90ac43695bd23ed735776b593d5).
+[Button source](https://github.com/wornpage/wornpage/tree/components-2026.09.07/packages/button) and
+[Theme source](https://github.com/wornpage/wornpage/tree/components-2026.09.07/packages/theme).

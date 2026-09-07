@@ -1,7 +1,7 @@
 {
   "name": "@wornpage/receipt",
-  "version": "0.1.6",
-  "description": "Svelte 5 action receipt component — undo-capable result cards with fly transition",
+  "version": "0.1.7",
+  "description": "Svelte 5 action receipt component \u2014 undo-capable result cards with fly transition",
   "type": "module",
   "wornpage": {
     "contractVersion": 2,
@@ -20,12 +20,26 @@
     }
   },
   "peerDependencies": {
-    "svelte": "^5.56.8"
+    "svelte": "^5.56.8",
+    "@wornpage/button": "0.2.2"
   },
-  "dependencies": {
-    "@wornpage/button": "https://codeload.github.com/wornpage/button/tar.gz/ade0d9cb63830d7ae1f19b74d240e33a68c00a00"
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "keywords": [
+    "svelte",
+    "receipt",
+    "undo",
+    "wornpage"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/receipt"
   },
-  "files": ["src", "README.md"],
-  "keywords": ["svelte", "receipt", "undo", "wornpage"],
-  "license": "MIT"
+  "devDependencies": {
+    "@wornpage/button": "workspace:*"
+  }
 }

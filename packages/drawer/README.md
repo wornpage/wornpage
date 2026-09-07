@@ -1,5 +1,8 @@
 # @wornpage/drawer
 
+> Part of **[Wornpage Components](https://github.com/wornpage/wornpage#component-library)**.
+> [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md) · [Wornpage overview](https://github.com/wornpage/wornpage)
+
 Accessible Svelte 5 drawer for mobile navigation and focused secondary content.
 
 Drawers remain inside dynamic mobile viewports and standalone-display safe areas,
@@ -16,7 +19,7 @@ cannot displace the backdrop or panel outside the visible screen.
 
 Repository text is checked out as LF through `.gitattributes`, so generated output is byte-stable across Windows and Linux.
 
-The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+The shared [component delivery contract](https://github.com/wornpage/wornpage/blob/main/packages/cli/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
 ```svelte

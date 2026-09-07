@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
-import { STANDALONE_SOURCES } from "./component-repositories.ts";
+import { COMPONENT_NAMES } from "./components.ts";
 
-const workflow = readFileSync(new URL("../.github/workflows/mirror-check.yml", import.meta.url), "utf8");
+const workflow = readFileSync(new URL("../.github/workflows/workspace.yml", import.meta.url), "utf8");
 const rootLicense = readFileSync(new URL("../LICENSE", import.meta.url), "utf8");
 const publicInstructions = [
 	readFileSync(new URL("../README.md", import.meta.url), "utf8"),
@@ -27,19 +27,11 @@ describe("repository security contract", () => {
 		expect(publicInstructions).not.toMatch(/\b(?:bun add|npm (?:add|install)|bunx) @wornpage\//u);
 	});
 
-	it("keeps public commit links aligned with the reviewed source manifest", () => {
-		const expectedRevisions = new Map(
-			STANDALONE_SOURCES.map(({ name, revision }) => [name, revision]),
-		);
-		const references = [
-			...publicInstructions.matchAll(
-				/https:\/\/(?:codeload\.)?github\.com\/wornpage\/([a-z][a-z0-9-]+)\/(?:tar\.gz|blob)\/([0-9a-f]{40})/gu,
-			),
-		];
-
-		expect(references.length).toBeGreaterThan(0);
-		for (const [, repository, revision] of references) {
-			expect(expectedRevisions.get(repository)).toBe(revision);
-		}
-	});
+	it("routes all component source to the canonical workspace", () => {
+        for (const name of COMPONENT_NAMES) {
+            expect(publicInstructions).toContain(`packages/${name}`);
+        }
+        expect(publicInstructions).not.toContain('codeload.github.com/wornpage/');
+        expect(publicInstructions).not.toContain('bun run sync');
+    });
 });

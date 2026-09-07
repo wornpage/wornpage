@@ -1,7 +1,8 @@
 node_modules/
 dist/*.map
 *.tsbuildinfo
-.sync-tmp/
+packages/*/dist/
+output/components/
 
 demo/dist/
 output/playwright/

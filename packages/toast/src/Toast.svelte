@@ -119,11 +119,17 @@
 		animation: wrn-toast-enter 220ms ease-out;
 	}
 	.wrn-toast.is-dismissing { animation: wrn-toast-exit 180ms ease-in forwards; pointer-events: none; }
-	.wrn-toast.is-error { border-color: var(--wrn-toast-error-border, var(--worn-danger-border, #e74c3c)); background: var(--wrn-toast-error-bg, var(--worn-danger-bg, #fdf0ef)); }
-	.wrn-toast.is-success { border-color: var(--wrn-toast-success-border, var(--worn-success-border, #27ae60)); background: var(--wrn-toast-success-bg, var(--worn-success-bg, #edf9f0)); }
+	.wrn-toast.is-error {
+		border-color: var(--wrn-toast-error-border, var(--worn-danger-border, #e74c3c));
+		background: var(--wrn-toast-error-bg, var(--worn-danger-bg, var(--wrn-toast-bg, var(--worn-surface, #fdf0ef))));
+		color: var(--wrn-toast-error-text, var(--worn-danger-text, var(--wrn-toast-text, var(--worn-text, #21322b))));
+	}
+	.wrn-toast.is-success {
+		border-color: var(--wrn-toast-success-border, var(--worn-success-border, #27ae60));
+		background: var(--wrn-toast-success-bg, var(--worn-success-bg, var(--wrn-toast-bg, var(--worn-surface, #edf9f0))));
+		color: var(--wrn-toast-success-text, var(--worn-success-text, var(--wrn-toast-text, var(--worn-text, #21322b))));
+	}
 	.wrn-toast-icon { font-size: 14px; line-height: 1; flex-shrink: 0; }
-	.wrn-toast.is-error .wrn-toast-icon { color: var(--wrn-toast-error-text, var(--worn-danger-text, #e74c3c)); }
-	.wrn-toast.is-success .wrn-toast-icon { color: var(--wrn-toast-success-text, var(--worn-success-text, #27ae60)); }
 	.wrn-toast-text { flex: 1; max-inline-size: 100%; min-width: 0; line-height: 1.3; overflow-wrap: anywhere; }
 	.wrn-toast-dismiss {
 		display: inline-grid; place-items: center; flex: 0 0 auto;

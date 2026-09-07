@@ -1,7 +1,7 @@
 {
   "name": "@wornpage/sidebar",
   "version": "0.1.6",
-  "description": "Svelte 5 sidebar navigation component — collapsible groups, keyboard nav, search, favorites, recent items, drag-to-reorder",
+  "description": "Svelte 5 sidebar navigation component \u2014 collapsible groups, keyboard nav, search, favorites, recent items, drag-to-reorder",
   "type": "module",
   "wornpage": {
     "contractVersion": 2,
@@ -11,26 +11,30 @@
     "test": "bun test",
     "build": "vite build"
   },
-"main": "./dist/worn-sidebar.js",
-"svelte": "./src/index.ts",
-"exports": {
-  ".": {
-    "types": "./src/index.ts",
-    "svelte": "./src/index.ts",
-    "default": "./dist/worn-sidebar.js"
+  "main": "./dist/worn-sidebar.js",
+  "svelte": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./dist/worn-sidebar.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "vite": "^8.1.5"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wornpage/wornpage.git",
+    "directory": "packages/sidebar"
   }
-},
-"files": ["dist", "src"],
-"peerDependencies": {
-"svelte": "^5.0.0"
-},
-"devDependencies": {
-  "@sveltejs/vite-plugin-svelte": "^7.2.0",
-  "vite": "^8.1.5"
-},
-"license": "MIT",
-"repository": {
-"type": "git",
-"url": "https://github.com/wornpage/sidebar.git"
-}
 }

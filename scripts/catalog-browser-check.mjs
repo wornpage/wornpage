@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { catalogOutputDirectory, prepareCatalogOutput } from './catalog-browser-output.mjs';
 import { observePreviewStartup, waitForPreview } from './catalog-preview-readiness.mjs';
-import { COMPONENT_SOURCES } from './component-repositories.ts';
+import { COMPONENT_NAMES, COMPONENT_RELEASE_TAG } from './components.ts';
 
 const HOST = '127.0.0.1';
 const PORT = 4173;
@@ -19,7 +19,7 @@ const VIEWPORTS = [
   { id: 'compact-touch', viewport: { width: 320, height: 900 }, hasTouch: true, isMobile: true },
   { id: 'desktop-fine', viewport: { width: 1440, height: 1000 }, hasTouch: false, isMobile: false },
 ];
-const EXPECTED_IDS = COMPONENT_SOURCES.map(({ name }) => name);
+const EXPECTED_IDS = COMPONENT_NAMES;
 const REQUIRED_TOKENS = [
   '--worn-bg', '--worn-bg-secondary', '--worn-surface', '--worn-surface-raised', '--worn-text',
   '--worn-text-secondary', '--worn-text-muted', '--worn-border', '--worn-border-strong', '--worn-accent',
@@ -355,7 +355,7 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
         sectionIds: sections.map((section) => section.id),
         metadataIds: metadata.map((node) => node.getAttribute('data-component-meta')),
         exampleIds: examples.map((node) => node.getAttribute('data-example-id')),
-        revisionsValid: metadata.every((node) => /^[0-9a-f]{40}$/.test(node.getAttribute('data-source-revision') || '')),
+        releaseTags: metadata.map((node) => node.getAttribute('data-component-release')),
         tokenValues,
         scrollWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth,
@@ -381,7 +381,7 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
     assert.deepEqual([...coverage.sectionIds].sort(), expectedSorted, `${label} section coverage drifted`);
     assert.deepEqual([...coverage.metadataIds].sort(), expectedSorted, `${label} metadata coverage drifted`);
     assert.deepEqual([...coverage.exampleIds].sort(), expectedSorted, `${label} example coverage drifted`);
-    assert.equal(coverage.revisionsValid, true, `${label} contains an unreviewed or unknown source revision`);
+    assert.deepEqual([...new Set(coverage.releaseTags)], [COMPONENT_RELEASE_TAG], `${label} contains an unknown component release`);
     assert.deepEqual(Object.entries(coverage.tokenValues).filter(([, value]) => !value), [], `${label} has unresolved semantic tokens`);
     assert.ok(coverage.scrollWidth <= coverage.viewportWidth, `${label} overflows horizontally: ${coverage.scrollWidth}/${coverage.viewportWidth}`);
     assert.ok(contrast(coverage.body.color, coverage.body.background) >= 4.5, `${label} body text contrast is below 4.5`);

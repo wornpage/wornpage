@@ -8,14 +8,13 @@ describe("WornReceipt", () => {
   it("package name is correct", () => {
     const pkg = require("../package.json");
     expect(pkg.name).toBe("@wornpage/receipt");
-    expect(pkg.version).toBe("0.1.6");
+    expect(pkg.version).toBe("0.1.7");
   });
 
-  it("pins the exact shared button commit", () => {
+  it("uses the canonical shared button version without a nested archive", () => {
     const pkg = require("../package.json");
-    expect(pkg.dependencies["@wornpage/button"]).toBe(
-      "https://codeload.github.com/wornpage/button/tar.gz/ade0d9cb63830d7ae1f19b74d240e33a68c00a00",
-    );
+    expect(pkg.peerDependencies["@wornpage/button"]).toBe(require('../../button/package.json').version);
+    expect(pkg.devDependencies["@wornpage/button"]).toBe('workspace:*');
   });
 
   it("exports WornReceipt from index", async () => {

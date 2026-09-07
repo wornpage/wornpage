@@ -1,5 +1,8 @@
 # @wornpage/async-states
 
+> Part of **[Wornpage Components](https://github.com/wornpage/wornpage#component-library)**.
+> [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md) · [Wornpage overview](https://github.com/wornpage/wornpage)
+
 Compact Svelte 5 loading, empty, and error states for application workflows.
 The package is source-delivered so consuming SvelteKit applications compile it
 with their own theme tokens and CSP policy.
@@ -11,7 +14,7 @@ with their own theme tokens and CSP policy.
 
 Repository text is checked out as LF through `.gitattributes`, so generated output is byte-stable across Windows and Linux.
 
-The shared [component delivery contract](https://github.com/wornpage/cli/blob/master/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
+The shared [component delivery contract](https://github.com/wornpage/wornpage/blob/main/packages/cli/docs/component-delivery.md) checks this declaration, package exports, packed files, and generated output on every push and pull request.
 <!-- /wornpage-delivery -->
 
 ## Source use

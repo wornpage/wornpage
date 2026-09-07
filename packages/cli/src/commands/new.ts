@@ -1,10 +1,9 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {
   DELIVERY_CONTRACT_VERSION,
   DELIVERY_GIT_ATTRIBUTES,
   renderDeliveryReadmeSection,
-  renderDeliveryWorkflow,
 } from '../delivery.ts';
 
 function capitalize(s: string): string {
@@ -16,7 +15,12 @@ export default async function newCommand(name: string) {
     throw new Error('Package name must be a lowercase slug such as button or command-menu.');
   }
 
-  const targetDir = join(process.cwd(), `wornpage-${name}`);
+  const root = process.cwd();
+  const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+  if (manifest.name !== 'wornpage' || !manifest.workspaces?.includes('packages/*')) {
+    throw new Error('Run bun run new from the canonical wornpage workspace root.');
+  }
+  const targetDir = join(root, 'packages', name);
 
   try {
     await mkdir(targetDir);
@@ -40,11 +44,8 @@ ${renderDeliveryReadmeSection('source')}
 
 ## Install
 
-Replace \`FULL_COMMIT_SHA\` with a reviewed 40-character commit from this repository.
-
-\`\`\`bash
-bun add "https://codeload.github.com/wornpage/${name}/tar.gz/FULL_COMMIT_SHA"
-\`\`\`
+Register this package in components-release.json and add its catalog example.
+Run the root verification gate, then publish it with the other workspace packages.
 `,
 
     'package.json': JSON.stringify({
@@ -100,8 +101,6 @@ describe('Worn${Cap}', () => {
 });
 `,
 
-    '.github/workflows/release-contract.yml': renderDeliveryWorkflow(),
-
     '.gitattributes': DELIVERY_GIT_ATTRIBUTES,
 
     '.gitignore': 'node_modules/\n',
@@ -115,9 +114,9 @@ describe('Worn${Cap}', () => {
   }
 
   console.log('\nInstalling dependencies...');
-  const install = Bun.spawn(['bun', 'install'], { cwd: targetDir, stdout: 'inherit', stderr: 'inherit' });
+  const install = Bun.spawn(['bun', 'install'], { cwd: root, stdout: 'inherit', stderr: 'inherit' });
   if (await install.exited !== 0) throw new Error('Dependency installation failed.');
 
   console.log(`\nScaffolded ${Object.keys(files).length} files.\n`);
-  console.log(`Next: cd wornpage-${name} && wornpage verify`);
+  console.log(`Next: register ${name} in components-release.json and the catalog, then bun run verify:catalog`);
 }

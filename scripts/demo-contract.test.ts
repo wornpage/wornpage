@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
-import { COMPONENT_REPOSITORIES } from './component-repositories.ts';
+import { COMPONENT_NAMES } from './components.ts';
 import { DEMO_CATALOG } from '../demo/src/sections.ts';
 
 const appSource = readFileSync(new URL('../demo/src/App.svelte', import.meta.url), 'utf8');
@@ -33,7 +33,7 @@ describe('aggregate demo contract', () => {
   });
 
   test('derives catalog coverage from the component repository denominator', () => {
-    const expectedIds = [...COMPONENT_REPOSITORIES].sort();
+    const expectedIds = [...COMPONENT_NAMES].sort();
     const catalogIds = DEMO_CATALOG.map(({ id }) => id).sort();
 
     expect(catalogIds).toEqual(expectedIds);
@@ -42,7 +42,7 @@ describe('aggregate demo contract', () => {
   });
 
   test('depends directly on every displayed workspace package', () => {
-    const expectedDependencies = COMPONENT_REPOSITORIES.map((id) => `@wornpage/${id}`).sort();
+    const expectedDependencies = COMPONENT_NAMES.map((id) => `@wornpage/${id}`).sort();
 
     expect(Object.keys(demoPackage.dependencies).sort()).toEqual(expectedDependencies);
     for (const dependency of expectedDependencies) {
@@ -53,7 +53,7 @@ describe('aggregate demo contract', () => {
   test('uses the explicit catalog for grouped navigation and rendered sections', () => {
     expect(appSource).toContain('const sections = DEMO_CATALOG.map(({ id }) => id);');
     expect(DEMO_CATALOG).toHaveLength(26);
-    expect(appSource).toContain('<p>{DEMO_CATALOG.length} standalone component repositories, one inspectable catalog.</p>');
+    expect(appSource).toContain('<p>{DEMO_CATALOG.length} components and supporting packages, one interface library.</p>');
     expect(appSource).toContain('function iconForCategory(category: CatalogCategory): NavIcon');
     expect(appSource).not.toMatch(/return ['"]<.+>/u);
     expect(appSource).toContain('const sidebarItems: NavItem[] = CATALOG_GROUPS.map');
@@ -126,10 +126,10 @@ describe('aggregate demo contract', () => {
     expect(exampleSource).toMatch(/\.tab-panel\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
   });
 
-  test('derives reviewed source and install details from the canonical pin manifest', () => {
+  test('derives reviewed source and install details from the canonical release manifest', () => {
     expect(appSource).toContain('catalogMetadata(entry.id)');
-    expect(appSource).toContain('data-source-revision={metadata.revision}');
-    expect(readFileSync(new URL('../demo/src/sections.ts', import.meta.url), 'utf8')).toContain("COMPONENT_SOURCES.find((candidate) => candidate.name === id)");
+    expect(appSource).toContain('data-component-release={metadata.releaseTag}');
+    expect(readFileSync(new URL('../demo/src/sections.ts', import.meta.url), 'utf8')).toContain("componentRelease(id)");
     expect(exampleSource).not.toMatch(/codeload\.github\.com\/wornpage\//u);
   });
 
@@ -137,7 +137,7 @@ describe('aggregate demo contract', () => {
     expect(rootPackage.devDependencies.playwright).toBe('1.62.0');
     expect(rootPackage.scripts['test:catalog:browser']).toBe('node scripts/catalog-browser-check.mjs');
     expect(rootPackage.scripts['verify:catalog']).toBe('node scripts/verify-catalog.mjs');
-    for (const command of ['bun run check:workspace', 'bun run check:components', 'bun run sync --check', 'bun test', 'bun run build', 'bun run test:catalog:browser']) {
+    for (const command of ['bun run check:workspace', 'bun run check:components', 'bun test', 'bun run pack:components', 'bun run build', 'bun run test:catalog:browser']) {
       expect(catalogVerifierSource).toContain(`command: '${command}'`);
     }
     expect(catalogVerifierSource).toContain("skipped.status = 'skipped'");

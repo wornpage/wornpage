@@ -1,7 +1,7 @@
 # Catalog Contract
 
 The public catalog is a local, inspectable playground for every component in
-`scripts/component-repositories.ts`. It does not call an application backend,
+`components-release.json`. It does not call an application backend,
 emit telemetry, or represent local example state as a persisted save.
 
 ## Ownership
@@ -11,16 +11,16 @@ emit telemetry, or represent local example state as a persisted save.
 | Theme preference and System resolution | `@wornpage/theme` `Theme` | Persists only valid choices in `wrn-theme`; System follows the operating-system color scheme. |
 | Host palette | `demo/index.html` | Defines the complete semantic `--worn-*` palette for all eight named themes. Shell and component examples consume the same tokens. |
 | Component-specific theme controls | `demo/src/App.svelte` | Maps Theme's live `--wrn-theme-*` consumer variables to semantic host tokens. |
-| Reviewed source metadata | `scripts/component-repositories.ts` through `demo/src/sections.ts` | Repository, exact revision, codeload install command, and sample import are generated from the reviewed pin manifest. |
+| Published source metadata | `components-release.json` through `scripts/components.ts` and `demo/src/sections.ts` | Canonical source path, named immutable release, package archive, and sample import share one release manifest. |
 | Example state | `demo/src/ComponentExample.svelte` | Local models expose outcomes, reset paths, and applicable disabled, loading, empty, error, undo, and redo states. |
 | Rendered verification | `scripts/catalog-browser-check.mjs` | Tests the built output and writes ignored evidence under `output/playwright/catalog/`. |
-| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, sync, Bun tests, build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
+| Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, Bun tests, component packaging, catalog build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
 
 `--worn-muted` and `--worn-subtle` are retained semantic spellings because the
 live `@wornpage/undo` consumer reads them. Their values are owned by the host
 palette, map to `--worn-text-muted` and `--worn-bg-secondary`, and are covered
 by the catalog browser matrix. Remove them when the reviewed Undo source no
-longer consumes either spelling and that updated pin reaches the mirror.
+longer consumes either spelling.
 
 The `--wrn-theme-*` variables are component-specific public overrides rather
 than a second global palette. They are mapped only at the Theme host boundary;
@@ -31,9 +31,9 @@ Theme revision adopts semantic `--worn-*` fallbacks directly.
 Compatibility retained:
 - Consumer: Catalog host navigation immediately after `@wornpage/cmdk` closes.
 - Owner: `demo/src/App.svelte` `openPalette` / `handlePaletteClose` focus phase.
-- Removal condition: A reviewed Cmdk revision invokes `onclose` only after its opener-focus restoration has settled, and the updated pin reaches this mirror.
+- Removal condition: A reviewed Cmdk revision invokes `onclose` only after its opener-focus restoration has settled.
 - Test coverage: The built-browser gate runs 20 cancellation-to-navigation checks with normal motion and 20 with reduced motion, including navigation triggered by native opener restoration.
-- Why hard cutover is unsafe now: `packages/cmdk` is generated from its canonical standalone repository and cannot be patched in this mirror.
+- Why hard cutover is unsafe now: Cmdk currently restores opener focus after calling `onclose`; removing this host phase would race that restoration and lose the requested navigation focus. The source consolidation preserves this existing interaction contract.
 
 ## Verification denominators
 
