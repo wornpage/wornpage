@@ -233,17 +233,17 @@
 <style>
   :global(*) { box-sizing: border-box; }
   :global(body) { margin: 0; }
-  .app-shell { display: grid; grid-template-columns: auto minmax(0, 1fr); min-height: 100vh; max-width: 100%; }
-  .demo-sidebar { align-self: start; background: var(--worn-surface); border-right: 1px solid var(--worn-border); height: 100vh; overflow-y: auto; position: sticky; top: 0; width: 248px; z-index: 20; }
+  .app-shell { column-gap: 48px; display: grid; grid-template-columns: auto minmax(0, 1fr); margin-inline: auto; min-height: 100vh; padding-top: 32px; width: min(1180px, calc(100% - 96px)); }
+  .demo-sidebar { align-self: start; background: var(--worn-surface); border: 1px solid var(--worn-border); border-radius: 8px; height: calc(100dvh - 48px); overflow-y: auto; position: sticky; top: 24px; width: 248px; z-index: 20; }
   .demo-sidebar.collapsed { width: 72px; }
   .nav-toggle { align-items: center; background: var(--worn-bg-secondary); border: 0; border-bottom: 1px solid var(--worn-border); color: var(--worn-text); cursor: pointer; display: flex; font: inherit; font-size: 12px; gap: 8px; justify-content: center; min-height: 44px; padding: 6px 10px; position: sticky; top: 0; width: 100%; z-index: 2; }
   .nav-toggle:focus-visible { outline: 2px dashed var(--worn-focus); outline-offset: -4px; }
   .nav-toggle span:first-child { font-size: 22px; line-height: 1; }
   .demo-sidebar.collapsed .nav-toggle span:last-child { border: 0; clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
-  .demo-main { box-sizing: border-box; min-width: 0; padding: 24px 32px 40px; width: min(100%, 980px); }
+  .demo-main { box-sizing: border-box; min-width: 0; padding: 8px 0 48px; width: min(100%, 840px); }
   .demo-header { border-bottom: 1px solid var(--worn-border); display: grid; gap: 16px; margin-bottom: 28px; padding-bottom: 22px; }
-  .demo-header h1 { font-size: 28px; letter-spacing: 0; margin: 0; }
-  .demo-header p { color: var(--worn-text-muted); line-height: 1.5; margin: 4px 0 0; }
+  .demo-header h1 { font-family: system-ui, -apple-system, sans-serif; font-size: 28px; letter-spacing: 0; margin: 0; }
+  .demo-header p { color: var(--worn-text-muted); line-height: 1.65; margin: 8px 0 0; max-width: 65ch; }
   .header-actions {
     --wrn-theme-active-bg: var(--worn-accent);
     --wrn-theme-active-text: var(--worn-accent-text);
@@ -270,15 +270,15 @@
   .catalog-jump label { color: var(--worn-text-muted); font-size: 12px; font-weight: 650; }
   .category-heading { align-items: center; border-bottom: 2px solid var(--worn-border); color: var(--worn-text-muted); display: flex; font-size: 12px; font-weight: 700; justify-content: space-between; margin: 36px 0 0; padding: 0 0 8px; text-transform: uppercase; }
   .category-heading span:last-child { color: var(--worn-text-muted); font-variant-numeric: tabular-nums; }
-  .demo-section { border-bottom: 1px solid var(--worn-border); min-width: 0; padding: 24px 0 28px; scroll-margin-top: 16px; }
+  .demo-section { border-bottom: 1px solid var(--worn-border); min-width: 0; padding: 32px 0 36px; scroll-margin-top: 24px; }
   .demo-section.active { border-bottom-color: var(--worn-accent); }
-  .section-heading { align-items: start; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; margin-bottom: 16px; min-width: 0; }
+  .section-heading { align-items: start; display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; margin-bottom: 24px; min-width: 0; }
   .section-heading > div { flex: 1 1 20rem; min-width: 0; }
-  .section-heading h2 { font-size: 19px; letter-spacing: 0; margin: 0 0 4px; }
+  .section-heading h2 { font-family: system-ui, -apple-system, sans-serif; font-size: 19px; letter-spacing: 0; margin: 0 0 4px; }
   .section-heading h2:focus-visible { border-radius: 3px; outline: 3px solid var(--worn-focus); outline-offset: 4px; }
-  .section-heading p { color: var(--worn-text-muted); line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
+  .section-heading p { color: var(--worn-text-muted); line-height: 1.65; margin: 0; max-width: 65ch; overflow-wrap: anywhere; }
   .section-heading code { background: var(--worn-bg-secondary); border: 1px solid var(--worn-border); border-radius: 4px; color: var(--worn-text-muted); flex: 0 1 auto; font-size: 12px; max-width: 100%; overflow-wrap: anywhere; padding: 4px 7px; }
-  .component-meta { background: var(--worn-bg-secondary); border: 1px solid var(--worn-border); border-radius: var(--worn-radius-sm); margin-top: 18px; max-width: 100%; }
+  .component-meta { background: var(--worn-bg-secondary); border: 1px solid var(--worn-border); border-radius: var(--worn-radius-sm); margin-top: 24px; max-width: 100%; }
   .component-meta summary { cursor: pointer; font-size: 13px; font-weight: 700; min-height: 44px; padding: 12px 14px; }
   .component-meta summary:focus-visible { outline: 2px dashed var(--worn-focus); outline-offset: 2px; }
   .component-meta-grid { border-top: 1px solid var(--worn-border); display: grid; gap: 12px; padding: 14px; }
@@ -289,10 +289,21 @@
   .component-meta-grid small { color: var(--worn-text-muted); }
   footer { align-items: center; color: var(--worn-text-muted); display: flex; flex-wrap: wrap; font-size: 12px; gap: 8px 16px; padding-top: 32px; }
   footer a { color: var(--worn-link); overflow-wrap: anywhere; }
+  @media (max-width: 1100px) {
+    .app-shell { column-gap: 32px; }
+    .demo-sidebar { width: 224px; }
+  }
+  @media (max-width: 950px) {
+    .app-shell { column-gap: 24px; width: calc(100% - 56px); }
+  }
   @media (max-width: 720px) {
+    .app-shell { column-gap: 0; padding-top: 0; width: 100%; }
+    .demo-sidebar { border-block: 0; border-inline-start: 0; border-radius: 0; height: 100vh; top: 0; }
     .demo-sidebar:not(.collapsed) { box-shadow: var(--worn-shadow-md); height: 100dvh; inset-block: 0; inset-inline-start: 0; position: fixed; width: min(280px, calc(100vw - 16px)); }
     .demo-main { padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
     .demo-header { margin-bottom: 20px; }
+    .demo-section { padding-block: 24px 28px; }
+    .section-heading { margin-bottom: 18px; }
     .section-heading > div { flex-basis: 100%; }
   }
   @media (max-width: 360px) {
