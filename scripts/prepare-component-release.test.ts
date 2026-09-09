@@ -1,21 +1,24 @@
 import { createHash } from 'node:crypto';
 import { afterEach, describe, expect, test } from 'bun:test';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   prepareComponentRelease,
   readPublishedManifestFromGitHub,
   releaseTagExistsOnGitHub,
+  selectReleaseArtifact,
   selectComponentPublication,
   type ComponentReleaseConfig,
 } from './prepare-component-release.ts';
-import { COMPONENT_PACK_OUTPUT } from './pack-components.ts';
 
 const HEAD = 'a'.repeat(40);
 const BASELINE_HEAD = 'b'.repeat(40);
 const BASELINE_TAG = 'components-2026.09.09';
 const NEXT_TAG = 'components-2026.10.01';
+const RUN_ID = 34397705651;
+const WORKFLOW_ID = 352600638;
+const REPOSITORY_ID = 1313294799;
 const temporaryRoots: string[] = [];
 
 function integrity(bytes: string) {
@@ -55,13 +58,74 @@ function config(identities: Record<string, { version: string; releaseTag: string
 async function fixtureRoot(manifest: ReturnType<typeof currentManifest>, archiveBytes: Record<string, string>) {
   const root = await mkdtemp(join(tmpdir(), 'wornpage-selective-release-'));
   temporaryRoots.push(root);
-  const output = join(root, COMPONENT_PACK_OUTPUT);
+  const output = join(root, 'artifact', 'components', 'catalog');
   await mkdir(output, { recursive: true });
   await writeFile(join(output, 'component-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   for (const manifestEntry of manifest.packages) {
     await writeFile(join(output, manifestEntry.filename), archiveBytes[manifestEntry.name]);
   }
+  const evidence = join(root, 'artifact', 'verify-catalog');
+  await mkdir(evidence, { recursive: true });
+  await writeFile(join(evidence, 'latest.json'), `${JSON.stringify({
+    schemaVersion: 1,
+    command: 'bun run verify:catalog',
+    status: 'passed',
+    exitCode: 0,
+    failedStage: null,
+    currentStage: null,
+    stages: [
+      ['workspace', 'bun run check:workspace'],
+      ['delivery', 'bun run check:components'],
+      ['theme-types', 'bun run --cwd packages/theme check:types'],
+      ['tests', 'bun test'],
+      ['packages', 'bun run pack:components'],
+      ['toast-focus', 'bun run test:toast:focus'],
+      ['build', 'bun run build'],
+      ['browser', 'bun run test:catalog:browser'],
+    ].map(([id, command], index) => ({ index: index + 1, id, command, status: 'passed', exitCode: 0, signal: null, error: null })),
+  }, null, 2)}\n`);
   return root;
+}
+
+function workflowMetadata(overrides: Record<string, unknown> = {}) {
+  return { id: WORKFLOW_ID, path: '.github/workflows/workspace.yml', ...overrides };
+}
+
+function runMetadata(overrides: Record<string, unknown> = {}) {
+  return {
+    id: RUN_ID,
+    workflow_id: WORKFLOW_ID,
+    run_attempt: 1,
+    path: '.github/workflows/workspace.yml',
+    event: 'push',
+    head_branch: 'main',
+    head_sha: HEAD,
+    status: 'completed',
+    conclusion: 'success',
+    repository: { id: REPOSITORY_ID, full_name: 'wornpage/wornpage' },
+    head_repository: { id: REPOSITORY_ID, full_name: 'wornpage/wornpage' },
+    ...overrides,
+  };
+}
+
+function artifactMetadata(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 987654321,
+    name: `component-release-verification-${RUN_ID}-1`,
+    expired: false,
+    expires_at: '2099-01-01T00:00:00Z',
+    digest: `sha256:${'c'.repeat(64)}`,
+    workflow_run: { id: RUN_ID, repository_id: REPOSITORY_ID, head_repository_id: REPOSITORY_ID, head_branch: 'main', head_sha: HEAD },
+    ...overrides,
+  };
+}
+
+function pages(key: 'workflow_runs' | 'artifacts', items: unknown[], total = items.length) {
+  return [{ total_count: total, [key]: items }];
+}
+
+function downloadFixture(root: string) {
+  return async (_runId: number, _artifactName: string, destination: string) => cp(join(root, 'artifact'), destination, { recursive: true });
 }
 
 function mockRun() {
@@ -75,6 +139,9 @@ function mockRun() {
       if (command === 'git rev-parse HEAD') return HEAD;
       if (command.includes('/git/ref/heads/main')) return HEAD;
       if (command.includes('/immutable-releases')) return '{"enabled":true}';
+      if (command.includes('/actions/workflows/workspace.yml')) return JSON.stringify(workflowMetadata());
+      if (command.includes(`/actions/workflows/${WORKFLOW_ID}/runs`)) return JSON.stringify(pages('workflow_runs', [runMetadata()]));
+      if (command.includes(`/actions/runs/${RUN_ID}/artifacts`)) return JSON.stringify(pages('artifacts', [artifactMetadata()]));
       if (command.startsWith('gh release list ')) return '';
       throw new Error(`Unexpected command: ${command}`);
     },
@@ -86,6 +153,37 @@ afterEach(async () => {
 });
 
 describe('selective component publication', () => {
+  test('selects the exact current successful main run artifact from actual API-shaped metadata', () => {
+    expect(selectReleaseArtifact(
+      workflowMetadata(),
+      pages('workflow_runs', [runMetadata()]),
+      pages('artifacts', [artifactMetadata()]),
+      HEAD,
+      new Date('2026-09-09T00:00:00Z'),
+    )).toEqual({ runId: RUN_ID, runAttempt: 1, artifactId: 987654321, artifactName: `component-release-verification-${RUN_ID}-1` });
+  });
+
+  test.each([
+    ['wrong repository', workflowMetadata(), [runMetadata({ repository: { id: REPOSITORY_ID, full_name: 'fork/wornpage' } })], [artifactMetadata()], 'No current main'],
+    ['wrong workflow', workflowMetadata({ path: '.github/workflows/other.yml' }), [runMetadata()], [artifactMetadata()], 'workflow path'],
+    ['wrong branch', workflowMetadata(), [runMetadata({ head_branch: 'feature' })], [artifactMetadata()], 'No current main'],
+    ['wrong event', workflowMetadata(), [runMetadata({ event: 'pull_request' })], [artifactMetadata()], 'No current main'],
+    ['wrong SHA', workflowMetadata(), [runMetadata({ head_sha: BASELINE_HEAD })], [artifactMetadata()], 'No current main'],
+    ['wrong attempt', workflowMetadata(), [runMetadata({ run_attempt: 2 })], [artifactMetadata()], 'missing component-release-verification'],
+    ['unsuccessful current attempt', workflowMetadata(), [runMetadata({ conclusion: 'failure' })], [artifactMetadata()], 'did not complete successfully'],
+    ['expired', workflowMetadata(), [runMetadata()], [artifactMetadata({ expired: true })], 'expired'],
+    ['ambiguous', workflowMetadata(), [runMetadata()], [artifactMetadata(), artifactMetadata({ id: 987654322 })], 'ambiguous'],
+    ['missing', workflowMetadata(), [runMetadata()], [], 'missing component-release-verification'],
+    ['malformed digest', workflowMetadata(), [runMetadata()], [artifactMetadata({ digest: 'sha256:nope' })], 'SHA-256 digest'],
+    ['cross-run proof', workflowMetadata(), [runMetadata()], [artifactMetadata({ workflow_run: { id: RUN_ID - 1 } })], 'provenance differs'],
+  ])('rejects %s release evidence', (_label, workflow, runs, artifacts, message) => {
+    expect(() => selectReleaseArtifact(workflow, pages('workflow_runs', runs), pages('artifacts', artifacts), HEAD, new Date('2026-09-09T00:00:00Z'))).toThrow(String(message));
+  });
+
+  test('rejects an incomplete paginated artifact inventory', () => {
+    expect(() => selectReleaseArtifact(workflowMetadata(), pages('workflow_runs', [runMetadata()]), pages('artifacts', [artifactMetadata()], 2), HEAD)).toThrow('response is incomplete');
+  });
+
   test('returns a production no-op and performs no GitHub release write when all package bytes are unchanged', async () => {
     const alpha = entry('alpha', '1.0.0', BASELINE_TAG, 'alpha-old');
     const beta = entry('beta', '1.0.0', BASELINE_TAG, 'beta-old');
@@ -100,6 +198,7 @@ describe('selective component publication', () => {
       config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG }, beta: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => baseline,
+      downloadArtifact: downloadFixture(root),
       createDraft: async () => { draftCalls += 1; return 'must not run'; },
     });
 
@@ -125,6 +224,7 @@ describe('selective component publication', () => {
       config: config({ alpha: { version: '1.1.0', releaseTag: NEXT_TAG }, beta: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => baseline,
+      downloadArtifact: downloadFixture(root),
       releaseExists: async () => false,
       createDraft: async (tag, assets) => { drafts.push({ tag, assets }); return 'draft fixture'; },
     });
@@ -153,6 +253,7 @@ describe('selective component publication', () => {
       config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG }, beta: { version: '0.1.0', releaseTag: NEXT_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => historicalBaseline([alpha]),
+      downloadArtifact: downloadFixture(root),
       releaseExists: async () => false,
       createDraft: async (tag, assets) => { drafts.push({ tag, assets }); return 'new package draft fixture'; },
     });
@@ -205,8 +306,41 @@ describe('selective component publication', () => {
       config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => historicalBaseline([alpha]),
+      downloadArtifact: downloadFixture(root),
       createDraft: async () => 'must not run',
     })).rejects.toThrow('Release asset changed after verification');
+  });
+
+  test('refuses a release artifact with a missing package archive', async () => {
+    const alpha = entry('alpha', '1.0.0', BASELINE_TAG, 'alpha-old');
+    const current = currentManifest([alpha]);
+    const root = await fixtureRoot(current, { '@wornpage/alpha': 'alpha-old' });
+    await rm(join(root, 'artifact', 'components', 'catalog', alpha.filename));
+    const boundary = mockRun();
+    await expect(prepareComponentRelease({
+      root,
+      config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
+      run: boundary.run,
+      readPublishedManifest: async () => historicalBaseline([alpha]),
+      downloadArtifact: downloadFixture(root),
+      createDraft: async () => 'must not run',
+    })).rejects.toThrow('package inventory is missing');
+  });
+
+  test('refuses malformed eight-stage verification evidence before a draft write', async () => {
+    const alpha = entry('alpha', '1.0.0', BASELINE_TAG, 'alpha-old');
+    const root = await fixtureRoot(currentManifest([alpha]), { '@wornpage/alpha': 'alpha-old' });
+    await writeFile(join(root, 'artifact', 'verify-catalog', 'latest.json'), '{not-json');
+    let draftCalls = 0;
+    await expect(prepareComponentRelease({
+      root,
+      config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
+      run: mockRun().run,
+      readPublishedManifest: async () => historicalBaseline([alpha]),
+      downloadArtifact: downloadFixture(root),
+      createDraft: async () => { draftCalls += 1; return 'must not run'; },
+    })).rejects.toThrow('malformed JSON');
+    expect(draftCalls).toBe(0);
   });
 
   test('trusts only the exact published immutable baseline release at the GitHub boundary', async () => {

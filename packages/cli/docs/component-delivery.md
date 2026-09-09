@@ -32,29 +32,31 @@ source-sync workflow have been retired.
    every unchanged package version and release tag untouched. The authored
    schema is version 2; the retired global-tag shape is rejected.
 2. Merge the reviewed source change into the default branch after verification.
-3. Run **Component release verification** from the default branch. It verifies
-   and packs all 26 packages, then uploads the whole-catalog packages and
-   per-stage evidence as an Actions artifact. This full denominator is a QA
-   contract, not the publication subset. A failed run can contain partial
-   output; its artifacts are diagnostic evidence, not a published release.
-4. The repository owner uses a clean checkout of current `main` and their local
-   GitHub CLI authentication. From the repository root, run:
+3. Wait for the successful **Wornpage workspace** run on `main`. That one CI run
+   verifies and packs all 26 packages and uploads the whole-catalog packages
+   with its eight-stage receipt. Pull requests and failed runs retain diagnostic
+   evidence only; they are never release inputs.
+4. The repository owner uses a clean checkout of that exact current `main` and
+   their local GitHub CLI authentication. From the repository root, run the one
+   draft-preparation command:
 
    ```sh
-   bun install --frozen-lockfile &&
-   bunx playwright install chromium &&
-   bun run verify:catalog &&
    bun run scripts/prepare-component-release.ts
    ```
 
-   The chain stops before draft preparation if any prerequisite fails.
-   The helper checks current `main`, a clean source tree, repository release
-   immutability, and the exact published, non-draft, immutable baseline release.
-   It compares every package version, release tag, source path, and SHA-512
-   archive digest with that baseline. A changed archive must also have a changed
-   version and release tag. The helper creates no release when all 26 packages
-   are unchanged; otherwise it creates a draft containing the full manifest and
-   only the changed archives.
+   The helper downloads the uniquely named artifact for the latest successful
+   `workspace.yml` push or explicit dispatch on that commit. It rejects wrong
+   repository, workflow, branch, event, SHA, attempt, expired or ambiguous
+   artifacts, incomplete eight-stage evidence, dirty manifests, and mismatched
+   SHA-512 archive bytes before any draft write. It also checks repository
+   release immutability and the exact published, non-draft, immutable baseline.
+   If the artifact expired, dispatch **Wornpage workspace** on current `main`,
+   wait for that same workflow to pass, and run the helper again. Do not rebuild
+   packages locally as a release fallback.
+
+   A changed archive must have a changed version and release tag. The helper
+   creates no release when all 26 packages are unchanged; otherwise it creates
+   a draft containing the full manifest and only the changed archives.
 5. Review that draft's assets, then publish it. Replace `TAG` below with the new
    tag assigned to the changed packages:
 
@@ -70,8 +72,8 @@ The immutability preflight requires
 [repository Administration read permission](https://docs.github.com/en/rest/repos/repos#check-if-immutable-releases-are-enabled-for-a-repository),
 which is unavailable to the standard
 [`GITHUB_TOKEN`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions).
-The hosted workflow therefore uses read-only repository access for verification;
-publication stays with the owner-authenticated helper. Do not bypass its
+The hosted workflow therefore uses read-only repository access; publication
+stays with the owner-authenticated helper. Do not bypass its
 immutability check or replace it with a previous release's status.
 
 Release immutability must be enabled. Publishing locks the assets and tag. The
