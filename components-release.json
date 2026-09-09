@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "baselineReleaseTag": "components-2026.09.09",
+  "baselineReleaseTag": "components-2026.09.09.1",
   "packages": {
     "alert": { "version": "0.1.2", "releaseTag": "components-2026.09.09" },
     "async-states": { "version": "0.1.5", "releaseTag": "components-2026.09.09" },
