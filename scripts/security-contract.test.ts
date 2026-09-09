@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { COMPONENT_NAMES } from "./components.ts";
 
 const workflow = readFileSync(new URL("../.github/workflows/workspace.yml", import.meta.url), "utf8");
@@ -20,11 +21,34 @@ function assertChromeSourceGuardBeforeInstall(source: string) {
 	expect(installIndex).toBeGreaterThan(guardIndex);
 	const guard = source.slice(guardIndex, installIndex);
 	expect(guard).toContain("for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources");
-	expect(guard).toContain('mv "$source" "$source.disabled"');
-	expect(guard).toContain("grep -RIl --include='*.list' --include='*.sources'");
-	expect(guard).toContain('if [[ -n "$active_chrome_sources" ]]; then');
+	expect(guard).toContain('sudo mv -- "$source" "$source.disabled"');
+	expect(guard).toContain('if [[ -e "$source.disabled" ]]; then');
 	expect(guard).toContain("exit 1");
+	expect(guard).not.toContain("grep -R");
 	expect(source).not.toMatch(unsafeAptFlag);
+}
+
+function chromeSourceGuard(source: string) {
+	const parsed = Bun.YAML.parse(source) as { jobs: Record<string, { steps: Array<{ name?: string; run?: string }> }> };
+	const guard = Object.values(parsed.jobs).flatMap((job) => job.steps).find((step) => step.name === "Disable unused Google Chrome APT sources")?.run;
+	expect(guard).toBeDefined();
+	return guard!.replaceAll("/etc/apt/sources.list.d", "$fixture_sources");
+}
+
+function runChromeSourceGuard(source: string, fixture: string, assertion = "") {
+	const script = `
+set -euo pipefail
+sudo() { "$@"; }
+fixture_root="/tmp/wornpage-chrome-apt-$$"
+mkdir -p "$fixture_root"
+trap 'rm -rf "$fixture_root"' EXIT
+fixture_sources="$fixture_root/etc/apt/sources.list.d"
+mkdir -p "$fixture_sources"
+${fixture}
+${chromeSourceGuard(source)}
+${assertion}
+`;
+	return spawnSync("bash", ["-c", `echo ${Buffer.from(script).toString("base64")} | base64 -d | bash`], { encoding: "utf8" });
 }
 
 describe("repository security contract", () => {
@@ -43,6 +67,29 @@ describe("repository security contract", () => {
 	it("guards Chromium installation from only the unused Google Chrome APT source", () => {
 		assertChromeSourceGuardBeforeInstall(workflow);
 		assertChromeSourceGuardBeforeInstall(releaseWorkflow);
+		expect(chromeSourceGuard(workflow)).toBe(chromeSourceGuard(releaseWorkflow));
+	});
+
+	it("moves only known Chrome sources and fails before overwriting a backup", () => {
+		const moved = runChromeSourceGuard(workflow, `
+printf 'active\\n' > "$fixture_sources/google-chrome.list"
+printf 'active\\n' > "$fixture_sources/google-chrome.sources"
+printf 'unrelated\\n' > "$fixture_sources/unrelated.sources"
+`, `
+test ! -e "$fixture_sources/google-chrome.list"
+test -f "$fixture_sources/google-chrome.list.disabled"
+test ! -e "$fixture_sources/google-chrome.sources"
+test -f "$fixture_sources/google-chrome.sources.disabled"
+test -f "$fixture_sources/unrelated.sources"
+`);
+		expect(moved.status).toBe(0);
+
+		const absent = runChromeSourceGuard(workflow, "printf 'unrelated\\n' > \"$fixture_sources/unrelated.list\"", "test -f \"$fixture_sources/unrelated.list\"");
+		expect(absent.status).toBe(0);
+
+		const collision = runChromeSourceGuard(workflow, "printf 'active\\n' > \"$fixture_sources/google-chrome.list\"; printf 'backup\\n' > \"$fixture_sources/google-chrome.list.disabled\"");
+		expect(collision.status).not.toBe(0);
+		expect(collision.stdout).toContain("Refusing to overwrite disabled APT source");
 	});
 
 	it("keeps hosted release verification read-only and retains failure evidence", () => {

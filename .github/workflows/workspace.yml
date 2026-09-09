@@ -40,15 +40,13 @@ jobs:
           set -euo pipefail
           for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
             if [[ -f "$source" ]]; then
-              mv "$source" "$source.disabled"
+              if [[ -e "$source.disabled" ]]; then
+                echo "Refusing to overwrite disabled APT source: $source.disabled"
+                exit 1
+              fi
+              sudo mv -- "$source" "$source.disabled"
             fi
           done
-          active_chrome_sources="$(grep -RIl --include='*.list' --include='*.sources' -E '(^|[^[:alnum:]])(dl\.google\.com/linux/chrome|google-chrome)([^[:alnum:]]|$)' /etc/apt/sources.list.d /etc/apt/sources.list 2>/dev/null || true)"
-          if [[ -n "$active_chrome_sources" ]]; then
-            echo "Unexpected active Google Chrome APT source(s):"
-            printf '%s\n' "$active_chrome_sources"
-            exit 1
-          fi
 
       - name: Install catalog Chromium
         run: bunx playwright install --with-deps chromium
