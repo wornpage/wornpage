@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { afterEach, describe, expect, test } from 'bun:test';
+import { existsSync } from 'node:fs';
 import { cp, mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -124,8 +125,11 @@ function pages(key: 'workflow_runs' | 'artifacts', items: unknown[], total = ite
   return [{ total_count: total, [key]: items }];
 }
 
-function downloadFixture(root: string) {
-  return async (_runId: number, _artifactName: string, destination: string) => cp(join(root, 'artifact'), destination, { recursive: true });
+function downloadFixture(root: string, destinations: string[] = []) {
+  return async (_runId: number, _artifactName: string, destination: string) => {
+    destinations.push(destination);
+    await cp(join(root, 'artifact'), destination, { recursive: true });
+  };
 }
 
 function mockRun() {
@@ -184,6 +188,17 @@ describe('selective component publication', () => {
     expect(() => selectReleaseArtifact(workflowMetadata(), pages('workflow_runs', [runMetadata()]), pages('artifacts', [artifactMetadata()], 2), HEAD)).toThrow('response is incomplete');
   });
 
+  test('rejects the newest matching completed run when it failed instead of falling back to an older success', () => {
+    const olderSuccess = runMetadata({ id: RUN_ID - 1 });
+    const newerFailure = runMetadata({ conclusion: 'failure' });
+    expect(() => selectReleaseArtifact(
+      workflowMetadata(),
+      pages('workflow_runs', [olderSuccess, newerFailure]),
+      pages('artifacts', [artifactMetadata()]),
+      HEAD,
+    )).toThrow('current main workspace run did not complete successfully');
+  });
+
   test('returns a production no-op and performs no GitHub release write when all package bytes are unchanged', async () => {
     const alpha = entry('alpha', '1.0.0', BASELINE_TAG, 'alpha-old');
     const beta = entry('beta', '1.0.0', BASELINE_TAG, 'beta-old');
@@ -191,6 +206,7 @@ describe('selective component publication', () => {
     const baseline = historicalBaseline([alpha, beta]);
     const root = await fixtureRoot(current, { '@wornpage/alpha': 'alpha-old', '@wornpage/beta': 'beta-old' });
     const boundary = mockRun();
+    const downloadDirectories: string[] = [];
     let draftCalls = 0;
 
     const result = await prepareComponentRelease({
@@ -198,7 +214,7 @@ describe('selective component publication', () => {
       config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG }, beta: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => baseline,
-      downloadArtifact: downloadFixture(root),
+      downloadArtifact: downloadFixture(root, downloadDirectories),
       createDraft: async () => { draftCalls += 1; return 'must not run'; },
     });
 
@@ -206,6 +222,8 @@ describe('selective component publication', () => {
     expect(result.assets).toEqual([]);
     expect(draftCalls).toBe(0);
     expect(boundary.commands.some((args) => args.join(' ').includes(`/releases/tags/${NEXT_TAG}`))).toBe(false);
+    expect(downloadDirectories).toHaveLength(1);
+    expect(existsSync(downloadDirectories[0])).toBe(false);
   });
 
   test('uploads only one changed archive plus the full manifest and preserves the unchanged identity', async () => {
@@ -218,13 +236,14 @@ describe('selective component publication', () => {
     const root = await fixtureRoot(current, { '@wornpage/alpha': 'alpha-new', '@wornpage/beta': 'beta-old' });
     const boundary = mockRun();
     const drafts: { tag: string; assets: string[] }[] = [];
+    const downloadDirectories: string[] = [];
 
     const result = await prepareComponentRelease({
       root,
       config: config({ alpha: { version: '1.1.0', releaseTag: NEXT_TAG }, beta: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => baseline,
-      downloadArtifact: downloadFixture(root),
+      downloadArtifact: downloadFixture(root, downloadDirectories),
       releaseExists: async () => false,
       createDraft: async (tag, assets) => { drafts.push({ tag, assets }); return 'draft fixture'; },
     });
@@ -238,6 +257,8 @@ describe('selective component publication', () => {
       'component-manifest.json',
       'wornpage-alpha-1.1.0.tgz',
     ]);
+    expect(downloadDirectories).toHaveLength(1);
+    expect(existsSync(downloadDirectories[0])).toBe(false);
   });
 
   test('selects a genuinely new package absent from the published baseline', async () => {
@@ -301,14 +322,17 @@ describe('selective component publication', () => {
     const current = currentManifest([alpha]);
     const root = await fixtureRoot(current, { '@wornpage/alpha': 'tampered-after-pack' });
     const boundary = mockRun();
+    const downloadDirectories: string[] = [];
     await expect(prepareComponentRelease({
       root,
       config: config({ alpha: { version: '1.0.0', releaseTag: BASELINE_TAG } }),
       run: boundary.run,
       readPublishedManifest: async () => historicalBaseline([alpha]),
-      downloadArtifact: downloadFixture(root),
+      downloadArtifact: downloadFixture(root, downloadDirectories),
       createDraft: async () => 'must not run',
     })).rejects.toThrow('Release asset changed after verification');
+    expect(downloadDirectories).toHaveLength(1);
+    expect(existsSync(downloadDirectories[0])).toBe(false);
   });
 
   test('refuses a release artifact with a missing package archive', async () => {

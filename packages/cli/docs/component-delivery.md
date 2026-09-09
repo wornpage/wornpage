@@ -44,8 +44,9 @@ source-sync workflow have been retired.
    bun run scripts/prepare-component-release.ts
    ```
 
-   The helper downloads the uniquely named artifact for the latest successful
-   `workspace.yml` push or explicit dispatch on that commit. It rejects wrong
+   The helper selects the latest matching completed `workspace.yml` push or
+   explicit dispatch on that commit, requires it to be successful, and downloads
+   its uniquely named artifact. It rejects wrong
    repository, workflow, branch, event, SHA, attempt, expired or ambiguous
    artifacts, incomplete eight-stage evidence, dirty manifests, and mismatched
    SHA-512 archive bytes before any draft write. It also checks repository
