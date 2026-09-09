@@ -172,15 +172,15 @@
   <main class="demo-main">
     <header class="demo-header">
       <div>
-        <h1>Wornpage</h1>
-        <p>{DEMO_CATALOG.length} components and supporting packages, one interface library.</p>
+        <h1>Svelte component library</h1>
+        <p>{DEMO_CATALOG.length} components and supporting packages from Wornpage, the technical publisher and namespace.</p>
       </div>
       <div class="header-actions">
         <Button onclick={openPalette}>Search catalog</Button>
         <Theme bind:theme={currentTheme} />
         <a href="https://github.com/wornpage/wornpage/blob/main/docs/getting-started.md" class="repo-link guide-link">Setup guide</a>
         <a href="https://github.com/wornpage/wornpage" class="repo-link">GitHub</a>
-        <a href="https://projects-webmcp-extension.pages.dev/webmcp-challenge" class="repo-link release-link">Projects release</a>
+        <a href="https://projects-webmcp-extension.pages.dev/webmcp-challenge" class="repo-link release-link">WebMCP challenge demo</a>
       </div>
       <div class="catalog-jump">
         <label for="catalog-jump">Jump to component</label>
