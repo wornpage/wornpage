@@ -13,7 +13,7 @@ emit telemetry, or represent local example state as a persisted save.
 | Component-specific theme controls | `demo/src/App.svelte` | Maps Theme's live `--wrn-theme-*` consumer variables to semantic host tokens. |
 | Published source metadata | `components-release.json` through `scripts/components.ts` and `demo/src/sections.ts` | Every package's canonical source path, archive, sample import, and internal-peer install command use that package's explicit immutable release identity. |
 | Example state | `demo/src/ComponentExample.svelte` | Local models expose outcomes, reset paths, and applicable disabled, loading, empty, error, undo, and redo states. |
-| Rendered verification | `scripts/catalog-browser-check.mjs` | Tests the built output and writes ignored evidence under `output/playwright/catalog/`. |
+| Rendered verification | Root `test:catalog:browser` command | Runs three rendered-readiness regressions before the built-output catalog matrix; the matrix writes ignored evidence under `output/playwright/catalog/`. |
 | Toast focus regression | `scripts/toast-focus-browser-check.mjs` | Exercises actual Toast controls, native modal focus boundaries, and open shadow hosts before the catalog build. |
 | Verification orchestration | `scripts/verify-catalog.mjs` | Runs workspace, delivery, Theme consumer types, Bun tests, component packaging, Toast focus regression, catalog build, and browser stages exactly once in that order; preserves per-stage logs and failure status under `output/verify-catalog/`. |
 
@@ -59,6 +59,14 @@ Compact sections use 24px/28px padding and an 18px heading gap. Safe-area paddin
 part of the mobile contract.
 
 ## Verification denominators
+
+The catalog browser stage first runs three rendered-readiness regressions: a
+moving overlay must settle fully inside the viewport at opacity 1, while the
+out-of-bounds and nonopaque fixtures must fail with their exact measurements.
+Only after those regressions pass does the command run the built catalog
+matrix. These three regressions share one browser stage with that matrix; they
+do not increase the eight-stage verification denominator or the 16-cell matrix
+denominator.
 
 The Toast focus regression is a separate 72-case Chromium check of the actual
 Svelte component and built custom element. It covers native dialogs, open shadow
