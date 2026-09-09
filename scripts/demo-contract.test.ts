@@ -8,6 +8,7 @@ const demoIndexSource = readFileSync(new URL('../demo/index.html', import.meta.u
 const exampleSource = readFileSync(new URL('../demo/src/ComponentExample.svelte', import.meta.url), 'utf8');
 const viteSource = readFileSync(new URL('../demo/vite.config.ts', import.meta.url), 'utf8');
 const browserCheckSource = readFileSync(new URL('./catalog-browser-check.mjs', import.meta.url), 'utf8');
+const renderedReadinessSource = readFileSync(new URL('./catalog-rendered-readiness.mjs', import.meta.url), 'utf8');
 const browserOutputSource = readFileSync(new URL('./catalog-browser-output.mjs', import.meta.url), 'utf8');
 const catalogVerifierSource = readFileSync(new URL('./verify-catalog.mjs', import.meta.url), 'utf8');
 const rootPackage = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
@@ -136,7 +137,7 @@ describe('aggregate demo contract', () => {
 
   test('runs the durable rendered catalog matrix from the fixed verification gate', () => {
     expect(rootPackage.devDependencies.playwright).toBe('1.62.0');
-    expect(rootPackage.scripts['test:catalog:browser']).toBe('node scripts/catalog-browser-check.mjs');
+    expect(rootPackage.scripts['test:catalog:browser']).toBe('node --test scripts/catalog-rendered-readiness-browser.mjs && node scripts/catalog-browser-check.mjs');
     expect(rootPackage.scripts['verify:catalog']).toBe('node scripts/verify-catalog.mjs');
     for (const command of ['bun run check:workspace', 'bun run check:components', 'bun test', 'bun run pack:components', 'bun run build', 'bun run test:catalog:browser']) {
       expect(catalogVerifierSource).toContain(`command: '${command}'`);
@@ -146,6 +147,11 @@ describe('aggregate demo contract', () => {
     expect(browserCheckSource).toContain('distinctPaletteSignaturesPerViewport');
     expect(browserCheckSource).toContain('assertPaletteCancellationNavigation(browser, reducedMotion, iterations = 20)');
     expect(browserCheckSource).toContain('40/40 cancellation-to-navigation focus ordering checks passed');
+    expect(browserCheckSource).toContain('observeRenderedReadiness(drawer)');
+    expect(browserCheckSource).toContain('-drawer-readiness-failure.json');
+    expect(browserCheckSource).toContain('-drawer-readiness-failure.png');
+    expect(renderedReadinessSource).toContain('requestAnimationFrame(resolve)');
+    expect(renderedReadinessSource).toContain('consecutiveStableFrames >= options.stableFrames');
     expect(browserCheckSource).toContain("pendingDeviceCoverage: ['current iOS Safari', 'installed iOS PWA standalone']");
   });
 
