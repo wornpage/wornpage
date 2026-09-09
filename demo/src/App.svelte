@@ -262,7 +262,7 @@
   .repo-link:hover { background: var(--worn-hover-bg); }
   .repo-link:focus-visible { outline: 2px dashed var(--worn-focus); outline-offset: 2px; }
   .release-link { background: var(--worn-accent); border-color: var(--worn-accent); color: var(--worn-accent-text); font-weight: 700; }
-  .release-link:hover { filter: brightness(.92); }
+  .release-link:hover { background: var(--worn-accent); color: var(--worn-accent-text); }
   @media (pointer: coarse) {
     .repo-link { min-height: 44px; }
   }
@@ -310,8 +310,5 @@
     .demo-main { padding-inline: 10px; }
     .header-actions { align-items: stretch; flex-direction: column; }
     .header-actions > :global(*) { max-width: 100%; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .release-link:hover { filter: none; }
   }
 </style>
