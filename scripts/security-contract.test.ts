@@ -1,6 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { COMPONENT_NAMES } from "./components.ts";
 
 const workflow = readFileSync(new URL("../.github/workflows/workspace.yml", import.meta.url), "utf8");
@@ -35,20 +37,35 @@ function chromeSourceGuard(source: string) {
 	return guard!.replaceAll("/etc/apt/sources.list.d", "$fixture_sources");
 }
 
+function nativeBash() {
+	if (process.platform !== "win32") return "bash";
+
+	const gitExecPath = spawnSync("git", ["--exec-path"], { encoding: "utf8", timeout: 5_000 });
+	if (gitExecPath.status !== 0) throw new Error(`git --exec-path failed: ${gitExecPath.stderr}`);
+	const bash = resolve(gitExecPath.stdout.trim(), "../../../bin/bash.exe");
+	if (!existsSync(bash)) throw new Error(`Git for Windows Bash not found at ${bash}`);
+	return bash;
+}
+
 function runChromeSourceGuard(source: string, fixture: string, assertion = "") {
+	const fixtureRoot = mkdtempSync(join(tmpdir(), "wornpage-chrome-apt-"));
+	const fixtureSources = join(fixtureRoot, "etc/apt/sources.list.d").replaceAll("\\", "/");
+	const scriptPath = join(fixtureRoot, "guard-fixture.sh");
 	const script = `
 set -euo pipefail
 sudo() { "$@"; }
-fixture_root="/tmp/wornpage-chrome-apt-$$"
-mkdir -p "$fixture_root"
-trap 'rm -rf "$fixture_root"' EXIT
-fixture_sources="$fixture_root/etc/apt/sources.list.d"
+fixture_sources='${fixtureSources.replaceAll("'", "'\\''")}'
 mkdir -p "$fixture_sources"
 ${fixture}
 ${chromeSourceGuard(source)}
 ${assertion}
 `;
-	return spawnSync("wsl.exe", ["--exec", "sh", "-c", `printf '%s' ${Buffer.from(script).toString("base64")} | base64 -d | bash -s`], { encoding: "utf8", timeout: 5_000 });
+	writeFileSync(scriptPath, script.replaceAll("\r\n", "\n"), "utf8");
+	try {
+		return spawnSync(nativeBash(), [scriptPath.replaceAll("\\", "/")], { encoding: "utf8", timeout: 5_000 });
+	} finally {
+		rmSync(fixtureRoot, { recursive: true, force: true });
+	}
 }
 
 describe("repository security contract", () => {
