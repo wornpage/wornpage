@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { COMPONENT_NAMES, COMPONENT_RELEASE_TAG, COMPONENT_VERSIONS } from './components.ts';
+import { COMPONENT_NAMES, COMPONENT_RELEASES } from './components.ts';
 import { inspectPackage } from '../packages/cli/src/commands/verify.ts';
+
+export const COMPONENT_PACK_OUTPUT = join('output', 'components', 'catalog');
 
 async function run(args: string[], cwd: string): Promise<string> {
   const child = Bun.spawn(args, { cwd, stdout: 'pipe', stderr: 'pipe' });
@@ -26,10 +28,7 @@ export function validatePackedEntries(files: string[], required: string[]) {
 }
 
 export async function packComponents(root = resolve(import.meta.dir, '..')) {
-  if (!/^components-\d{4}\.\d{2}\.\d{2}(?:\.\d+)?$/u.test(COMPONENT_RELEASE_TAG)) {
-    throw new Error('components-release.json must declare an explicit dated release tag.');
-  }
-  const output = join(root, 'output', 'components', COMPONENT_RELEASE_TAG);
+  const output = join(root, COMPONENT_PACK_OUTPUT);
   await mkdir(output, { recursive: true });
   const sourceCommit = await run(['git', 'rev-parse', 'HEAD'], root);
   const packages = [];
@@ -37,7 +36,8 @@ export async function packComponents(root = resolve(import.meta.dir, '..')) {
     const directory = join(root, 'packages', name);
     const contract = await inspectPackage(directory);
     const pkg = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8'));
-    if (pkg.name !== `@wornpage/${name}` || pkg.version !== COMPONENT_VERSIONS[name]) {
+    const identity = COMPONENT_RELEASES[name];
+    if (pkg.name !== `@wornpage/${name}` || pkg.version !== identity.version) {
       throw new Error(`Release metadata differs from the package manifest for ${name}.`);
     }
     if (contract.mode === 'bundle') await run([process.execPath, 'run', 'build'], directory);
@@ -53,11 +53,11 @@ export async function packComponents(root = resolve(import.meta.dir, '..')) {
     const bytes = await readFile(join(output, filename));
     const integrity = `sha512-${createHash('sha512').update(bytes).digest('base64')}`;
     if (integrity !== archive.integrity) throw new Error(`npm pack integrity differs for ${name}.`);
-    packages.push({ name: pkg.name, version: pkg.version, filename, integrity, source: `packages/${name}`, delivery: pkg.wornpage.delivery });
+    packages.push({ name: pkg.name, version: pkg.version, releaseTag: identity.releaseTag, filename, integrity, source: `packages/${name}`, delivery: pkg.wornpage.delivery });
     console.log(`Packed ${pkg.name}@${pkg.version}`);
   }
   const sourceTreeClean = (await run(['git', 'status', '--porcelain', '--untracked-files=normal'], root)) === '';
-  const manifest = { schemaVersion: 1, tag: COMPONENT_RELEASE_TAG, sourceCommit, sourceTreeClean, packages };
+  const manifest = { schemaVersion: 2, sourceCommit, sourceTreeClean, packages };
   await writeFile(join(output, 'component-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`Packed ${packages.length} components in ${output}; source tree ${sourceTreeClean ? 'clean' : 'has unpublished changes'}.`);
   return manifest;

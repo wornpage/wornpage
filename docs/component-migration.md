@@ -6,8 +6,9 @@ standalone repositories are historical sources. Their final imported revisions
 are recorded in [standalone-provenance.json](standalone-provenance.json).
 
 The generated mirror and its scheduled fetch workflow have been removed.
-Package changes are reviewed here and released together as immutable GitHub
-release assets. No current build fetches package source from the old repositories.
+Package changes are reviewed here and published selectively as immutable GitHub
+release assets; unchanged packages retain their existing release URLs. No current
+build fetches package source from the old repositories.
 
 ## Compatibility retained
 

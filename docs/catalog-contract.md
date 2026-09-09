@@ -11,7 +11,7 @@ emit telemetry, or represent local example state as a persisted save.
 | Theme preference and System resolution | `@wornpage/theme` `Theme` | Persists only valid choices in `wrn-theme`; System follows the operating-system color scheme. |
 | Host palette | `demo/index.html` | Defines the complete semantic `--worn-*` palette for all eight named themes. Shell and component examples consume the same tokens. |
 | Component-specific theme controls | `demo/src/App.svelte` | Maps Theme's live `--wrn-theme-*` consumer variables to semantic host tokens. |
-| Published source metadata | `components-release.json` through `scripts/components.ts` and `demo/src/sections.ts` | Canonical source path, named immutable release, package archive, and sample import share one release manifest. |
+| Published source metadata | `components-release.json` through `scripts/components.ts` and `demo/src/sections.ts` | Every package's canonical source path, archive, sample import, and internal-peer install command use that package's explicit immutable release identity. |
 | Example state | `demo/src/ComponentExample.svelte` | Local models expose outcomes, reset paths, and applicable disabled, loading, empty, error, undo, and redo states. |
 | Rendered verification | `scripts/catalog-browser-check.mjs` | Tests the built output and writes ignored evidence under `output/playwright/catalog/`. |
 | Toast focus regression | `scripts/toast-focus-browser-check.mjs` | Exercises actual Toast controls, native modal focus boundaries, and open shadow hosts before the catalog build. |
