@@ -6,7 +6,6 @@ import { join, resolve } from "node:path";
 import { COMPONENT_NAMES } from "./components.ts";
 
 const workflow = readFileSync(new URL("../.github/workflows/workspace.yml", import.meta.url), "utf8");
-const releaseWorkflow = readFileSync(new URL("../.github/workflows/component-release.yml", import.meta.url), "utf8");
 const rootLicense = readFileSync(new URL("../LICENSE", import.meta.url), "utf8");
 const publicInstructions = [
 	readFileSync(new URL("../README.md", import.meta.url), "utf8"),
@@ -76,15 +75,13 @@ describe("repository security contract", () => {
 	});
 
 	it("pins every third-party action to a full commit", () => {
-		const references = [...`${workflow}\n${releaseWorkflow}`.matchAll(/^\s*uses:\s*([^\s#]+)/gmu)].map((match) => match[1]);
+		const references = [...workflow.matchAll(/^\s*uses:\s*([^\s#]+)/gmu)].map((match) => match[1]);
 		expect(references.length).toBeGreaterThan(0);
 		expect(references.every((reference) => /@[0-9a-f]{40}$/u.test(reference))).toBe(true);
 	});
 
 	it("guards Chromium installation from only the unused Google Chrome APT source", () => {
 		assertChromeSourceGuardBeforeInstall(workflow);
-		assertChromeSourceGuardBeforeInstall(releaseWorkflow);
-		expect(chromeSourceGuard(workflow)).toBe(chromeSourceGuard(releaseWorkflow));
 	});
 
 	it("moves only known Chrome sources and fails before overwriting a backup", () => {
@@ -109,10 +106,10 @@ test -f "$fixture_sources/unrelated.sources"
 		expect(collision.stdout).toContain("Refusing to overwrite disabled APT source");
 	}, 20_000);
 
-	it("keeps hosted release verification read-only and retains failure evidence", () => {
-		const parsed = Bun.YAML.parse(releaseWorkflow) as {
+	it("keeps the one hosted release producer read-only and retains diagnostic evidence", () => {
+		const parsed = Bun.YAML.parse(workflow) as {
 			permissions: Record<string, string>;
-			jobs: Record<string, { permissions?: Record<string, string>; steps: Array<{ run?: string; uses?: string; if?: string; with?: { path?: string } }> }>;
+			jobs: Record<string, { permissions?: Record<string, string>; steps: Array<{ name?: string; run?: string; uses?: string; if?: string; with?: { name?: string; path?: string; "if-no-files-found"?: string } }> }>;
 		};
 		expect(parsed.permissions).toEqual({ contents: "read" });
 		for (const job of Object.values(parsed.jobs)) {
@@ -122,11 +119,22 @@ test -f "$fixture_sources/unrelated.sources"
 		const commands = steps.map((step) => step.run ?? "").join("\n");
 		expect(commands).toContain("bun run verify:catalog");
 		expect(commands).not.toMatch(/prepare-component-release|gh\s+release/u);
-		const uploads = steps.filter((step) => step.uses?.startsWith("actions/upload-artifact@"));
-		expect(uploads).toHaveLength(1);
-		expect(uploads[0].if).toBe("always()");
-		expect(uploads[0].with?.path).toContain("output/components/");
-		expect(uploads[0].with?.path).toContain("output/verify-catalog/");
+		const releaseUpload = steps.find((step) => step.name === "Upload release packages and verification evidence");
+		expect(releaseUpload?.if).toContain("success()");
+		expect(releaseUpload?.if).toContain("github.ref == 'refs/heads/main'");
+		expect(releaseUpload?.if).toContain("github.event_name == 'push'");
+		expect(releaseUpload?.if).toContain("github.event_name == 'workflow_dispatch'");
+		expect(releaseUpload?.with?.name).toBe("component-release-verification-${{ github.run_id }}-${{ github.run_attempt }}");
+		expect(releaseUpload?.with?.path).toContain("output/components/");
+		expect(releaseUpload?.with?.path).toContain("output/verify-catalog/");
+		expect(releaseUpload?.with?.["if-no-files-found"]).toBe("error");
+
+		const diagnosticUpload = steps.find((step) => step.name === "Upload diagnostic verification evidence");
+		expect(diagnosticUpload?.if).toContain("always()");
+		expect(diagnosticUpload?.if).toContain("job.status == 'success'");
+		expect(diagnosticUpload?.with?.path).toBe("output/verify-catalog/");
+		expect(diagnosticUpload?.with?.name).toBe("catalog-verification-${{ github.run_id }}-${{ github.run_attempt }}");
+		expect(workflow).not.toContain("Component release verification");
 	});
 
 	it("does not advertise the unavailable registry as an installation path", () => {

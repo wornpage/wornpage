@@ -7,7 +7,7 @@ development tools. Edit the owning source directly here.
 | --- | --- |
 | Component behavior | `packages/<name>/src/` and its tests |
 | Catalog examples and navigation | `demo/` |
-| Component release verification | `packages/cli/` and `scripts/pack-components.ts` |
+| Component release preparation | `scripts/prepare-component-release.ts` |
 | Development tools | `tools/` |
 
 ## Verification
@@ -47,8 +47,8 @@ to npm.
 
 For each changed package, update its version and give it the same new dated
 `releaseTag` in `components-release.json`; leave unchanged package identities alone.
-Submit and merge the change here after verification. The **Component release
-verification** workflow verifies and packs the whole catalog and uploads QA evidence.
+Submit and merge the change here after verification. The successful **Wornpage
+workspace** run on `main` verifies and packs the whole catalog and uploads QA evidence.
 The owner prepares a draft from a clean checkout of current `main`, using their local
 GitHub authentication and the existing `scripts/prepare-component-release.ts`
 helper. The helper compares the full package inventory and byte hashes against the
