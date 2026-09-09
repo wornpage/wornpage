@@ -25,6 +25,20 @@ jobs:
         with:
           node-version: 24.18.0
       - run: bun install --frozen-lockfile
+      - name: Disable unused Google Chrome APT sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
+            if [[ -f "$source" ]]; then
+              if [[ -e "$source.disabled" ]]; then
+                echo "Refusing to overwrite disabled APT source: $source.disabled"
+                exit 1
+              fi
+              sudo mv -- "$source" "$source.disabled"
+            fi
+          done
+
       - run: bunx playwright install --with-deps chromium
       - run: bun run verify:catalog
       - name: Upload full-catalog packages and verification evidence

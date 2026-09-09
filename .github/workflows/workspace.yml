@@ -36,6 +36,20 @@ jobs:
       - name: Install workspace dependencies
         run: bun install --frozen-lockfile
 
+      - name: Disable unused Google Chrome APT sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
+            if [[ -f "$source" ]]; then
+              if [[ -e "$source.disabled" ]]; then
+                echo "Refusing to overwrite disabled APT source: $source.disabled"
+                exit 1
+              fi
+              sudo mv -- "$source" "$source.disabled"
+            fi
+          done
+
       - name: Install catalog Chromium
         run: bunx playwright install --with-deps chromium
 
