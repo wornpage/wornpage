@@ -27,12 +27,16 @@ source-sync workflow have been retired.
 
 ## Publish
 
-1. Set package versions and a new dated tag in `components-release.json`.
+1. For each changed package, bump its package version and set that package's
+   `releaseTag` in `components-release.json` to one shared new dated tag. Leave
+   every unchanged package version and release tag untouched. The authored
+   schema is version 2; the retired global-tag shape is rejected.
 2. Merge the reviewed source change into the default branch after verification.
 3. Run **Component release verification** from the default branch. It verifies
-   and packs the workspace, then uploads archives and per-stage evidence as an
-   Actions artifact. A failed run can contain partial output; its artifacts are
-   diagnostic evidence, not a published release.
+   and packs all 26 packages, then uploads the whole-catalog packages and
+   per-stage evidence as an Actions artifact. This full denominator is a QA
+   contract, not the publication subset. A failed run can contain partial
+   output; its artifacts are diagnostic evidence, not a published release.
 4. The repository owner uses a clean checkout of current `main` and their local
    GitHub CLI authentication. From the repository root, run:
 
@@ -44,15 +48,23 @@ source-sync workflow have been retired.
    ```
 
    The chain stops before draft preparation if any prerequisite fails.
-   The existing helper checks current `main`, a clean source tree, enabled
-   release immutability, and the manifest's package inventory and integrity
-   before creating a draft with the archives and `component-manifest.json`.
-5. Review that draft's assets, then publish it. Replace `TAG` below with the
-   tag declared in `components-release.json`:
+   The helper checks current `main`, a clean source tree, repository release
+   immutability, and the exact published, non-draft, immutable baseline release.
+   It compares every package version, release tag, source path, and SHA-512
+   archive digest with that baseline. A changed archive must also have a changed
+   version and release tag. The helper creates no release when all 26 packages
+   are unchanged; otherwise it creates a draft containing the full manifest and
+   only the changed archives.
+5. Review that draft's assets, then publish it. Replace `TAG` below with the new
+   tag assigned to the changed packages:
 
    ```sh
    gh release edit TAG --repo wornpage/wornpage --draft=false
    ```
+6. In a follow-up reviewed change, set `baselineReleaseTag` to the newly
+   published tag. That release's schema-2 manifest is the next full-catalog
+   comparison checkpoint even though unchanged package entries continue to
+   name their older immutable release tags. Do not rewrite those entries.
 
 The immutability preflight requires
 [repository Administration read permission](https://docs.github.com/en/rest/repos/repos#check-if-immutable-releases-are-enabled-for-a-repository),
@@ -63,9 +75,14 @@ publication stays with the owner-authenticated helper. Do not bypass its
 immutability check or replace it with a previous release's status.
 
 Release immutability must be enabled. Publishing locks the assets and tag. The
-manifest records each package version, SHA-512 integrity, and the source commit;
-draft preparation rejects a dirty source tree or mismatched artifact. A release is
-never overwritten. Use a new tag for the next release.
+manifest records each package version, release tag, source path, SHA-512
+integrity, and the clean build commit. The top-level commit identifies the
+verified full-catalog build; an unchanged package's own `releaseTag` remains its
+published source and archive provenance. Draft preparation rejects a dirty tree,
+mismatched source metadata, reused tag, or mismatched artifact. Historical
+published schema-1 manifests remain readable as immutable baselines, but new
+authored configuration and generated manifests use schema 2. A release is never
+overwritten.
 
 ## Consume
 

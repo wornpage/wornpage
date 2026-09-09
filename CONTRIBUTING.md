@@ -38,20 +38,23 @@ documented keyboard, focus, containment, and reduced-motion behavior.
 
 ## Adding a component
 
-Run `bun run new <name>` from this root. Add the package version to
-`components-release.json`, add a catalog entry and example, and run the full gate
+Run `bun run new <name>` from this root. Add the package's explicit version and
+release tag to `components-release.json`, add a catalog entry and example, and run the full gate
 before opening a PR. The CLI does not create standalone repositories or publish
 to npm.
 
 ## Releases
 
-Update package versions and the dated release tag in `components-release.json`.
+For each changed package, update its version and give it the same new dated
+`releaseTag` in `components-release.json`; leave unchanged package identities alone.
 Submit and merge the change here after verification. The **Component release
-verification** workflow verifies and packs that source and uploads evidence.
+verification** workflow verifies and packs the whole catalog and uploads QA evidence.
 The owner prepares a draft from a clean checkout of current `main`, using their local
 GitHub authentication and the existing `scripts/prepare-component-release.ts`
-helper, then reviews and publishes that draft. Follow the commands and permission
-requirements in [component delivery](packages/cli/docs/component-delivery.md#publish).
+helper. The helper compares the full package inventory and byte hashes against the
+published baseline, then uploads only changed archives; an unchanged catalog exits
+without creating a draft. Follow the commands and permission requirements in
+[component delivery](packages/cli/docs/component-delivery.md#publish).
 Consumer applications deliberately update to the published archive and its
 lockfile integrity.
 

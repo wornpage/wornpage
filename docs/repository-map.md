@@ -10,7 +10,8 @@
 ## Components
 
 All 26 component and supporting packages are developed here. Package names and
-versions are explicit in [`components-release.json`](../components-release.json).
+versions and immutable per-package release tags are explicit in
+[`components-release.json`](../components-release.json).
 Use the [setup guide](getting-started.md) to install immutable release archives,
 and [CONTRIBUTING.md](../CONTRIBUTING.md) to change the library.
 

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { catalogOutputDirectory, prepareCatalogOutput } from './catalog-browser-output.mjs';
 import { observePreviewStartup, waitForPreview } from './catalog-preview-readiness.mjs';
-import { COMPONENT_NAMES, COMPONENT_RELEASE_TAG } from './components.ts';
+import { COMPONENT_NAMES, COMPONENT_RELEASE_TAGS } from './components.ts';
 
 const HOST = '127.0.0.1';
 const PORT = 4173;
@@ -367,7 +367,7 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
         sectionIds: sections.map((section) => section.id),
         metadataIds: metadata.map((node) => node.getAttribute('data-component-meta')),
         exampleIds: examples.map((node) => node.getAttribute('data-example-id')),
-        releaseTags: metadata.map((node) => node.getAttribute('data-component-release')),
+        releaseTags: Object.fromEntries(metadata.map((node) => [node.getAttribute('data-component-meta'), node.getAttribute('data-component-release')])),
         tokenValues,
         scrollWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth,
@@ -395,7 +395,7 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
     assert.deepEqual([...coverage.sectionIds].sort(), expectedSorted, `${label} section coverage drifted`);
     assert.deepEqual([...coverage.metadataIds].sort(), expectedSorted, `${label} metadata coverage drifted`);
     assert.deepEqual([...coverage.exampleIds].sort(), expectedSorted, `${label} example coverage drifted`);
-    assert.deepEqual([...new Set(coverage.releaseTags)], [COMPONENT_RELEASE_TAG], `${label} contains an unknown component release`);
+    assert.deepEqual(coverage.releaseTags, COMPONENT_RELEASE_TAGS, `${label} component release identities drifted`);
     assert.deepEqual(Object.entries(coverage.tokenValues).filter(([, value]) => !value), [], `${label} has unresolved semantic tokens`);
     assert.ok(coverage.scrollWidth <= coverage.viewportWidth, `${label} overflows horizontally: ${coverage.scrollWidth}/${coverage.viewportWidth}`);
     assert.ok(coverage.sidebarScrollWidth <= coverage.sidebarClientWidth, `${label} sidebar overflows horizontally: ${coverage.sidebarScrollWidth}/${coverage.sidebarClientWidth}`);

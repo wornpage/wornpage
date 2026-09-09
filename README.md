@@ -101,9 +101,9 @@ for Button and Theme release archives and a complete example.
 
 - **This repository is canonical.** Edit component implementations in `packages/<name>/src/`.
 - **One workspace and lockfile.** The catalog consumes `workspace:*` dependencies; `bun.lock` fixes the build environment.
-- **One release path.** `components-release.json` names the release and package versions. `bun run pack:components` builds browser bundles and packs the declared consumer entries.
+- **One release path.** `components-release.json` gives every package an explicit version and immutable release tag. `bun run pack:components` builds and packs all declared consumer entries for regression coverage; draft publication uploads only packages changed from the published baseline manifest.
 - **Generated bundles stay generated.** Package `dist/` directories are ignored build output, never a second implementation.
-- **Immutable public delivery.** GitHub release assets contain package archives, integrity hashes, and their source commit. The catalog links to the same release.
+- **Immutable public delivery.** GitHub release assets contain changed package archives plus a full-catalog manifest. Catalog and peer-install links retain each package's actual immutable release instead of moving every package to the newest tag.
 - **Historical sources remain available where required.** See [the migration record](docs/component-migration.md) for protected consumers and retained archive addresses.
 - **The catalog is a working playground.** Its interaction and browser contracts are in [docs/catalog-contract.md](docs/catalog-contract.md).
 
