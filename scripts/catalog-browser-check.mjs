@@ -371,6 +371,8 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
         tokenValues,
         scrollWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth,
+        sidebarScrollWidth: document.querySelector('.demo-sidebar').scrollWidth,
+        sidebarClientWidth: document.querySelector('.demo-sidebar').clientWidth,
         body: { color: bodyStyle.color, background: bodyStyle.backgroundColor },
         primary: primaryStyle ? { color: primaryStyle.color, background: primaryStyle.backgroundColor } : null,
         palette: {
@@ -396,6 +398,7 @@ async function assertCatalogCell(browser, viewportConfig, theme) {
     assert.deepEqual([...new Set(coverage.releaseTags)], [COMPONENT_RELEASE_TAG], `${label} contains an unknown component release`);
     assert.deepEqual(Object.entries(coverage.tokenValues).filter(([, value]) => !value), [], `${label} has unresolved semantic tokens`);
     assert.ok(coverage.scrollWidth <= coverage.viewportWidth, `${label} overflows horizontally: ${coverage.scrollWidth}/${coverage.viewportWidth}`);
+    assert.ok(coverage.sidebarScrollWidth <= coverage.sidebarClientWidth, `${label} sidebar overflows horizontally: ${coverage.sidebarScrollWidth}/${coverage.sidebarClientWidth}`);
     assert.ok(contrast(coverage.body.color, coverage.body.background) >= 4.5, `${label} body text contrast is below 4.5`);
     assert.ok(coverage.primary, `${label} did not render the primary button variant`);
     assert.ok(contrast(coverage.primary.color, coverage.primary.background) >= 4.5, `${label} primary button contrast is below 4.5`);
@@ -469,6 +472,48 @@ async function assertSystemCase(browser, colorScheme) {
   }
 }
 
+async function assertCollapsedSidebar(page, label) {
+  const sidebar = page.locator('.demo-sidebar');
+  await sidebar.evaluate(async (node) => {
+    await Promise.all(node.getAnimations({ subtree: true }).map((animation) => animation.finished));
+  });
+  const geometry = await sidebar.evaluate((node) => ({
+    clientWidth: node.clientWidth,
+    scrollWidth: node.scrollWidth,
+    navigationWidth: node.querySelector('.worn-sidebar').getBoundingClientRect().width,
+    clientHeight: node.clientHeight,
+    scrollHeight: node.scrollHeight,
+    overflowY: getComputedStyle(node).overflowY,
+  }));
+  assert.ok(geometry.scrollWidth <= geometry.clientWidth, `${label} has horizontal sidebar overflow: ${JSON.stringify(geometry)}`);
+  assert.ok(geometry.navigationWidth <= geometry.clientWidth, `${label} clips an oversized sidebar component`);
+  assert.equal(geometry.overflowY, 'auto', `${label} lost vertical scrolling`);
+  assert.ok(geometry.scrollHeight > geometry.clientHeight, `${label} did not exercise vertical overflow`);
+
+  const links = sidebar.locator('a[data-nav-id]');
+  await links.first().focus();
+  await page.keyboard.press('End');
+  assert.equal(await links.last().evaluate((node) => node === document.activeElement), true, `${label} cannot reach the final link by keyboard`);
+  const focus = await links.last().evaluate((node) => {
+    const aside = node.closest('.demo-sidebar');
+    const frame = aside.getBoundingClientRect();
+    const box = node.getBoundingClientRect();
+    const style = getComputedStyle(node);
+    const outline = Number.parseFloat(style.outlineWidth) + Number.parseFloat(style.outlineOffset);
+    const left = frame.left + aside.clientLeft;
+    return {
+      outlineVisible: style.outlineStyle !== 'none' && Number.parseFloat(style.outlineWidth) >= 2,
+      outlineFits: box.left - outline >= left && box.right + outline <= left + aside.clientWidth,
+      scrollLeft: aside.scrollLeft,
+      scrollTop: aside.scrollTop,
+    };
+  });
+  assert.equal(focus.outlineVisible && focus.outlineFits, true, `${label} clips keyboard focus: ${JSON.stringify(focus)}`);
+  assert.equal(focus.scrollLeft, 0, `${label} shifts horizontally during keyboard navigation`);
+  assert.ok(focus.scrollTop > 0, `${label} did not scroll down to the final link`);
+  return { ...geometry, keyboardFocus: true, verticalScroll: true };
+}
+
 async function assertInteractions(browser) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
@@ -491,17 +536,22 @@ async function assertInteractions(browser) {
     const sidebar = page.locator('.demo-sidebar');
     const toggle = sidebar.getByRole('button', { name: /Collapse navigation/ });
     assert.equal(await toggle.getAttribute('aria-expanded'), 'true', 'Desktop sidebar did not start expanded');
+    await toggle.click();
+    const desktopSidebar = await assertCollapsedSidebar(page, 'desktop collapsed');
+    await sidebar.getByRole('button', { name: 'Expand navigation', exact: true }).click();
     await page.setViewportSize({ width: 320, height: 900 });
     await page.getByRole('button', { name: 'Expand navigation', exact: true }).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, 'Desktop-to-compact transition overflowed');
+    const compactSidebar = await assertCollapsedSidebar(page, 'compact collapsed');
     await page.getByRole('button', { name: 'Expand navigation', exact: true }).click();
     const compactGeometry = await page.evaluate(() => {
       const aside = document.querySelector('.demo-sidebar').getBoundingClientRect();
       const main = document.querySelector('.demo-main').getBoundingClientRect();
-      return { asideWidth: aside.width, mainWidth: main.width, viewport: innerWidth };
+      // Native scrollbar gutters are not usable layout width.
+      return { asideWidth: aside.width, mainWidth: main.width, availableWidth: document.documentElement.clientWidth };
     });
-    assert.ok(compactGeometry.asideWidth <= compactGeometry.viewport - 16, 'Expanded compact navigation exceeded its overlay boundary');
-    assert.ok(compactGeometry.mainWidth >= compactGeometry.viewport - 1, 'Expanded compact navigation squeezed main content');
+    assert.ok(compactGeometry.asideWidth <= compactGeometry.availableWidth - 16, 'Expanded compact navigation exceeded its overlay boundary');
+    assert.ok(compactGeometry.mainWidth >= compactGeometry.availableWidth - 1, 'Expanded compact navigation squeezed main content');
     const filter = sidebar.getByRole('searchbox', { name: 'Filter navigation' });
     await filter.fill('Toast');
     await sidebar.locator('a[href="#toast"]').click();
@@ -510,7 +560,7 @@ async function assertInteractions(browser) {
     await page.getByRole('button', { name: 'Expand navigation', exact: true }).waitFor();
 
     assertClean();
-    return { searchFocus: true, jumpFocus: true, hashHistory: true, desktopToCompact: true, mobileFilterNavigation: true };
+    return { searchFocus: true, jumpFocus: true, hashHistory: true, desktopToCompact: true, mobileFilterNavigation: true, desktopSidebar, compactSidebar };
   } catch (error) {
     console.error(`catalog browser navigation-responsive failed\n${error?.stack || error}`);
     throw error;
@@ -624,7 +674,8 @@ let browser;
 try {
   await waitForPreview(preview, previewStartup, { url: BASE_URL });
   console.log('catalog browser phase start: chromium launch');
-  browser = await chromium.launch({ headless: true });
+  // Keep native scrollbar gutters: hiding them can mask overflow inside the sidebar.
+  browser = await chromium.launch({ headless: true, ignoreDefaultArgs: ['--hide-scrollbars'] });
   if (focusOrderingOnly) {
     console.log('catalog browser phase start: palette cancellation navigation 20 no-preference + 20 reduce');
     const cases = [
@@ -639,6 +690,8 @@ try {
     await writeFile(join(OUTPUT_DIR, 'focus-ordering-report.json'), `${JSON.stringify(report, null, 2)}\n`);
     console.log(`catalog browser: ${report.passed}/${report.expected} cancellation-to-navigation focus ordering checks passed`);
   } else {
+  console.log('catalog browser phase start: navigation-responsive');
+  const interactions = await assertInteractions(browser);
   const matrix = [];
   for (const viewport of VIEWPORTS) {
     for (const theme of THEMES) {
@@ -650,8 +703,6 @@ try {
   }
   console.log('catalog browser phase start: System light/dark');
   const system = [await assertSystemCase(browser, 'light'), await assertSystemCase(browser, 'dark')];
-  console.log('catalog browser phase start: navigation-responsive');
-  const interactions = await assertInteractions(browser);
   console.log('catalog browser phase start: palette cancellation navigation 20 no-preference + 20 reduce');
   const paletteCancellationNavigation = [
     await assertPaletteCancellationNavigation(browser, 'no-preference'),
