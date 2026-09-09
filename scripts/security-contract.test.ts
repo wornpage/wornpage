@@ -11,6 +11,22 @@ const publicInstructions = [
 	readFileSync(new URL("../demo/src/ComponentExample.svelte", import.meta.url), "utf8"),
 ].join("\n");
 
+const unsafeAptFlag = /trusted\s*=\s*yes|\[\s*trusted\s*\]|allow-unauthenticated|allow-insecure|AllowInsecureRepositories|no-check-certificate/;
+
+function assertChromeSourceGuardBeforeInstall(source: string) {
+	const guardIndex = source.indexOf("Disable unused Google Chrome APT sources");
+	const installIndex = source.indexOf("bunx playwright install --with-deps chromium");
+	expect(guardIndex).toBeGreaterThanOrEqual(0);
+	expect(installIndex).toBeGreaterThan(guardIndex);
+	const guard = source.slice(guardIndex, installIndex);
+	expect(guard).toContain("for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources");
+	expect(guard).toContain('mv "$source" "$source.disabled"');
+	expect(guard).toContain("grep -RIl --include='*.list' --include='*.sources'");
+	expect(guard).toContain('if [[ -n "$active_chrome_sources" ]]; then');
+	expect(guard).toContain("exit 1");
+	expect(source).not.toMatch(unsafeAptFlag);
+}
+
 describe("repository security contract", () => {
 	it("publishes the MIT license declared by the root package and README", () => {
 		expect(rootLicense).toContain("MIT License");
@@ -22,6 +38,11 @@ describe("repository security contract", () => {
 		const references = [...`${workflow}\n${releaseWorkflow}`.matchAll(/^\s*uses:\s*([^\s#]+)/gmu)].map((match) => match[1]);
 		expect(references.length).toBeGreaterThan(0);
 		expect(references.every((reference) => /@[0-9a-f]{40}$/u.test(reference))).toBe(true);
+	});
+
+	it("guards Chromium installation from only the unused Google Chrome APT source", () => {
+		assertChromeSourceGuardBeforeInstall(workflow);
+		assertChromeSourceGuardBeforeInstall(releaseWorkflow);
 	});
 
 	it("keeps hosted release verification read-only and retains failure evidence", () => {

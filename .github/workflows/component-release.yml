@@ -25,6 +25,22 @@ jobs:
         with:
           node-version: 24.18.0
       - run: bun install --frozen-lockfile
+      - name: Disable unused Google Chrome APT sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
+            if [[ -f "$source" ]]; then
+              mv "$source" "$source.disabled"
+            fi
+          done
+          active_chrome_sources="$(grep -RIl --include='*.list' --include='*.sources' -E '(^|[^[:alnum:]])(dl\.google\.com/linux/chrome|google-chrome)([^[:alnum:]]|$)' /etc/apt/sources.list.d /etc/apt/sources.list 2>/dev/null || true)"
+          if [[ -n "$active_chrome_sources" ]]; then
+            echo "Unexpected active Google Chrome APT source(s):"
+            printf '%s\n' "$active_chrome_sources"
+            exit 1
+          fi
+
       - run: bunx playwright install --with-deps chromium
       - run: bun run verify:catalog
       - name: Upload full-catalog packages and verification evidence
