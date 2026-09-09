@@ -54,7 +54,7 @@ describe('aggregate demo contract', () => {
     expect(appSource).toContain('const sections = DEMO_CATALOG.map(({ id }) => id);');
     expect(DEMO_CATALOG).toHaveLength(26);
     expect(appSource).toContain('<h1>Svelte component library</h1>');
-    expect(appSource).toContain('<p>{DEMO_CATALOG.length} components and supporting packages from Wornpage, the technical publisher and namespace.</p>');
+    expect(appSource).toContain('<p>{DEMO_CATALOG.length} components and supporting packages for clear, keyboard-friendly interfaces.</p>');
     expect(appSource).toContain('function iconForCategory(category: CatalogCategory): NavIcon');
     expect(appSource).not.toMatch(/return ['"]<.+>/u);
     expect(appSource).toContain('const sidebarItems: NavItem[] = CATALOG_GROUPS.map');

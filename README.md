@@ -1,15 +1,13 @@
-# Wornpage
+# Accessible interfaces and human-controlled AI workflows
 
-**Accessible interfaces and human-controlled AI workflows.**
-
-Wornpage is the technical publisher and namespace for work that keeps AI-assisted
-delivery visible, bounded, and subject to human approval.
+A collection of accessible interfaces and tools for human-controlled AI
+workflows, published as `@wornpage`.
 
 ## Start here
 
 | Part of Wornpage | What it is for | Explore |
 | --- | --- | --- |
-| **Projects — application work and public challenge** | Projects application work is distinct from the frozen public WebMCP Challenge demo. The read-only challenge lets browser agents inspect visible evidence and prepare drafts for human review. | [Open the WebMCP challenge demo](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Challenge source](https://github.com/wornpage/projects-webmcp-extension) |
+| **Projects — application work and public challenge** | A frozen WebMCP challenge submission, separate from the private production app. Browser agents can inspect visible evidence and prepare drafts for human review. | [Open the WebMCP challenge demo](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Challenge source](https://github.com/wornpage/projects-webmcp-extension) |
 | **Components — Svelte component library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](docs/getting-started.md) |
 | **WebMCP Conformance — the validation toolkit** | Check page-owned tool declarations, authority limits, lifecycle behavior, and action receipts. | [Source and checks](https://github.com/wornpage/webmcp-conformance) |
 | **PR Machine — the delivery tool** | Turn reviewed agent work into a verified draft pull request. The repository owner controls merging. Public beta. | [Install and use](https://github.com/wornpage/projects-pr-machine#install) · [Workflow evidence](https://github.com/wornpage/projects-pr-machine/blob/main/docs/challenge-extension-case-study.md) |

@@ -173,7 +173,7 @@
     <header class="demo-header">
       <div>
         <h1>Svelte component library</h1>
-        <p>{DEMO_CATALOG.length} components and supporting packages from Wornpage, the technical publisher and namespace.</p>
+        <p>{DEMO_CATALOG.length} components and supporting packages for clear, keyboard-friendly interfaces.</p>
       </div>
       <div class="header-actions">
         <Button onclick={openPalette}>Search catalog</Button>

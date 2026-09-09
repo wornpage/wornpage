@@ -9,17 +9,20 @@ const index = read('../demo/index.html');
 
 describe('public branding contract', () => {
   test('uses descriptive headings while retaining Wornpage as the technical namespace', () => {
-    expect(readme).toContain('Accessible interfaces and human-controlled AI workflows.');
+    expect(readme).toContain('# Accessible interfaces and human-controlled AI workflows');
+    expect(readme).toMatch(/A collection of accessible interfaces and tools for human-controlled AI\s+workflows, published as `@wornpage`\./u);
     expect(readme).toContain('## Svelte component library');
     expect(app).toContain('<h1>Svelte component library</h1>');
-    expect(app).toContain('from Wornpage, the technical publisher and namespace.');
+    expect(app).toContain('{DEMO_CATALOG.length} components and supporting packages for clear, keyboard-friendly interfaces.');
     expect(index).toContain('<title>Wornpage — Svelte Component Library</title>');
   });
 
   test('labels the frozen public challenge honestly without changing its destination', () => {
-    expect(readme).toContain('Projects application work is distinct from the frozen public WebMCP Challenge demo.');
+    expect(readme).toContain('A frozen WebMCP challenge submission, separate from the private production app. Browser agents can inspect visible evidence and prepare drafts for human review.');
     expect(app).toContain('href="https://projects-webmcp-extension.pages.dev/webmcp-challenge" class="repo-link release-link">WebMCP challenge demo</a>');
     expect(app).not.toContain('Projects release');
+    expect(`${readme}\n${caseStudy}`).not.toContain('read-only');
+    expect(caseStudy).toContain('frozen challenge submission, separate from the private production app.');
   });
 
   test('links a compact case study and keeps governance claims bounded', () => {
