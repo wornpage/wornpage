@@ -337,6 +337,8 @@ describe('keyboard navigation', () => {
 	test('continues handling keys after focus enters rendered navigation', () => {
 		expect(sidebarSource).toMatch(/onclick=\{\(e\) => handleNav\(e, item\.href\)\}\s+onkeydown=\{handleKeydown\}/u);
 		expect(sidebarSource).toContain('<nav class="worn-nav" bind:this={navEl}>');
+		expect(sidebarSource).toContain('if (e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;');
+		expect(sidebarSource).toContain("if (e.currentTarget === filterInput && (e.key === 'Home' || e.key === 'End')) return;");
 		expect(sidebarSource).toContain("querySelectorAll<HTMLAnchorElement>('[data-nav-id]')");
 		expect(sidebarSource).toContain('links.findIndex((link) => link === document.activeElement)');
 		expect(sidebarSource).toContain("else if (e.key === ' ' && currentIndex >= 0)");

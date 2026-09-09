@@ -534,6 +534,26 @@ async function assertInteractions(browser) {
     await page.locator('#workflow-heading:focus').waitFor();
 
     const sidebar = page.locator('.demo-sidebar');
+    const desktopFilter = sidebar.getByRole('searchbox', { name: 'Filter navigation' });
+    await desktopFilter.fill('Form');
+    await desktopFilter.focus();
+    await desktopFilter.evaluate((input) => input.setSelectionRange(2, 2));
+    await page.keyboard.press('Home');
+    assert.equal(await desktopFilter.evaluate((input) => input === document.activeElement), true, 'Sidebar filter Home moved focus instead of its caret');
+    assert.deepEqual(await desktopFilter.evaluate((input) => ({ start: input.selectionStart, end: input.selectionEnd })), { start: 0, end: 0 }, 'Sidebar filter Home did not move the native caret to the start');
+    await page.keyboard.press('End');
+    assert.equal(await desktopFilter.evaluate((input) => input === document.activeElement), true, 'Sidebar filter End moved focus instead of its caret');
+    assert.deepEqual(await desktopFilter.evaluate((input) => ({ start: input.selectionStart, end: input.selectionEnd, length: input.value.length })), { start: 4, end: 4, length: 4 }, 'Sidebar filter End did not move the native caret to the end');
+    await desktopFilter.evaluate((input) => input.setSelectionRange(2, 2));
+    await page.keyboard.press('Shift+Home');
+    assert.equal(await desktopFilter.evaluate((input) => input === document.activeElement), true, 'Sidebar filter Shift+Home moved focus instead of extending selection');
+    assert.deepEqual(await desktopFilter.evaluate((input) => ({ start: input.selectionStart, end: input.selectionEnd })), { start: 0, end: 2 }, 'Sidebar filter Shift+Home did not preserve native selection editing');
+    await desktopFilter.press(process.platform === 'darwin' ? 'Meta+A' : 'Control+A');
+    assert.equal(await desktopFilter.evaluate((input) => input === document.activeElement), true, 'Sidebar filter select-all shortcut moved focus');
+    assert.deepEqual(await desktopFilter.evaluate((input) => ({ start: input.selectionStart, end: input.selectionEnd, length: input.value.length })), { start: 0, end: 4, length: 4 }, 'Sidebar filter select-all shortcut was not native');
+    await page.keyboard.press('ArrowDown');
+    await sidebar.locator('a[href="#form-fields"]:focus').waitFor();
+    await desktopFilter.fill('');
     const toggle = sidebar.getByRole('button', { name: /Collapse navigation/ });
     assert.equal(await toggle.getAttribute('aria-expanded'), 'true', 'Desktop sidebar did not start expanded');
     await toggle.click();

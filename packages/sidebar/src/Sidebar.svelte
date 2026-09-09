@@ -204,6 +204,11 @@
 	));
 
 	function handleKeydown(e: KeyboardEvent) {
+		// Native controls own IME and modified keyboard gestures, including
+		// input caret and selection editing such as Shift+Home/End.
+		if (e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+		if (e.currentTarget === filterInput && (e.key === 'Home' || e.key === 'End')) return;
+
 		if (shouldClearNavFilter(e.key, filterText)) {
 			e.preventDefault();
 			filterText = '';
