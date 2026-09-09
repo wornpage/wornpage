@@ -1,5 +1,5 @@
 {
-  "tag": "components-2026.09.07.2",
+  "tag": "components-2026.09.09",
   "packages": {
     "alert": "0.1.2",
     "async-states": "0.1.5",
@@ -20,7 +20,7 @@
     "scenarios": "0.1.1",
     "segmented-control": "0.1.1",
     "select-card": "0.1.1",
-    "sidebar": "0.1.6",
+    "sidebar": "0.1.7",
     "sync": "0.1.0",
     "tabs": "0.1.1",
     "theme": "0.1.3",

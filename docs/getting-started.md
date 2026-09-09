@@ -10,8 +10,8 @@ Install the immutable component release archives with Bun (see
 [Bun's `add` reference](https://bun.sh/docs/pm/cli/add)):
 
 ```bash
-bun add "https://github.com/wornpage/wornpage/releases/download/components-2026.09.07.2/wornpage-button-0.2.2.tgz"
-bun add "https://github.com/wornpage/wornpage/releases/download/components-2026.09.07.2/wornpage-theme-0.1.3.tgz"
+bun add "https://github.com/wornpage/wornpage/releases/download/components-2026.09.09/wornpage-button-0.2.2.tgz"
+bun add "https://github.com/wornpage/wornpage/releases/download/components-2026.09.09/wornpage-theme-0.1.3.tgz"
 ```
 
 Put this complete example in a `.svelte` file. It uses native buttons and
@@ -116,5 +116,5 @@ archive URL and SHA-512 lockfile entry together when upgrading a consumer.
 This is not npm scope publication.
 
 For component API details, use the current canonical
-[Button source](https://github.com/wornpage/wornpage/tree/components-2026.09.07.2/packages/button) and
-[Theme source](https://github.com/wornpage/wornpage/tree/components-2026.09.07.2/packages/theme).
+[Button source](https://github.com/wornpage/wornpage/tree/components-2026.09.09/packages/button) and
+[Theme source](https://github.com/wornpage/wornpage/tree/components-2026.09.09/packages/theme).
