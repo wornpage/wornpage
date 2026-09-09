@@ -23,7 +23,7 @@ const rawHtmlDirective = `{${'@'}html`;
 describe('package delivery', () => {
 	test('declares the next browser-bundle contract revision', () => {
 		expect(packageManifest.name).toBe('@wornpage/sidebar');
-		expect(packageManifest.version).toBe('0.1.6');
+		expect(packageManifest.version).toBe('0.1.7');
 		expect(packageManifest.wornpage).toEqual({ contractVersion: 2, delivery: 'browser-bundle' });
 		expect(packageManifest.main).toBe('./dist/worn-sidebar.js');
 		expect(packageManifest.svelte).toBe('./src/index.ts');
