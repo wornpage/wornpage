@@ -23,7 +23,7 @@ const rawHtmlDirective = `{${'@'}html`;
 describe('package delivery', () => {
 	test('declares the next browser-bundle contract revision', () => {
 		expect(packageManifest.name).toBe('@wornpage/sidebar');
-		expect(packageManifest.version).toBe('0.1.7');
+		expect(packageManifest.version).toBe('0.1.8');
 		expect(packageManifest.wornpage).toEqual({ contractVersion: 2, delivery: 'browser-bundle' });
 		expect(packageManifest.main).toBe('./dist/worn-sidebar.js');
 		expect(packageManifest.svelte).toBe('./src/index.ts');
@@ -110,6 +110,12 @@ describe('filter control', () => {
 		expect(sidebarSource.match(/class="worn-filter-clear"/gu)?.length).toBe(1);
 		expect(sidebarSource).toContain('aria-label="Clear filter"');
 		expect(sidebarSource).toContain('orderedFavoriteItems(flatItems, favorites).filter(i => matchesNavItem(i, normalizedFilterText))');
+	});
+
+	test('owns an opaque, theme-aware placeholder color', () => {
+		expect(sidebarSource).toContain('.worn-filter-input::placeholder');
+		expect(sidebarSource).toContain('color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));');
+		expect(sidebarSource).toContain('opacity: 1;');
 	});
 });
 

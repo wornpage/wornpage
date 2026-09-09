@@ -21,7 +21,7 @@
     "scenarios": { "version": "0.1.1", "releaseTag": "components-2026.09.09" },
     "segmented-control": { "version": "0.1.1", "releaseTag": "components-2026.09.09" },
     "select-card": { "version": "0.1.1", "releaseTag": "components-2026.09.09" },
-    "sidebar": { "version": "0.1.7", "releaseTag": "components-2026.09.09" },
+    "sidebar": { "version": "0.1.8", "releaseTag": "components-2026.09.09.1" },
     "sync": { "version": "0.1.0", "releaseTag": "components-2026.09.09" },
     "tabs": { "version": "0.1.1", "releaseTag": "components-2026.09.09" },
     "theme": { "version": "0.1.3", "releaseTag": "components-2026.09.09" },

@@ -126,6 +126,79 @@ async function assertHeaderLinkContrast(browser, theme, reducedMotion) {
   }
 }
 
+async function sidebarPlaceholderStyle(locator) {
+  return locator.evaluate((node) => {
+    const placeholder = getComputedStyle(node, '::placeholder');
+    const input = getComputedStyle(node);
+    return {
+      color: placeholder.color,
+      opacity: Number.parseFloat(placeholder.opacity),
+      background: input.backgroundColor,
+    };
+  });
+}
+
+async function assertSidebarPlaceholderContrast(browser) {
+  const cases = [];
+  for (const pointer of ['fine', 'coarse']) {
+    for (const reducedMotion of ['no-preference', 'reduce']) {
+      for (const theme of THEMES) {
+        const motionLabel = reducedMotion === 'reduce' ? 'reduced' : 'normal';
+        const label = `sidebar-placeholder-${theme}-${motionLabel}-${pointer}`;
+        const coarse = pointer === 'coarse';
+        const context = await browser.newContext({
+          viewport: coarse ? { width: 320, height: 900 } : { width: 1280, height: 900 },
+          hasTouch: coarse,
+          isMobile: coarse,
+          reducedMotion,
+        });
+        const page = await context.newPage();
+        const assertClean = watchPage(page, label);
+        try {
+          await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+          await page.getByRole('button', { name: THEME_LABELS[theme], exact: true }).click();
+          await page.locator(`html[data-theme="${theme}"]`).waitFor();
+          const sidebar = page.locator('.demo-sidebar');
+          const toggle = sidebar.getByRole('button', { name: /navigation/ });
+          if ((await toggle.getAttribute('aria-expanded')) === 'false') await toggle.click();
+          const filter = sidebar.getByRole('searchbox', { name: 'Filter navigation' });
+          await filter.waitFor();
+          const style = await sidebarPlaceholderStyle(filter);
+          if (theme === 'light' && reducedMotion === 'no-preference' && pointer === 'fine') {
+            await filter.screenshot({ path: join(OUTPUT_DIR, 'sidebar-placeholder-light-normal-fine.png') });
+          }
+          assert.equal(style.opacity, 1, `${label} placeholder opacity must remain explicit and fully opaque`);
+          assert.ok(contrast(style.color, style.background) >= 4.5, `${label} placeholder contrast is below 4.5: ${style.color} on ${style.background}`);
+          if (theme === 'dark' && reducedMotion === 'no-preference' && pointer === 'fine') {
+            await filter.screenshot({ path: join(OUTPUT_DIR, 'sidebar-placeholder-dark-normal-fine.png') });
+          }
+          assertClean();
+          cases.push({ label, theme, motion: reducedMotion, pointer, ...style });
+        } finally {
+          await context.close();
+        }
+      }
+    }
+  }
+
+  const fixtureLabel = 'sidebar-placeholder-custom-sidebar-token-fixture';
+  const fixtureContext = await browser.newContext({ viewport: { width: 1280, height: 900 }, hasTouch: false, isMobile: false, reducedMotion: 'no-preference' });
+  const fixturePage = await fixtureContext.newPage();
+  const fixtureAssertClean = watchPage(fixturePage, fixtureLabel);
+  try {
+    await fixturePage.goto(BASE_URL, { waitUntil: 'networkidle' });
+    const filter = fixturePage.locator('.demo-sidebar').getByRole('searchbox', { name: 'Filter navigation' });
+    await filter.evaluate((node) => node.closest('.worn-sidebar')?.style.setProperty('--worn-sidebar-text-muted', 'rgb(16, 40, 32)'));
+    const style = await sidebarPlaceholderStyle(filter);
+    assert.equal(style.color, 'rgb(16, 40, 32)', `${fixtureLabel} did not apply the existing custom sidebar muted-text token`);
+    assert.equal(style.opacity, 1, `${fixtureLabel} placeholder opacity must remain explicit and fully opaque`);
+    fixtureAssertClean();
+    return { cases, fixture: { label: fixtureLabel, ...style } };
+  } finally {
+    await fixtureContext.close();
+  }
+}
+
 function watchPage(page, label) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
@@ -790,6 +863,8 @@ try {
    for (const reducedMotion of ['no-preference', 'reduce']) {
      for (const theme of THEMES) headerContrast.push(await assertHeaderLinkContrast(browser, theme, reducedMotion));
    }
+   console.log('catalog browser phase start: sidebar placeholder contrast 8 themes x 2 motion preferences x 2 pointer modes');
+   const sidebarPlaceholderContrast = await assertSidebarPlaceholderContrast(browser);
    console.log('catalog browser phase start: navigation-responsive');
   const interactions = await assertInteractions(browser);
   const matrix = [];
@@ -835,6 +910,12 @@ try {
       focusOutlineChecks: headerContrast.reduce((total, entry) => total + entry.focusOutlineChecks, 0),
       cases: headerContrast,
     },
+    sidebarPlaceholderContrast: {
+      passed: sidebarPlaceholderContrast.cases.length,
+      expected: THEMES.length * 2 * 2,
+      customSidebarTokenFixture: sidebarPlaceholderContrast.fixture,
+      cases: sidebarPlaceholderContrast.cases,
+    },
     paletteCancellationNavigation: {
       passed: paletteCancellationNavigation.reduce((total, scenario) => total + scenario.passed, 0),
       expected: paletteCancellationNavigation.reduce((total, scenario) => total + scenario.expected, 0),
@@ -849,6 +930,7 @@ try {
   await writeFile(join(OUTPUT_DIR, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
    console.log(`catalog browser: ${matrix.length}/16 named-theme cells, ${matrix.length * EXPECTED_IDS.length}/416 presence checks, ${matrix.length * EXPECTED_IDS.length}/416 family outcome checks`);
    console.log(`catalog browser: ${headerContrast.length}/16 header contrast cells, ${headerContrast.length * 9}/144 text contrast checks, ${headerContrast.length * 3}/48 keyboard focus outline checks`);
+  console.log(`catalog browser: ${sidebarPlaceholderContrast.cases.length}/32 sidebar placeholder contrast cells plus custom sidebar token fixture passed`);
   console.log('catalog browser: 8/8 distinct computed palette signatures per viewport');
   console.log('catalog browser: 2/2 System light/dark cases; motion, keyboard, focus, state, and containment passed');
   console.log('catalog browser: 40/40 cancellation-to-navigation focus ordering checks passed');

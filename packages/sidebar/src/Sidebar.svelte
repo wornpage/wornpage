@@ -424,6 +424,10 @@
 		font: inherit; font-size: 12px;
 		box-sizing: border-box;
 	}
+	.worn-filter-input::placeholder {
+		color: var(--worn-sidebar-text-muted, var(--worn-text-muted, #666));
+		opacity: 1;
+	}
 	.worn-filter-input:focus-visible { outline: 2px dashed var(--worn-sidebar-focus, var(--worn-focus, var(--worn-text, #21322b))); outline-offset: -2px; }
 	.worn-filter-clear {
 		position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
