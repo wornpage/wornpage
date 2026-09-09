@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { catalogOutputDirectory, prepareCatalogOutput } from './catalog-browser-output.mjs';
 import { observePreviewStartup, waitForPreview } from './catalog-preview-readiness.mjs';
+import { observeRenderedReadiness, renderedSampleStatus } from './catalog-rendered-readiness.mjs';
 import { COMPONENT_NAMES, COMPONENT_RELEASE_TAGS } from './components.ts';
 
 const HOST = '127.0.0.1';
@@ -323,16 +324,16 @@ async function exerciseFamilies(page, label) {
   await drawerSection.getByRole('button', { name: 'Open details drawer', exact: true }).click();
   const drawer = page.getByRole('dialog', { name: 'Component details' });
   assert.equal(await drawer.evaluate((node) => node.contains(document.activeElement)), true, `${label} drawer did not receive focus`);
-  await drawer.evaluate(async (node) => {
-    const animations = node.getAnimations({ subtree: true });
-    await Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)));
-  });
-  const drawerGeometry = await drawer.evaluate((node) => {
-    const box = node.getBoundingClientRect();
-    return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, viewportWidth: innerWidth, viewportHeight: innerHeight, opacity: getComputedStyle(node).opacity };
-  });
-  assert.ok(drawerGeometry.left >= 0 && drawerGeometry.top >= 0 && drawerGeometry.right <= drawerGeometry.viewportWidth && drawerGeometry.bottom <= drawerGeometry.viewportHeight, `${label} drawer was not fully contained before capture`);
-  assert.equal(drawerGeometry.opacity, '1', `${label} drawer was not opaque before capture`);
+  const drawerReadiness = await observeRenderedReadiness(drawer);
+  const drawerStatus = renderedSampleStatus(drawerReadiness.final);
+  if (!drawerReadiness.ready) {
+    await writeFile(join(OUTPUT_DIR, `${label}-drawer-readiness-failure.json`), `${JSON.stringify(drawerReadiness, null, 2)}\n`);
+    await page.screenshot({ path: join(OUTPUT_DIR, `${label}-drawer-readiness-failure.png`) });
+  }
+  assert.equal(drawerReadiness.ready, true, `${label} drawer rendered state did not stabilize before capture: ${JSON.stringify(drawerReadiness.final)}`);
+  assert.ok(drawerStatus.contained, `${label} drawer was not fully contained before capture: ${JSON.stringify(drawerReadiness.final)}`);
+  assert.equal(drawerStatus.opaque, true, `${label} drawer was not opaque before capture: ${JSON.stringify(drawerReadiness.final)}`);
+  assert.equal(drawerStatus.animationsSettled, true, `${label} drawer animation was not settled before capture: ${JSON.stringify(drawerReadiness.final)}`);
   await page.screenshot({ path: join(OUTPUT_DIR, `${label}-overlay.png`) });
   await drawer.getByLabel('Preview density').selectOption('compact');
   await drawer.getByRole('button', { name: 'Apply', exact: true }).click();
