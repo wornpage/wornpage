@@ -136,7 +136,7 @@ describe('aggregate demo contract', () => {
 
   test('runs the durable rendered catalog matrix from the fixed verification gate', () => {
     expect(rootPackage.devDependencies.playwright).toBe('1.62.0');
-    expect(rootPackage.scripts['test:catalog:browser']).toBe('node scripts/catalog-browser-check.mjs');
+    expect(rootPackage.scripts['test:catalog:browser']).toBe('node --test scripts/catalog-rendered-readiness-browser.mjs && node scripts/catalog-browser-check.mjs');
     expect(rootPackage.scripts['verify:catalog']).toBe('node scripts/verify-catalog.mjs');
     for (const command of ['bun run check:workspace', 'bun run check:components', 'bun test', 'bun run pack:components', 'bun run build', 'bun run test:catalog:browser']) {
       expect(catalogVerifierSource).toContain(`command: '${command}'`);

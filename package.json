@@ -14,7 +14,7 @@
     "lint": "bun run --filter '*' lint",
     "check:components": "bun run scripts/check-component-delivery.ts",
     "check:workspace": "bun run scripts/check-workspace-contract.ts",
-    "test:catalog:browser": "node scripts/catalog-browser-check.mjs",
+    "test:catalog:browser": "node --test scripts/catalog-rendered-readiness-browser.mjs && node scripts/catalog-browser-check.mjs",
     "test:toast:focus": "node scripts/toast-focus-browser-check.mjs",
     "verify:catalog": "node scripts/verify-catalog.mjs",
     "new": "bun run packages/cli/src/index.ts new",
