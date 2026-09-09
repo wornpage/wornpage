@@ -48,7 +48,7 @@ ${fixture}
 ${chromeSourceGuard(source)}
 ${assertion}
 `;
-	return spawnSync("bash", ["-c", `echo ${Buffer.from(script).toString("base64")} | base64 -d | bash`], { encoding: "utf8" });
+	return spawnSync("wsl.exe", ["--exec", "sh", "-c", `printf '%s' ${Buffer.from(script).toString("base64")} | base64 -d | bash -s`], { encoding: "utf8", timeout: 5_000 });
 }
 
 describe("repository security contract", () => {
@@ -90,7 +90,7 @@ test -f "$fixture_sources/unrelated.sources"
 		const collision = runChromeSourceGuard(workflow, "printf 'active\\n' > \"$fixture_sources/google-chrome.list\"; printf 'backup\\n' > \"$fixture_sources/google-chrome.list.disabled\"");
 		expect(collision.status).not.toBe(0);
 		expect(collision.stdout).toContain("Refusing to overwrite disabled APT source");
-	});
+	}, 20_000);
 
 	it("keeps hosted release verification read-only and retains failure evidence", () => {
 		const parsed = Bun.YAML.parse(releaseWorkflow) as {
