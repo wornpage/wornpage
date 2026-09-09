@@ -51,6 +51,81 @@ function contrast(foreground, background) {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
+async function headerLinkStyle(locator) {
+  return locator.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return {
+      color: style.color,
+      background: style.backgroundColor,
+      filter: style.filter,
+      outlineColor: style.outlineColor,
+      outlineStyle: style.outlineStyle,
+      outlineWidth: Number.parseFloat(style.outlineWidth),
+      focused: document.activeElement === node,
+    };
+  });
+}
+
+async function assertHeaderLinkContrast(browser, theme, reducedMotion) {
+  const motionLabel = reducedMotion === 'reduce' ? 'reduced' : 'normal';
+  const label = `header-contrast-${theme}-${motionLabel}-fine`;
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    hasTouch: false,
+    isMobile: false,
+    reducedMotion,
+  });
+  const page = await context.newPage();
+  const assertClean = watchPage(page, label);
+  const headerLinks = [
+    { name: 'setup guide', selector: '.guide-link' },
+    { name: 'GitHub', selector: '.repo-link:not(.guide-link):not(.release-link)' },
+    { name: 'Projects release', selector: '.release-link' },
+  ];
+  try {
+    await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: THEME_LABELS[theme], exact: true }).click();
+    await page.locator(`html[data-theme="${theme}"]`).waitFor();
+    const checks = [];
+    for (const link of headerLinks) {
+      const locator = page.locator(link.selector);
+      await locator.waitFor();
+      const initial = await headerLinkStyle(locator);
+      checks.push({ link: link.name, state: 'default', ...initial });
+      await locator.hover();
+      await settleFrames(page);
+      const hovered = await headerLinkStyle(locator);
+      checks.push({ link: link.name, state: 'hover', ...hovered });
+      await page.mouse.move(0, 0);
+      await settleFrames(page);
+      await page.locator('body').focus();
+      for (let step = 0; step < 24 && !(await locator.evaluate((node) => document.activeElement === node)); step += 1) await page.keyboard.press('Tab');
+      const focused = await headerLinkStyle(locator);
+      checks.push({ link: link.name, state: 'keyboard focus', ...focused });
+      assert.equal(focused.focused, true, `${label} ${link.name} did not receive keyboard focus`);
+      assert.equal(await locator.evaluate((node) => node.matches(':hover')), false, `${label} ${link.name} keyboard focus retained hover state`);
+      assert.notEqual(focused.outlineStyle, 'none', `${label} ${link.name} has no keyboard focus outline`);
+      assert.ok(focused.outlineWidth >= 2, `${label} ${link.name} keyboard focus outline is below 2px`);
+    }
+    for (const check of checks) {
+      assert.ok(contrast(check.color, check.background) >= 4.5, `${label} ${check.link} ${check.state} text contrast is below 4.5: ${check.color} on ${check.background}`);
+    }
+    const releaseHover = checks.find((check) => check.link === 'Projects release' && check.state === 'hover');
+    assert.equal(releaseHover.filter, 'none', `${label} release hover uses a filter that obscures rendered color contrast`);
+    if (theme === 'dark' && reducedMotion === 'no-preference') {
+      await page.locator('.release-link').hover();
+      await page.screenshot({ path: join(OUTPUT_DIR, 'header-contrast-dark-normal-release-hover.png') });
+    }
+    assertClean();
+    return { label, theme, motion: reducedMotion, pointer: 'fine', textContrastChecks: checks.length, focusOutlineChecks: headerLinks.length, checks };
+  } catch (error) {
+    console.error(`catalog browser header contrast case failed: ${label}\n${error?.stack || error}`);
+    throw error;
+  } finally {
+    try { await context.close(); } catch (error) { console.error(`catalog browser header contrast cleanup failed: ${label}\n${error?.stack || error}`); throw error; }
+  }
+}
+
 function watchPage(page, label) {
   const errors = [];
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
@@ -710,7 +785,12 @@ try {
     await writeFile(join(OUTPUT_DIR, 'focus-ordering-report.json'), `${JSON.stringify(report, null, 2)}\n`);
     console.log(`catalog browser: ${report.passed}/${report.expected} cancellation-to-navigation focus ordering checks passed`);
   } else {
-  console.log('catalog browser phase start: navigation-responsive');
+   console.log('catalog browser phase start: header link contrast 8 themes x 2 motion preferences x fine pointer');
+   const headerContrast = [];
+   for (const reducedMotion of ['no-preference', 'reduce']) {
+     for (const theme of THEMES) headerContrast.push(await assertHeaderLinkContrast(browser, theme, reducedMotion));
+   }
+   console.log('catalog browser phase start: navigation-responsive');
   const interactions = await assertInteractions(browser);
   const matrix = [];
   for (const viewport of VIEWPORTS) {
@@ -748,6 +828,13 @@ try {
     },
     system: { passed: system.length, expected: 2, cases: system },
     interactions,
+    headerContrast: {
+      passed: headerContrast.length,
+      expected: THEMES.length * 2,
+      textContrastChecks: headerContrast.reduce((total, entry) => total + entry.textContrastChecks, 0),
+      focusOutlineChecks: headerContrast.reduce((total, entry) => total + entry.focusOutlineChecks, 0),
+      cases: headerContrast,
+    },
     paletteCancellationNavigation: {
       passed: paletteCancellationNavigation.reduce((total, scenario) => total + scenario.passed, 0),
       expected: paletteCancellationNavigation.reduce((total, scenario) => total + scenario.expected, 0),
@@ -760,7 +847,8 @@ try {
   assert.equal(matrix.length, 16);
   assert.equal(system.length, 2);
   await writeFile(join(OUTPUT_DIR, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
-  console.log(`catalog browser: ${matrix.length}/16 named-theme cells, ${matrix.length * EXPECTED_IDS.length}/416 presence checks, ${matrix.length * EXPECTED_IDS.length}/416 family outcome checks`);
+   console.log(`catalog browser: ${matrix.length}/16 named-theme cells, ${matrix.length * EXPECTED_IDS.length}/416 presence checks, ${matrix.length * EXPECTED_IDS.length}/416 family outcome checks`);
+   console.log(`catalog browser: ${headerContrast.length}/16 header contrast cells, ${headerContrast.length * 9}/144 text contrast checks, ${headerContrast.length * 3}/48 keyboard focus outline checks`);
   console.log('catalog browser: 8/8 distinct computed palette signatures per viewport');
   console.log('catalog browser: 2/2 System light/dark cases; motion, keyboard, focus, state, and containment passed');
   console.log('catalog browser: 40/40 cancellation-to-navigation focus ordering checks passed');
