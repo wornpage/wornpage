@@ -80,7 +80,7 @@ async function assertHeaderLinkContrast(browser, theme, reducedMotion) {
   const headerLinks = [
     { name: 'setup guide', selector: '.guide-link' },
     { name: 'GitHub', selector: '.repo-link:not(.guide-link):not(.release-link)' },
-    { name: 'Projects release', selector: '.release-link' },
+    { name: 'WebMCP challenge demo', selector: '.release-link' },
   ];
   try {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
@@ -110,8 +110,8 @@ async function assertHeaderLinkContrast(browser, theme, reducedMotion) {
     for (const check of checks) {
       assert.ok(contrast(check.color, check.background) >= 4.5, `${label} ${check.link} ${check.state} text contrast is below 4.5: ${check.color} on ${check.background}`);
     }
-    const releaseHover = checks.find((check) => check.link === 'Projects release' && check.state === 'hover');
-    assert.equal(releaseHover.filter, 'none', `${label} release hover uses a filter that obscures rendered color contrast`);
+    const challengeHover = checks.find((check) => check.link === 'WebMCP challenge demo' && check.state === 'hover');
+    assert.equal(challengeHover.filter, 'none', `${label} challenge hover uses a filter that obscures rendered color contrast`);
     if (theme === 'dark' && reducedMotion === 'no-preference') {
       await page.locator('.release-link').hover();
       await page.screenshot({ path: join(OUTPUT_DIR, 'header-contrast-dark-normal-release-hover.png') });
