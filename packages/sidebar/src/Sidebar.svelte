@@ -351,6 +351,7 @@
 <style>
 	.worn-sidebar {
 		inline-size: 100%;
+		max-inline-size: 100%;
 		min-inline-size: 0;
 		overflow-x: clip;
 		transition: inline-size 0.2s ease;

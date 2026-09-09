@@ -123,6 +123,11 @@ describe('danger badge theming', () => {
 });
 
 describe('collapsed web component', () => {
+	test('fits the available consumer width after borders and scrollbar gutters', () => {
+		const sidebarRule = sidebarSource.match(/\.worn-sidebar \{([^}]+)\}/u)?.[1];
+		expect(sidebarRule).toContain('max-inline-size: 100%;');
+	});
+
 	test('owns a visual collapsed state without removing link names', () => {
 		expect(sidebarSource).toContain('title={collapsed ? item.label : undefined}');
 		expect(sidebarSource).toContain('.worn-sidebar.is-collapsed {');
