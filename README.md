@@ -1,23 +1,20 @@
-# Wornpage
+# Accessible interfaces and human-controlled AI workflows
 
-**Interfaces and tools that keep people in control of agent-assisted work.**
-
-I build Wornpage around a practical loop: make the work visible, make actions
-inspectable, and keep the final decision with a person.
+A collection of accessible interfaces and tools for human-controlled AI
+workflows, published as `@wornpage`.
 
 ## Start here
 
 | Part of Wornpage | What it is for | Explore |
 | --- | --- | --- |
-| **Projects — the application** | Track blockers, owners, and next actions. The public WebMCP Challenge edition lets browser agents inspect visible evidence and prepare drafts for human review. | [Try Projects](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Source](https://github.com/wornpage/projects-webmcp-extension) |
-| **Components — the interface library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage-components.pages.dev) · [Use a component](docs/getting-started.md) |
+| **Projects — application work and public challenge** | A frozen WebMCP challenge submission, separate from the private production app. Browser agents can inspect visible evidence and prepare drafts for human review. | [Open the WebMCP challenge demo](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Challenge source](https://github.com/wornpage/projects-webmcp-extension) |
+| **Components — Svelte component library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](docs/getting-started.md) |
 | **WebMCP Conformance — the validation toolkit** | Check page-owned tool declarations, authority limits, lifecycle behavior, and action receipts. | [Source and checks](https://github.com/wornpage/webmcp-conformance) |
 | **PR Machine — the delivery tool** | Turn reviewed agent work into a verified draft pull request. The repository owner controls merging. Public beta. | [Install and use](https://github.com/wornpage/projects-pr-machine#install) · [Workflow evidence](https://github.com/wornpage/projects-pr-machine/blob/main/docs/challenge-extension-case-study.md) |
 
-These are the four public entry points. All component source now lives here under **`packages/`**; use the catalog to discover the library together. See the
-[repository map](docs/repository-map.md) for source ownership and contribution paths.
+These are the four public entry points. Read the short [portfolio case study](docs/portfolio.md) for the demonstrated controls and their limits. All component source now lives here under **`packages/`**; see the [repository map](docs/repository-map.md) for source ownership and contribution paths.
 
-## Component library
+## Svelte component library
 
 This repository is the Wornpage overview and the integration catalog for 26
 component and supporting packages, three development tools, and a CLI. This repository owns package source, the catalog, and immutable component releases.

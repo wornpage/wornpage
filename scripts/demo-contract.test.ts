@@ -54,7 +54,8 @@ describe('aggregate demo contract', () => {
   test('uses the explicit catalog for grouped navigation and rendered sections', () => {
     expect(appSource).toContain('const sections = DEMO_CATALOG.map(({ id }) => id);');
     expect(DEMO_CATALOG).toHaveLength(26);
-    expect(appSource).toContain('<p>{DEMO_CATALOG.length} components and supporting packages, one interface library.</p>');
+    expect(appSource).toContain('<h1>Svelte component library</h1>');
+    expect(appSource).toContain('<p>{DEMO_CATALOG.length} components and supporting packages for clear, keyboard-friendly interfaces.</p>');
     expect(appSource).toContain('function iconForCategory(category: CatalogCategory): NavIcon');
     expect(appSource).not.toMatch(/return ['"]<.+>/u);
     expect(appSource).toContain('const sidebarItems: NavItem[] = CATALOG_GROUPS.map');
@@ -65,7 +66,7 @@ describe('aggregate demo contract', () => {
 
   test('links the catalog to its released Projects consumer', () => {
     expect(appSource).toContain('href="https://projects-webmcp-extension.pages.dev/webmcp-challenge"');
-    expect(appSource).toContain('class="repo-link release-link">Projects release</a>');
+    expect(appSource).toContain('class="repo-link release-link">WebMCP challenge demo</a>');
     expect(appSource).toMatch(/@media \(pointer: coarse\)\s*\{\s*\.repo-link \{ min-height: 44px; \}/u);
   });
 
