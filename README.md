@@ -16,7 +16,7 @@ These are the four public entry points. Read the short [portfolio case study](do
 
 ## Svelte component library
 
-This repository is the Wornpage overview and the integration catalog for 26
+This repository is the Wornpage overview and the integration catalog for 25
 component and supporting packages, three development tools, and a CLI. This repository owns package source, the catalog, and immutable component releases.
 
 Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-started.md).
@@ -24,7 +24,7 @@ Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-s
 <details>
 <summary><strong>Installation, component catalog, architecture, and contributing</strong></summary>
 
-> One component library: 26 component and supporting packages, three development
+> One component library: 25 component and supporting packages, three development
 > tools, and one internal CLI. Install versioned package archives from this repository's immutable GitHub releases. The `@wornpage` npm scope is not a supported distribution path.
 
 Live catalog: <https://wornpage-components.pages.dev>
@@ -83,7 +83,6 @@ for Button and Theme release archives and a complete example.
 | `@wornpage/theme` | [packages/theme](packages/theme) | `browser-bundle` | Persistent multi-theme CSS custom properties |
 | `@wornpage/toast` | [packages/toast](packages/toast) | `browser-bundle` | Toast notifications with contextual dismissal |
 | `@wornpage/undo` | [packages/undo](packages/undo) | `browser-bundle` | Receipt-oriented undo and redo stack |
-| `@wornpage/workflow` | [packages/workflow](packages/workflow) | `source` | Pack state machine for blocker and next-action flow |
 | `@wornpage/cli` | [packages/cli](packages/cli) | `tooling` | Workspace scaffolding and release verification |
 
 ### Tools (`tools/` — monorepo-native)

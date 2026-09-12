@@ -44,13 +44,12 @@ MIT as well.
 
 ### Product-specific or product-adjacent logic requiring an owner gate
 
-The following packages are the deliberate review boundary because their
+The following retained public packages are the deliberate review boundary because their
 descriptions encode application concepts or sharing behavior rather than only
 rendering primitives:
 
 | Package | Canonical repository | Current description boundary | Prospective owner decision |
 | --- | --- | --- | --- |
-| `@wornpage/workflow` | [packages/workflow](../packages/workflow) | Pack state machine, including blocker/next/doneWhen filtering and ordering | Keep MIT; dual-license future releases; use a source-available license for future releases; or move unreleased product logic private |
 | `@wornpage/sync` | [packages/sync](../packages/sync) | Demo state sync-code generation, hashing, QR encoding, and no-account sharing behavior | Same four options |
 | `@wornpage/scenarios` | [packages/scenarios](../packages/scenarios) | Shared scenario definitions and validators for Wornpage demo apps | Same four options |
 
@@ -71,6 +70,15 @@ The four options mean:
 4. **Move unreleased product logic private:** keep only unreleased,
    owner-controlled product code out of the public package; do not imply that
    previously distributed copies have become private.
+
+### Removed workflow implementation
+
+`@wornpage/workflow` is no longer part of the current public workspace,
+catalog, release inventory, or generated component artifacts. Its implementation
+continues in its owner-controlled private repository. This prospective cutover
+does not erase source from earlier public Git history or remove immutable assets
+from prior releases, and it does not revoke the MIT permissions attached to
+copies that were already distributed.
 
 Any change is prospective and version-specific. A future release may have a
 different license only after the copyright owners make that business/legal
@@ -117,9 +125,11 @@ does not rewrite the terms of prior releases.
 
 ## Release gate
 
-Before publishing a future `workflow`, `sync`, or `scenarios` release, the
+Before publishing a future `sync` or `scenarios` release, the
 owner should approve one explicit choice: **MIT**, **dual-license**,
 **source-available**, or **private for unreleased logic**. The release must
 identify the covered version and files, preserve required third-party notices,
 and avoid suggesting that a license change is a technical safety fix. The
-decision should be recorded here with the covered package version. The source-consolidation release preserves the existing MIT declarations and grants; it changes repository ownership and delivery, not licensing.
+decision should be recorded here with the covered package version. The current
+public source cutover preserves the existing MIT grants for prior copies while
+removing the workflow package from future public component artifacts.

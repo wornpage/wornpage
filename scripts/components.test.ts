@@ -17,7 +17,7 @@ describe('canonical component delivery', () => {
     const packages = readdirSync(new URL('../packages/', import.meta.url), { withFileTypes: true })
       .filter(entry => entry.isDirectory() && entry.name !== 'cli').map(entry => entry.name).sort();
     expect(COMPONENT_NAMES).toEqual(packages);
-    expect(COMPONENT_NAMES).toHaveLength(26);
+    expect(COMPONENT_NAMES).toHaveLength(25);
     for (const name of COMPONENT_NAMES) {
       const pkg = JSON.parse(readFileSync(new URL(`../packages/${name}/package.json`, import.meta.url), 'utf8'));
       expect(pkg.name).toBe(`@wornpage/${name}`);

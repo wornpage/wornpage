@@ -374,7 +374,7 @@ async function exerciseFamilies(page, label) {
   await expectText(navigation.locator('[data-output="pagination"]'), /Toast/, `${label} pagination did not render page 2 rows`);
   assert.equal((await navigation.locator('[data-output="pagination"]').innerText()).includes('Alert'), false, `${label} pagination retained page 1 rows`);
   await navigation.getByRole('button', { name: 'Reset page', exact: true }).click();
-  await expectText(navigation, /Showing 1–4 of 26 components/, `${label} pagination denominator/reset drifted`);
+  await expectText(navigation, /Showing 1–4 of 25 components/, `${label} pagination denominator/reset drifted`);
   mark('navigation-surfaces');
 
   const receipt = page.locator('#receipt');
@@ -461,14 +461,6 @@ async function exerciseFamilies(page, label) {
   await expectText(undo.locator('[data-output="undo-model"]'), /Reviewed catalog/, `${label} redo did not reapply content`);
   await undo.getByRole('button', { name: 'Reset history', exact: true }).click();
   mark('undo');
-
-  const workflow = page.locator('#workflow');
-  await workflow.getByRole('button', { name: 'Clear local blocker', exact: true }).click();
-  await expectText(workflow.locator('[data-output="workflow"]'), /Navigation coverage.*active/s, `${label} workflow output did not recompute`);
-  await expectText(workflow.locator('tbody tr').first(), /Navigation coverage\s+active\s+Open/, `${label} workflow row did not change`);
-  await workflow.getByRole('button', { name: 'Reset workflow', exact: true }).click();
-  await expectText(workflow.locator('tbody tr').first(), /blocked\s+Review blocker/, `${label} workflow reset failed`);
-  mark('workflow');
 
   assert.deepEqual([...exercised].sort(), [...EXPECTED_IDS].sort(), `${label} did not exercise every family`);
   return exercised.length;
@@ -670,17 +662,17 @@ async function assertInteractions(browser) {
   try {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: 'Search catalog', exact: true }).click();
-    await page.getByRole('combobox', { name: 'Command palette search' }).fill('Workflow');
+    await page.getByRole('combobox', { name: 'Command palette search' }).fill('Undo');
     await page.getByRole('combobox', { name: 'Command palette search' }).press('Enter');
-    await page.waitForURL(/#workflow$/);
-    await page.locator('#workflow-heading:focus').waitFor();
+    await page.waitForURL(/#undo$/);
+    await page.locator('#undo-heading:focus').waitFor();
 
     await page.getByLabel('Jump to component').selectOption('dialog');
     await page.waitForURL(/#dialog$/);
     await page.locator('#dialog-heading:focus').waitFor();
     await page.goBack();
-    await page.waitForURL(/#workflow$/);
-    await page.locator('#workflow-heading:focus').waitFor();
+    await page.waitForURL(/#undo$/);
+    await page.locator('#undo-heading:focus').waitFor();
 
     const sidebar = page.locator('.demo-sidebar');
     const desktopFilter = sidebar.getByRole('searchbox', { name: 'Filter navigation' });
@@ -747,7 +739,7 @@ async function assertPaletteCancellationNavigation(browser, reducedMotion, itera
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
     const search = page.getByRole('button', { name: 'Search catalog', exact: true });
     for (let iteration = 0; iteration < iterations; iteration += 1) {
-      const destination = iteration % 2 === 0 ? 'workflow' : 'alert';
+      const destination = iteration % 2 === 0 ? 'sync' : 'alert';
       console.log(`catalog browser focus ordering start: ${label} ${iteration + 1}/${iterations} -> ${destination}`);
       await search.click();
       await page.getByRole('dialog', { name: 'Command palette' }).waitFor();
@@ -809,13 +801,13 @@ async function assertReducedMotionAndKeyboard(browser) {
     assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior), 'auto');
     await page.keyboard.press('Escape');
     await page.waitForFunction((selector) => document.activeElement === document.querySelector(selector), '.demo-header button');
-    await page.getByLabel('Jump to component').selectOption('workflow');
-    await page.locator('#workflow-heading:focus').waitFor();
+    await page.getByLabel('Jump to component').selectOption('sync');
+    await page.locator('#sync-heading:focus').waitFor();
     const reducedNavigation = await page.evaluate(async () => {
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       const firstScroll = window.scrollY;
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      const box = document.querySelector('#workflow-heading').getBoundingClientRect();
+      const box = document.querySelector('#sync-heading').getBoundingClientRect();
       return { behaviors: window.__catalogScrollBehaviors, settled: firstScroll === window.scrollY, visible: box.top >= 0 && box.bottom <= innerHeight };
     });
     assert.equal(reducedNavigation.behaviors.at(-1), 'auto', 'Reduced-motion JS navigation did not request auto scrolling');
@@ -874,7 +866,7 @@ try {
       console.log(`catalog browser cell start: ${viewport.id}-${theme}`);
       const cell = await assertCatalogCell(browser, viewport, theme);
       matrix.push(cell);
-      console.log(`catalog browser cell: ${cell.label} — 26 present, 26 outcomes`);
+      console.log(`catalog browser cell: ${cell.label} — ${cell.sectionsPresent} present, ${cell.outcomesExercised} outcomes`);
     }
   }
   console.log('catalog browser phase start: System light/dark');
@@ -929,7 +921,8 @@ try {
   assert.equal(matrix.length, 16);
   assert.equal(system.length, 2);
   await writeFile(join(OUTPUT_DIR, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
-   console.log(`catalog browser: ${matrix.length}/16 named-theme cells, ${matrix.length * EXPECTED_IDS.length}/416 presence checks, ${matrix.length * EXPECTED_IDS.length}/416 family outcome checks`);
+   const familyChecks = matrix.length * EXPECTED_IDS.length;
+   console.log(`catalog browser: ${matrix.length}/16 named-theme cells, ${familyChecks}/${familyChecks} presence checks, ${familyChecks}/${familyChecks} family outcome checks`);
    console.log(`catalog browser: ${headerContrast.length}/16 header contrast cells, ${headerContrast.length * 9}/144 text contrast checks, ${headerContrast.length * 3}/48 keyboard focus outline checks`);
   console.log(`catalog browser: ${sidebarPlaceholderContrast.cases.length}/32 sidebar placeholder contrast cells plus custom sidebar token fixture passed`);
   console.log('catalog browser: 8/8 distinct computed palette signatures per viewport');

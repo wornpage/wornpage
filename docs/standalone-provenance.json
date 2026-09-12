@@ -150,12 +150,6 @@
     "previous_catalog_revision": "b7f7e42bb362f6886f11001f55a68c3fef1abc23"
   },
   {
-    "package": "@wornpage/workflow",
-    "repository": "wornpage/workflow",
-    "revision": "9262c3c4ede2fda4d104f3fafc063101e47d1935",
-    "previous_catalog_revision": "7e705da0d1349487458b4b3feb28d8ebc52aeec0"
-  },
-  {
     "package": "@wornpage/cli",
     "repository": "wornpage/cli",
     "revision": "d49c31c349baf88bc881111eb2a0322a62f68ce6",

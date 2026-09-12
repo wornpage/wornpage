@@ -27,12 +27,6 @@ jobs:
         with:
           node-version: 24.18.0
 
-      - name: Check workspace dependency contract
-        run: bun run check:workspace
-
-      - name: Check every component delivery contract
-        run: bun run check:components
-
       - name: Install workspace dependencies
         run: bun install --frozen-lockfile
 
@@ -53,8 +47,8 @@ jobs:
       - name: Install catalog Chromium
         run: bunx playwright install --with-deps chromium
 
-      - name: Verify packages and rendered catalog
-        run: bun run verify:catalog
+      - name: Verify public component boundary, packages, and rendered catalog
+        run: node scripts/verify-public-workflow-boundary.mjs
 
       - name: Upload release packages and verification evidence
         if: ${{ success() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}

@@ -20,8 +20,10 @@ describe("workspace workflow triggers", () => {
 	it("publishes release material only from a successful main run and otherwise keeps diagnostics", () => {
 		const parsed = Bun.YAML.parse(workflow) as { jobs: Record<string, { steps: Array<{ name?: string; if?: string; with?: Record<string, string> }> }> };
 		const steps = Object.values(parsed.jobs).flatMap((job) => job.steps);
+		const verification = steps.find((step) => step.name === "Verify public component boundary, packages, and rendered catalog");
 		const release = steps.find((step) => step.name === "Upload release packages and verification evidence");
 		const diagnostic = steps.find((step) => step.name === "Upload diagnostic verification evidence");
+		expect((verification as { run?: string } | undefined)?.run).toBe("node scripts/verify-public-workflow-boundary.mjs");
 		expect(release?.if).toBe("${{ success() && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}");
 		expect(release?.with?.name).toBe("component-release-verification-${{ github.run_id }}-${{ github.run_attempt }}");
 		expect(diagnostic?.if).toBe("${{ always() && !(job.status == 'success' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) }}");
