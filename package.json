@@ -17,6 +17,7 @@
     "test:catalog:browser": "node --test scripts/catalog-rendered-readiness-browser.mjs && node scripts/catalog-browser-check.mjs",
     "test:toast:focus": "node scripts/toast-focus-browser-check.mjs",
     "verify:catalog": "node scripts/verify-catalog.mjs",
+    "verify:public-workflow-boundary": "node scripts/verify-public-workflow-boundary.mjs",
     "new": "bun run packages/cli/src/index.ts new",
     "pack:components": "bun run scripts/pack-components.ts"
   },

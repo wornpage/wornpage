@@ -76,7 +76,7 @@ theme/viewport cells; they are not users or additional component families.
 
 The named-theme matrix is exactly 16 cells: compact `320x900` with touch and
 desktop `1440x1000` with a fine pointer, each across light, dark, forest,
-ocean, sepia, halloween, winter, and holiday. Every cell verifies all 26
+ocean, sepia, halloween, winter, and holiday. Every cell verifies all 25
 sections, metadata, non-empty semantic tokens, readable shell/accent contrast,
 containment, a real local state transition, persistence, and browser/network
 cleanliness.

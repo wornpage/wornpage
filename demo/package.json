@@ -32,8 +32,7 @@
     "@wornpage/tabs": "workspace:*",
     "@wornpage/theme": "workspace:*",
     "@wornpage/toast": "workspace:*",
-    "@wornpage/undo": "workspace:*",
-    "@wornpage/workflow": "workspace:*"
+    "@wornpage/undo": "workspace:*"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",

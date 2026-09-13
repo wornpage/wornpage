@@ -21,7 +21,6 @@
   import { Tabs, tabDomIds } from '@wornpage/tabs';
   import { Toast } from '@wornpage/toast';
   import { createUndoStack, UndoReceipt } from '@wornpage/undo';
-  import { buildStandupText, hasBlocker, orderPacks, primaryCommand, type DemoPack } from '@wornpage/workflow';
   import { onDestroy } from 'svelte';
   import { DEMO_CATALOG, type DemoCatalogId } from './sections';
 
@@ -65,7 +64,6 @@
   let undoTitle = $state('Draft catalog');
   let canUndo = $state(false);
   let canRedo = $state(false);
-  let workflowBlocked = $state(true);
   let exampleRoot = $state<HTMLElement>();
   let asyncRequest = 0;
 
@@ -85,12 +83,6 @@
   const pageStart = $derived((page - 1) * catalogPageSize);
   const visibleCatalogEntries = $derived(DEMO_CATALOG.slice(pageStart, pageStart + catalogPageSize));
   const undoAction = { type: 'action' as const, packId: 'catalog-demo', label: 'Renamed catalog draft', createdAt: Date.now() };
-  const workflowPacks = $derived.by<DemoPack[]>(() => [
-    { id: '1', title: 'Navigation coverage', status: workflowBlocked ? 'blocked' : 'active', blocker: workflowBlocked ? 'Review compact layout' : 'none', next: workflowBlocked ? 'Review' : 'Open', owner: 'Design', due: '2026-08-18', doneWhen: 'No horizontal overflow' },
-    { id: '2', title: 'Component examples', status: 'active', blocker: 'none', next: 'Open', owner: 'UI', due: '2026-08-20', doneWhen: 'All package exports render' },
-    { id: '3', title: 'Catalog contract', status: 'done', blocker: 'none', next: 'Done', owner: 'QA', due: '2026-08-15', doneWhen: 'Denominator is derived' },
-  ]);
-  const standup = $derived(buildStandupText(orderPacks(workflowPacks)));
 
   onDestroy(() => { asyncRequest += 1; });
 
@@ -223,7 +215,7 @@
     <div class="control-row"><Button size="sm" variant="primary" onclick={validateForm}>Validate locally</Button><Button size="sm" onclick={resetForm}>Reset form</Button></div><p class="live-output" data-output="form" aria-live="polite">{formStatus}</p>
 
   {:else if id === 'layout-surfaces'}
-    <p class="contract-note">Read-only composition example</p><Panel sectionLabel="Delivery" heading="Launch readiness" headingLevel={3}><p>All 26 package examples are connected to one catalog.</p><Divider label="Evidence" /><strong>Workspace, component, build, and browser checks are required.</strong></Panel>
+    <p class="contract-note">Read-only composition example</p><Panel sectionLabel="Delivery" heading="Launch readiness" headingLevel={3}><p>All 25 package examples are connected to one catalog.</p><Divider label="Evidence" /><strong>Workspace, component, build, and browser checks are required.</strong></Panel>
 
   {:else if id === 'multi-select'}
     <label class="field-label" for="catalog-priorities">Priorities</label><MultiSelect id="catalog-priorities" aria-label="Priorities" size={3} bind:value={priorities} options={[{ value: 'low', label: 'Low' }, { value: 'high', label: 'High' }, { value: 'paused', label: 'Paused', disabled: true }]} />
@@ -269,9 +261,6 @@
   {:else if id === 'undo'}
     <div class="control-row"><Button variant="primary" disabled={undoTitle === 'Reviewed catalog'} onclick={renameDraft}>Rename local draft</Button><Button onclick={resetUndo}>Reset history</Button></div><p class="live-output" data-output="undo-model">Title: {undoTitle}</p><UndoReceipt action={undoAction} {canUndo} {canRedo} onundo={undoRename} onredo={redoRename} />
 
-  {:else if id === 'workflow'}
-    <div class="control-row"><Button size="sm" onclick={() => workflowBlocked = !workflowBlocked}>{workflowBlocked ? 'Clear local blocker' : 'Restore local blocker'}</Button><Button size="sm" disabled={workflowBlocked} onclick={() => workflowBlocked = true}>Reset workflow</Button></div><p class="standup" data-output="workflow"><strong>Standup:</strong> {standup}<span>Navigation coverage: {workflowBlocked ? 'blocked' : 'active'}</span></p>
-    <div class="table-scroll"><table><thead><tr><th>Title</th><th>Status</th><th>Next</th></tr></thead><tbody>{#each orderPacks(workflowPacks) as pack (pack.id)}<tr><td>{pack.title}</td><td>{pack.status}</td><td>{hasBlocker(pack) ? 'Review blocker' : primaryCommand(pack).label}</td></tr>{/each}</tbody></table></div>
   {/if}
 </div>
 
@@ -279,8 +268,7 @@
   .example-surface { box-sizing: border-box; display: grid; gap: 12px; max-width: 100%; min-width: 0; }
   .example-stack { display: grid; gap: 12px; min-width: 0; }
   .control-row { align-items: center; display: flex; flex-wrap: wrap; gap: 10px; min-width: 0; }
-  .live-output, .standup { color: var(--worn-text-muted); font-size: 13px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
-  .standup span { display: block; }
+  .live-output { color: var(--worn-text-muted); font-size: 13px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
   .contract-note { color: var(--worn-text-secondary); font-size: 12px; font-weight: 700; letter-spacing: .03em; margin: 0; text-transform: uppercase; }
   .form-grid { display: grid; gap: 7px; max-width: 32rem; min-width: 0; }
   .field-label { color: var(--worn-text-muted); font-size: 12px; font-weight: 650; }
@@ -305,10 +293,6 @@
   .theme-swatches span:nth-child(2) { background: var(--worn-surface); color: var(--worn-text); }
   .theme-swatches span:nth-child(3) { background: var(--worn-accent); color: var(--worn-accent-text); }
   .theme-swatches span:nth-child(4) { background: var(--worn-danger-bg); color: var(--worn-danger-text); }
-  .table-scroll { max-width: 100%; overflow-x: auto; }
-  table { border-collapse: collapse; font-size: 13px; min-width: 32rem; width: 100%; }
-  th, td { border-bottom: 1px solid var(--worn-border); padding: 8px 10px; text-align: left; }
-  th { color: var(--worn-text-muted); font-size: 11px; text-transform: uppercase; }
   @media (max-width: 480px) {
     .selection-grid, .theme-swatches { grid-template-columns: minmax(0, 1fr); }
     .control-row { align-items: stretch; flex-direction: column; }

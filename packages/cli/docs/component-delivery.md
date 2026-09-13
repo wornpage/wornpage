@@ -33,7 +33,7 @@ source-sync workflow have been retired.
    schema is version 2; the retired global-tag shape is rejected.
 2. Merge the reviewed source change into the default branch after verification.
 3. Wait for the successful **Wornpage workspace** run on `main`. That one CI run
-   verifies and packs all 26 packages and uploads the whole-catalog packages
+   verifies and packs all 25 packages and uploads the whole-catalog packages
    with its eight-stage receipt. Pull requests and failed runs retain diagnostic
    evidence only; they are never release inputs.
 4. The repository owner uses a clean checkout of that exact current `main` and
@@ -56,7 +56,7 @@ source-sync workflow have been retired.
    packages locally as a release fallback.
 
    A changed archive must have a changed version and release tag. The helper
-   creates no release when all 26 packages are unchanged; otherwise it creates
+   creates no release when all 25 packages are unchanged; otherwise it creates
    a draft containing the full manifest and only the changed archives.
 5. Review that draft's assets, then publish it. Replace `TAG` below with the new
    tag assigned to the changed packages:

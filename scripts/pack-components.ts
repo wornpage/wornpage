@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { COMPONENT_NAMES, COMPONENT_RELEASES } from './components.ts';
 import { inspectPackage } from '../packages/cli/src/commands/verify.ts';
@@ -29,6 +29,7 @@ export function validatePackedEntries(files: string[], required: string[]) {
 
 export async function packComponents(root = resolve(import.meta.dir, '..')) {
   const output = join(root, COMPONENT_PACK_OUTPUT);
+  await rm(output, { recursive: true, force: true });
   await mkdir(output, { recursive: true });
   const sourceCommit = await run(['git', 'rev-parse', 'HEAD'], root);
   const packages = [];

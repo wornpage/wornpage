@@ -5,11 +5,11 @@
 | [Projects](https://projects-webmcp-extension.pages.dev/webmcp-challenge) | The application and published WebMCP Challenge edition. | [`projects-webmcp-extension`](https://github.com/wornpage/projects-webmcp-extension), preserved independently. |
 | [Components](https://wornpage-components.pages.dev) | One Svelte interface library, catalog, and development toolkit. | This repository: [`packages/`](../packages), [`demo/`](../demo), and [`tools/`](../tools). |
 | [WebMCP Conformance](https://github.com/wornpage/webmcp-conformance) | Framework-neutral descriptor, authority, lifecycle, receipt, and consumer validation. | `webmcp-conformance`. |
-| [PR Machine](https://github.com/wornpage/projects-pr-machine) | Verified draft PR delivery for reviewed agent work. | `projects-pr-machine`. |
+| [PR Machine](https://github.com/wornpage/projects-pr-machine) | Bounded local Git and GitHub runner for the private Projects service; ready-for-review, merge, and deploy remain repository-owner decisions. | [`projects-pr-machine` runner contract](https://github.com/wornpage/projects-pr-machine/blob/main/docs/projects-pr.md). |
 
 ## Components
 
-All 26 component and supporting packages are developed here. Package names and
+All 25 component and supporting packages are developed here. Package names and
 versions and immutable per-package release tags are explicit in
 [`components-release.json`](../components-release.json).
 Use the [setup guide](getting-started.md) to install immutable release archives,

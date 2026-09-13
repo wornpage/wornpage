@@ -117,7 +117,7 @@ test -f "$fixture_sources/unrelated.sources"
 		}
 		const steps = Object.values(parsed.jobs).flatMap((job) => job.steps);
 		const commands = steps.map((step) => step.run ?? "").join("\n");
-		expect(commands).toContain("bun run verify:catalog");
+		expect(commands).toContain("node scripts/verify-public-workflow-boundary.mjs");
 		expect(commands).not.toMatch(/prepare-component-release|gh\s+release/u);
 		const releaseUpload = steps.find((step) => step.name === "Upload release packages and verification evidence");
 		expect(releaseUpload?.if).toContain("success()");

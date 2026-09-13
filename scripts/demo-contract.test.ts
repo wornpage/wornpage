@@ -53,7 +53,7 @@ describe('aggregate demo contract', () => {
 
   test('uses the explicit catalog for grouped navigation and rendered sections', () => {
     expect(appSource).toContain('const sections = DEMO_CATALOG.map(({ id }) => id);');
-    expect(DEMO_CATALOG).toHaveLength(26);
+    expect(DEMO_CATALOG).toHaveLength(25);
     expect(appSource).toContain('<h1>Svelte component library</h1>');
     expect(appSource).toContain('<p>{DEMO_CATALOG.length} components and supporting packages for clear, keyboard-friendly interfaces.</p>');
     expect(appSource).toContain('function iconForCategory(category: CatalogCategory): NavIcon');
@@ -110,10 +110,9 @@ describe('aggregate demo contract', () => {
     expect(appSource).toContain('grid-template-columns: auto minmax(0, 1fr)');
     expect(appSource).toContain('.demo-main { box-sizing: border-box; min-width: 0;');
     expect(appSource).toContain('--wrn-theme-text: var(--worn-text);');
-    expect(exampleSource).toContain('.table-scroll { max-width: 100%; overflow-x: auto; }');
     expect(tabsSource).toMatch(/\.worn-tabs\s*\{[^}]*overflow-x:\s*auto;/su);
     expect(appSource).not.toContain('overflow-x:');
-    expect(exampleSource.match(/overflow-x:\s*auto;/gu)?.length).toBe(1);
+    expect(exampleSource).not.toContain('overflow-x:');
     expect(combinedDemoSource).not.toMatch(/:global\((?:html|body)\)[^{]*\{[^}]*overflow-x:\s*(?:clip|hidden)/su);
   });
 
@@ -122,7 +121,7 @@ describe('aggregate demo contract', () => {
     expect(appSource).toMatch(/\.catalog-jump label\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
     expect(appSource).toMatch(/\.category-heading\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
     expect(appSource).toMatch(/\.section-heading code\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
-    expect(exampleSource).toMatch(/\.live-output, \.standup\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
+    expect(exampleSource).toMatch(/\.live-output\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
     expect(exampleSource).toMatch(/\.field-label\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
     expect(exampleSource).toMatch(/\.data-list span\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
     expect(exampleSource).toMatch(/\.tab-panel\s*\{[^}]*color:\s*var\(--worn-text-muted\)/su);
@@ -139,6 +138,7 @@ describe('aggregate demo contract', () => {
     expect(rootPackage.devDependencies.playwright).toBe('1.62.0');
     expect(rootPackage.scripts['test:catalog:browser']).toBe('node --test scripts/catalog-rendered-readiness-browser.mjs && node scripts/catalog-browser-check.mjs');
     expect(rootPackage.scripts['verify:catalog']).toBe('node scripts/verify-catalog.mjs');
+    expect(rootPackage.scripts['verify:public-workflow-boundary']).toBe('node scripts/verify-public-workflow-boundary.mjs');
     for (const command of ['bun run check:workspace', 'bun run check:components', 'bun test', 'bun run pack:components', 'bun run build', 'bun run test:catalog:browser']) {
       expect(catalogVerifierSource).toContain(`command: '${command}'`);
     }

@@ -55,7 +55,6 @@ export const DEMO_CATALOG = [
 
   { id: 'scenarios', label: 'Scenarios', category: 'workflow', description: 'Canonical scenario metadata and validation for demo applications.', exampleMarker: 'SCENARIOS', exampleKind: 'output' },
   { id: 'sync', label: 'Sync', category: 'workflow', description: 'Shareable codes and QR output without an account.', exampleMarker: 'generateSyncCode', exampleKind: 'output' },
-  { id: 'workflow', label: 'Workflow', category: 'workflow', description: 'Pure pack ordering, blocker, command, and standup decisions.', exampleMarker: 'buildStandupText', exampleKind: 'output' },
 ] as const satisfies readonly DemoCatalogEntry[];
 
 export type DemoCatalogId = (typeof DEMO_CATALOG)[number]['id'];

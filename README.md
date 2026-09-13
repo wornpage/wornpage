@@ -10,13 +10,13 @@ workflows, published as `@wornpage`.
 | **Projects — application work and public challenge** | A frozen WebMCP challenge submission, separate from the private production app. Browser agents can inspect visible evidence and prepare drafts for human review. | [Open the WebMCP challenge demo](https://projects-webmcp-extension.pages.dev/webmcp-challenge) · [Challenge source](https://github.com/wornpage/projects-webmcp-extension) |
 | **Components — Svelte component library** | Build Svelte 5 interfaces with shared interaction patterns, keyboard support, themes, and verified package delivery. | [Browse the catalog](https://wornpage-components.pages.dev) · [Setup guide](docs/getting-started.md) |
 | **WebMCP Conformance — the validation toolkit** | Check page-owned tool declarations, authority limits, lifecycle behavior, and action receipts. | [Source and checks](https://github.com/wornpage/webmcp-conformance) |
-| **PR Machine — the delivery tool** | Turn reviewed agent work into a verified draft pull request. The repository owner controls merging. Public beta. | [Install and use](https://github.com/wornpage/projects-pr-machine#install) · [Workflow evidence](https://github.com/wornpage/projects-pr-machine/blob/main/docs/challenge-extension-case-study.md) |
+| **PR Machine — the bounded delivery runner** | A local Git and GitHub runner performs fixed draft-delivery actions selected by the private Projects service. The repository owner separately decides ready-for-review, merge, and deploy. | [Runner requirements](https://github.com/wornpage/projects-pr-machine#requirements) · [CLI guide](https://github.com/wornpage/projects-pr-machine#cli) |
 
 These are the four public entry points. Read the short [portfolio case study](docs/portfolio.md) for the demonstrated controls and their limits. All component source now lives here under **`packages/`**; see the [repository map](docs/repository-map.md) for source ownership and contribution paths.
 
 ## Svelte component library
 
-This repository is the Wornpage overview and the integration catalog for 26
+This repository is the Wornpage overview and the integration catalog for 25
 component and supporting packages, three development tools, and a CLI. This repository owns package source, the catalog, and immutable component releases.
 
 Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-started.md).
@@ -24,7 +24,7 @@ Start with the compact, copyable [Svelte 5 component setup guide](docs/getting-s
 <details>
 <summary><strong>Installation, component catalog, architecture, and contributing</strong></summary>
 
-> One component library: 26 component and supporting packages, three development
+> One component library: 25 component and supporting packages, three development
 > tools, and one internal CLI. Install versioned package archives from this repository's immutable GitHub releases. The `@wornpage` npm scope is not a supported distribution path.
 
 Live catalog: <https://wornpage-components.pages.dev>
@@ -83,7 +83,6 @@ for Button and Theme release archives and a complete example.
 | `@wornpage/theme` | [packages/theme](packages/theme) | `browser-bundle` | Persistent multi-theme CSS custom properties |
 | `@wornpage/toast` | [packages/toast](packages/toast) | `browser-bundle` | Toast notifications with contextual dismissal |
 | `@wornpage/undo` | [packages/undo](packages/undo) | `browser-bundle` | Receipt-oriented undo and redo stack |
-| `@wornpage/workflow` | [packages/workflow](packages/workflow) | `source` | Pack state machine for blocker and next-action flow |
 | `@wornpage/cli` | [packages/cli](packages/cli) | `tooling` | Workspace scaffolding and release verification |
 
 ### Tools (`tools/` — monorepo-native)
