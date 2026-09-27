@@ -2,11 +2,22 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
-const canonical = 'https://github.com/wornpage/components';
+function currentLibraryLink(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname === 'github.com' && !url.port && !url.username && !url.password
+      && /^\/wornpage\/components(?:\/|$)/u.test(url.pathname);
+  } catch { return false; }
+}
+assert.equal(currentLibraryLink('https://github.com/wornpage/components'), true);
+assert.equal(currentLibraryLink('https://github.com.evil.example/wornpage/components'), false);
+assert.equal(currentLibraryLink('https://evil.example/github.com/wornpage/components'), false);
+assert.equal(currentLibraryLink('https://github.com/wornpage/components-other'), false);
 const documents = ['README.md', 'CONTRIBUTING.md', 'docs/getting-started.md', 'docs/repository-map.md'];
 for (const file of documents) {
   const text = readFileSync(file, 'utf8');
-  assert.ok(text.includes(canonical), `${file} must point to the active library`);
+  const links = [...text.matchAll(/\]\((https:\/\/[^)\s]+)\)/gu)].map(match => match[1]);
+  assert.ok(links.some(currentLibraryLink), `${file} must point to the active library`);
   assert.doesNotMatch(text, /https:\/\/github\.com\/wornpage\/(?:projects-pr-machine|wornpage\/releases\/download)\b/u, `${file} contains a retired installation link`);
 }
 const event = process.env.GITHUB_EVENT_PATH ? JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')) : null;
