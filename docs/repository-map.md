@@ -1,30 +1,12 @@
-# Wornpage repository map
+# Current repository map
 
-| Start here | Role | Canonical source |
-| --- | --- | --- |
-| [Projects](https://projects-webmcp-extension.pages.dev/webmcp-challenge) | The application and published WebMCP Challenge edition. | [`projects-webmcp-extension`](https://github.com/wornpage/projects-webmcp-extension), preserved independently. |
-| [Components](https://wornpage-components.pages.dev) | One Svelte interface library, catalog, and development toolkit. | This repository: [`packages/`](../packages), [`demo/`](../demo), and [`tools/`](../tools). |
-| [WebMCP Conformance](https://github.com/wornpage/webmcp-conformance) | Framework-neutral descriptor, authority, lifecycle, receipt, and consumer validation. | `webmcp-conformance`. |
-| [PR Machine](https://github.com/wornpage/projects-pr-machine) | Bounded local Git and GitHub runner for the private Projects service; ready-for-review, merge, and deploy remain repository-owner decisions. | [`projects-pr-machine` runner contract](https://github.com/wornpage/projects-pr-machine/blob/main/docs/projects-pr.md). |
+[wornpage/components](https://github.com/wornpage/components) owns active
+component source, the catalog, and component releases. This repository retains
+the earlier workspace and history.
 
-## Components
+Use the maintained [repository map](https://github.com/wornpage/components/blob/main/docs/repository-map.md)
+for the public Projects edition, component library, conformance toolkit, and
+bounded [PR runner](https://github.com/wornpage/pr-runner).
 
-All 25 component and supporting packages are developed here. Package names and
-versions and immutable per-package release tags are explicit in
-[`components-release.json`](../components-release.json).
-Use the [setup guide](getting-started.md) to install immutable release archives,
-and [CONTRIBUTING.md](../CONTRIBUTING.md) to change the library.
-
-The standalone repositories are historical sources. Fourteen remain publicly
-readable for fixed dependencies in the published Projects edition and other
-existing consumers. The remaining twelve package repositories and the former
-standalone CLI can retire to private GitHub history after their consumers have
-migrated. The [migration record](component-migration.md) documents that boundary.
-
-## Other repositories
-
-[`.github`](https://github.com/wornpage/.github) owns shared community files.
-Upstream forks are labeled separately and are not additional Wornpage products.
-
-The catalog, components, and conformance toolkit use MIT. PR Machine uses
-AGPL-3.0-only. Consult each repository's license for the code you use.
+Historical standalone component repositories remain available for consumers
+with exact archive pins. This guidance does not change their visibility or URLs.
